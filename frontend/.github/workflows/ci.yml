@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Pipeline conforme à rules/cicd.md : Lint → Format → Tests → Build.
+# NEXT_PUBLIC_* sont des valeurs factices ici : ce ne sont pas des secrets (embarquées telles
+# quelles dans le bundle JS, voir src/lib/firebase.ts), mais le build Next.js a besoin qu'elles
+# existent pour s'exécuter sans .env.local.
+jobs:
+  lint-test-build:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_API_URL: "http://localhost:4000/api"
+      NEXT_PUBLIC_FIREBASE_API_KEY: "ci-placeholder"
+      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "ci-placeholder.firebaseapp.com"
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: "ci-placeholder"
+      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "ci-placeholder.appspot.com"
+      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "000000000000"
+      NEXT_PUBLIC_FIREBASE_APP_ID: "1:000000000000:web:ci"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build

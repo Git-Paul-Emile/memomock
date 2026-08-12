@@ -1,0 +1,200 @@
+﻿{
+    "documents":  [
+                      {
+                          "statut":  "soumis",
+                          "id":  "doc1",
+                          "etudiantId":  "u5",
+                          "scoreConformite":  0,
+                          "nomFichier":  "v1.docx",
+                          "titre":  "Impact de l\u0027IA",
+                          "scoreFond":  0,
+                          "dateSoumission":  "2026-07-08T09:12:00.000Z",
+                          "encadrantId":  "u2",
+                          "scoreForme":  0
+                      },
+                      {
+                          "statut":  "analyse_en_cours",
+                          "id":  "doc2",
+                          "etudiantId":  "u6",
+                          "scoreConformite":  0,
+                          "nomFichier":  "v1.pdf",
+                          "titre":  "Architectures microservices",
+                          "scoreFond":  0,
+                          "dateSoumission":  "2026-07-09T14:30:00.000Z",
+                          "encadrantId":  "u2",
+                          "scoreForme":  0
+                      }
+                  ],
+    "notifications":  [
+
+                      ],
+    "logsErreurs":  [
+
+                    ],
+    "users":  [
+                  {
+                      "id":  "u1",
+                      "provider":  "password",
+                      "nom":  "Système",
+                      "password":  "admin123",
+                      "prenom":  "Admin",
+                      "role":  "admin",
+                      "createdAt":  "2026-01-05T09:00:00.000Z",
+                      "email":  "admin@memoai.fr"
+                  },
+                  {
+                      "id":  "u2",
+                      "provider":  "password",
+                      "nom":  "Leroux",
+                      "password":  "encadrant123",
+                      "prenom":  "Jérôme",
+                      "role":  "encadrant",
+                      "createdAt":  "2026-01-06T09:00:00.000Z",
+                      "email":  "j.leroux@memoai.fr"
+                  },
+                  {
+                      "id":  "u3",
+                      "provider":  "password",
+                      "nom":  "Sarr",
+                      "password":  "encadrant123",
+                      "prenom":  "Fatou",
+                      "role":  "encadrant",
+                      "createdAt":  "2026-01-06T09:05:00.000Z",
+                      "email":  "f.sarr@memoai.fr"
+                  },
+                  {
+                      "id":  "u4",
+                      "provider":  "password",
+                      "nom":  "Belhadj",
+                      "password":  "encadrant123",
+                      "prenom":  "Karim",
+                      "role":  "encadrant",
+                      "createdAt":  "2026-01-06T09:10:00.000Z",
+                      "email":  "k.belhadj@memoai.fr"
+                  },
+                  {
+                      "id":  "u5",
+                      "nom":  "Diallo",
+                      "createdAt":  "2026-02-01T10:00:00.000Z",
+                      "password":  "etudiant123",
+                      "prenom":  "Amina",
+                      "role":  "etudiant",
+                      "provider":  "password",
+                      "filiere":  "Master 2 Informatique",
+                      "encadrantId":  "u2",
+                      "email":  "amina.diallo@etu.memoai.fr"
+                  },
+                  {
+                      "id":  "u6",
+                      "nom":  "Morel",
+                      "createdAt":  "2026-02-01T10:05:00.000Z",
+                      "password":  "etudiant123",
+                      "prenom":  "Yanis",
+                      "role":  "etudiant",
+                      "provider":  "password",
+                      "filiere":  "Master 2 Informatique",
+                      "encadrantId":  "u2",
+                      "email":  "y.morel@etu.memoai.fr"
+                  },
+                  {
+                      "id":  "u7",
+                      "nom":  "Bernard",
+                      "createdAt":  "2026-02-02T10:00:00.000Z",
+                      "password":  "etudiant123",
+                      "prenom":  "Chloé",
+                      "role":  "etudiant",
+                      "provider":  "password",
+                      "filiere":  "Master 2 Sciences de gestion",
+                      "encadrantId":  "u3",
+                      "email":  "c.bernard@etu.memoai.fr"
+                  },
+                  {
+                      "id":  "u8",
+                      "nom":  "Ba",
+                      "createdAt":  "2026-02-02T10:10:00.000Z",
+                      "password":  "etudiant123",
+                      "prenom":  "Mamadou",
+                      "role":  "etudiant",
+                      "provider":  "password",
+                      "filiere":  "Master 2 Sciences de gestion",
+                      "encadrantId":  "u3",
+                      "email":  "m.ba@etu.memoai.fr"
+                  }
+              ],
+    "temoignages":  [
+                        {
+                            "id":  "tem1",
+                            "contenu":  "Plateforme excellente.",
+                            "note":  5,
+                            "etudiantId":  "u5",
+                            "dateCreation":  "2026-07-10T09:00:00.000Z",
+                            "titre":  "Utile et motivant"
+                        },
+                        {
+                            "id":  "tem2",
+                            "contenu":  "Facile à utiliser.",
+                            "note":  4,
+                            "etudiantId":  "u7",
+                            "dateCreation":  "2026-07-08T15:30:00.000Z",
+                            "titre":  "Interface intuitive"
+                        }
+                    ],
+    "revisions":  [
+
+                  ],
+    "messages":  [
+
+                 ],
+    "commentairesMarges":  [
+
+                           ],
+    "faq":  [
+                {
+                    "reponse":  "Via l\u0027onglet Documents.",
+                    "categorie":  "soumission",
+                    "id":  "faq1",
+                    "titre":  "Comment soumettre ?"
+                },
+                {
+                    "reponse":  "Conformité, Forme, Fond.",
+                    "categorie":  "analyses",
+                    "id":  "faq2",
+                    "titre":  "Les scores ?"
+                }
+            ],
+    "passwordResets":  [
+
+                       ],
+    "filesAttente":  [
+
+                     ],
+    "reglesApprises":  [
+
+                       ],
+    "analyses":  [
+
+                 ],
+    "encadrants":  [
+                       {
+                           "email":  "j.leroux@memoai.fr",
+                           "nom":  "Leroux",
+                           "id":  "u2",
+                           "prenom":  "Jérôme"
+                       },
+                       {
+                           "email":  "f.sarr@memoai.fr",
+                           "nom":  "Sarr",
+                           "id":  "u3",
+                           "prenom":  "Fatou"
+                       },
+                       {
+                           "email":  "k.belhadj@memoai.fr",
+                           "nom":  "Belhadj",
+                           "id":  "u4",
+                           "prenom":  "Karim"
+                       }
+                   ],
+    "invitations":  [
+
+                    ]
+}
