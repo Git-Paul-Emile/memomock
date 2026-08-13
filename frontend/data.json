@@ -1,0 +1,1250 @@
+{
+  "documents": [
+    {
+      "id": "doc1",
+      "etudiantId": "u5",
+      "encadrantId": "u2",
+      "titre": "Impact de l'IA générative sur la pédagogie universitaire",
+      "nomFichier": "diallo_memoire_v1.docx",
+      "tailleOctets": 842112,
+      "statut": "soumis",
+      "scoreConformite": 0,
+      "scoreForme": 0,
+      "scoreFond": 0,
+      "dateSoumission": "2026-07-08T09:12:00.000Z",
+      "version": 1,
+      "dateMaj": "2026-07-08T09:12:00.000Z",
+      "scoreCoherence": 0,
+      "typeDocument": "master",
+      "discipline": "Informatique",
+      "profilEncadrantId": "pe1"
+    },
+    {
+      "id": "doc2",
+      "etudiantId": "u6",
+      "encadrantId": "u2",
+      "titre": "Optimisation des architectures microservices sous charge variable",
+      "nomFichier": "morel_memoire_v1.pdf",
+      "tailleOctets": 1230456,
+      "statut": "analyse_en_cours",
+      "scoreConformite": 0,
+      "scoreForme": 0,
+      "scoreFond": 0,
+      "dateSoumission": "2026-07-09T14:30:00.000Z",
+      "version": 1,
+      "dateMaj": "2026-07-09T14:30:00.000Z",
+      "scoreCoherence": 0,
+      "typeDocument": "master",
+      "discipline": "Informatique",
+      "profilEncadrantId": "pe1"
+    },
+    {
+      "id": "doc3",
+      "etudiantId": "u7",
+      "encadrantId": "u3",
+      "titre": "La transformation digitale des PME familiales en France",
+      "nomFichier": "bernard_memoire_v1.docx",
+      "tailleOctets": 987654,
+      "statut": "analyse_terminee",
+      "scoreConformite": 71,
+      "scoreForme": 82,
+      "scoreFond": 60,
+      "dateSoumission": "2026-07-05T11:00:00.000Z",
+      "version": 1,
+      "dateMaj": "2026-07-05T11:00:00.000Z",
+      "scoreCoherence": 60,
+      "typeDocument": "master",
+      "discipline": "Sciences de gestion",
+      "profilEncadrantId": "pe2"
+    },
+    {
+      "id": "doc4",
+      "etudiantId": "u8",
+      "encadrantId": "u3",
+      "titre": "Facteurs d'adoption du télétravail dans les PME post-2025",
+      "nomFichier": "ba_memoire_v2.docx",
+      "tailleOctets": 1102345,
+      "statut": "en_correction",
+      "scoreConformite": 74,
+      "scoreForme": 85,
+      "scoreFond": 68,
+      "dateSoumission": "2026-07-02T09:00:00.000Z",
+      "version": 2,
+      "dateMaj": "2026-07-02T09:00:00.000Z",
+      "scoreCoherence": 68,
+      "typeDocument": "master",
+      "discipline": "Sciences de gestion",
+      "profilEncadrantId": "pe2"
+    },
+    {
+      "id": "doc5",
+      "etudiantId": "u9",
+      "encadrantId": "u4",
+      "titre": "Le RGPD face aux modèles de langage génératifs",
+      "nomFichier": "petit_memoire_v2.pdf",
+      "tailleOctets": 1345678,
+      "statut": "pret_pour_encadrant",
+      "scoreConformite": 86,
+      "scoreForme": 90,
+      "scoreFond": 82,
+      "dateSoumission": "2026-06-28T09:00:00.000Z",
+      "version": 2,
+      "dateMaj": "2026-06-28T09:00:00.000Z",
+      "scoreCoherence": 82,
+      "typeDocument": "master",
+      "discipline": "Droit du numérique",
+      "profilEncadrantId": "pe3"
+    },
+    {
+      "id": "doc6",
+      "etudiantId": "u10",
+      "encadrantId": "u4",
+      "titre": "Responsabilité juridique des agents IA autonomes en droit français",
+      "nomFichier": "rossi_memoire_v2.docx",
+      "tailleOctets": 1189234,
+      "statut": "en_relecture",
+      "scoreConformite": 88,
+      "scoreForme": 91,
+      "scoreFond": 85,
+      "dateSoumission": "2026-06-25T09:00:00.000Z",
+      "version": 2,
+      "dateMaj": "2026-06-25T09:00:00.000Z",
+      "scoreCoherence": 85,
+      "typeDocument": "master",
+      "discipline": "Droit du numérique",
+      "profilEncadrantId": "pe3"
+    },
+    {
+      "id": "doc7",
+      "etudiantId": "u5",
+      "encadrantId": "u2",
+      "titre": "Systèmes de recommandation pédagogique adaptatifs",
+      "nomFichier": "diallo_memoire_final.docx",
+      "tailleOctets": 1450000,
+      "statut": "valide",
+      "scoreConformite": 95,
+      "scoreForme": 96,
+      "scoreFond": 94,
+      "note": "18 / 20",
+      "appreciation": "Travail solide sur le fond et la méthodologie. La partie critique gagnerait encore à discuter les limites de l'échantillon, mais l'ensemble est de très bonne qualité.",
+      "dateSoumission": "2026-06-10T09:00:00.000Z",
+      "version": 3,
+      "dateMaj": "2026-06-10T09:00:00.000Z",
+      "scoreCoherence": 94,
+      "typeDocument": "master",
+      "discipline": "Informatique",
+      "profilEncadrantId": "pe1"
+    },
+    {
+      "id": "doc8",
+      "etudiantId": "u6",
+      "encadrantId": "u2",
+      "titre": "Étude comparative des bases de données vectorielles",
+      "nomFichier": "morel_memoire_ancien.pdf",
+      "tailleOctets": 765432,
+      "statut": "rejete",
+      "scoreConformite": 45,
+      "scoreForme": 50,
+      "scoreFond": 40,
+      "dateSoumission": "2026-05-20T09:00:00.000Z",
+      "version": 1,
+      "dateMaj": "2026-05-20T09:00:00.000Z",
+      "scoreCoherence": 40,
+      "typeDocument": "master",
+      "discipline": "Informatique",
+      "profilEncadrantId": "pe1"
+    }
+  ],
+  "notifications": [],
+  "logsErreurs": [],
+  "users": [
+    {
+      "id": "u1",
+      "role": "admin",
+      "nom": "Système",
+      "prenom": "Admin",
+      "email": "admin@memoai.fr",
+      "createdAt": "2026-01-05T09:00:00.000Z",
+      "password": "admin123",
+      "telephoneVerifie": false
+    },
+    {
+      "id": "u2",
+      "role": "encadrant",
+      "nom": "Leroux",
+      "prenom": "Jérôme",
+      "email": "j.leroux@memoai.fr",
+      "createdAt": "2026-01-06T09:00:00.000Z",
+      "password": "encadrant123",
+      "telephoneVerifie": false
+    },
+    {
+      "id": "u3",
+      "role": "encadrant",
+      "nom": "Sarr",
+      "prenom": "Fatou",
+      "email": "f.sarr@memoai.fr",
+      "createdAt": "2026-01-06T09:05:00.000Z",
+      "password": "encadrant123",
+      "telephoneVerifie": false
+    },
+    {
+      "id": "u4",
+      "role": "encadrant",
+      "nom": "Belhadj",
+      "prenom": "Karim",
+      "email": "k.belhadj@memoai.fr",
+      "createdAt": "2026-01-06T09:10:00.000Z",
+      "password": "encadrant123",
+      "telephoneVerifie": false
+    },
+    {
+      "id": "u5",
+      "role": "etudiant",
+      "nom": "Diallo",
+      "prenom": "Amina",
+      "email": "amina.diallo@etu.memoai.fr",
+      "encadrantId": "u2",
+      "filiere": "Master 2 Informatique",
+      "createdAt": "2026-02-01T10:00:00.000Z",
+      "password": "etudiant123",
+      "telephoneVerifie": false
+    },
+    {
+      "id": "u6",
+      "role": "etudiant",
+      "nom": "Morel",
+      "prenom": "Yanis",
+      "email": "y.morel@etu.memoai.fr",
+      "encadrantId": "u2",
+      "filiere": "Master 2 Informatique",
+      "createdAt": "2026-02-01T10:05:00.000Z",
+      "password": "etudiant123",
+      "telephoneVerifie": false
+    },
+    {
+      "id": "u7",
+      "role": "etudiant",
+      "nom": "Bernard",
+      "prenom": "Chloé",
+      "email": "c.bernard@etu.memoai.fr",
+      "encadrantId": "u3",
+      "filiere": "Master 2 Sciences de gestion",
+      "createdAt": "2026-02-02T10:00:00.000Z",
+      "password": "etudiant123",
+      "telephoneVerifie": false
+    },
+    {
+      "id": "u8",
+      "role": "etudiant",
+      "nom": "Ba",
+      "prenom": "Mamadou",
+      "email": "m.ba@etu.memoai.fr",
+      "encadrantId": "u3",
+      "filiere": "Master 2 Sciences de gestion",
+      "createdAt": "2026-02-02T10:10:00.000Z",
+      "password": "etudiant123",
+      "telephoneVerifie": false
+    },
+    {
+      "id": "u9",
+      "role": "etudiant",
+      "nom": "Petit",
+      "prenom": "Lucas",
+      "email": "l.petit@etu.memoai.fr",
+      "encadrantId": "u4",
+      "filiere": "Master 2 Droit du numérique",
+      "createdAt": "2026-02-03T10:00:00.000Z",
+      "password": "etudiant123",
+      "telephoneVerifie": false
+    },
+    {
+      "id": "u10",
+      "role": "etudiant",
+      "nom": "Rossi",
+      "prenom": "Sofia",
+      "email": "s.rossi@etu.memoai.fr",
+      "encadrantId": "u4",
+      "filiere": "Master 2 Droit du numérique",
+      "createdAt": "2026-02-03T10:15:00.000Z",
+      "password": "etudiant123",
+      "telephoneVerifie": false
+    },
+    {
+      "id": "u11",
+      "role": "admin",
+      "nom": "Fall",
+      "prenom": "Aïda",
+      "email": "admin.paris-saclay@memoai.fr",
+      "createdAt": "2026-01-05T09:10:00.000Z",
+      "password": "admin123",
+      "telephoneVerifie": false
+    },
+    {
+      "id": "u12",
+      "role": "admin",
+      "nom": "Diop",
+      "prenom": "Moussa",
+      "email": "admin.lyon2@memoai.fr",
+      "createdAt": "2026-01-05T09:15:00.000Z",
+      "password": "admin123",
+      "telephoneVerifie": false
+    }
+  ],
+  "temoignages": [
+    {
+      "id": "temoignage1",
+      "ordre": 1,
+      "nom": "Amina Diallo",
+      "role": "Étudiante en Master 2 Informatique - Université Paris-Saclay",
+      "citation": "Le score de conformité m'a évité plusieurs allers-retours inutiles avec mon encadrant : je corrige la forme avant même de lui envoyer mon document."
+    },
+    {
+      "id": "temoignage2",
+      "ordre": 2,
+      "nom": "Jérôme Leroux",
+      "role": "Encadrant - Université Paris-Saclay",
+      "citation": "Je passe enfin mon temps de relecture sur le fond scientifique. Les corrections répétitives de forme sont déjà faites quand le document arrive sur mon bureau."
+    },
+    {
+      "id": "temoignage3",
+      "ordre": 3,
+      "nom": "Lucas Petit",
+      "role": "Étudiant en Master 2 Droit du numérique - Université Lumière Lyon 2",
+      "citation": "Le tuteur IA explique pourquoi une correction est suggérée, pas seulement quoi corriger. J'ai l'impression de progresser, pas juste de suivre des instructions."
+    },
+    {
+      "id": "temoignage4",
+      "ordre": 4,
+      "nom": "Fatou Sarr",
+      "role": "Encadrante - Université Paris-Saclay",
+      "citation": "Configurer mes exigences une fois (normes, grille d'évaluation) puis les voir appliquées automatiquement à chaque étudiant m'a fait gagner un temps considérable."
+    }
+  ],
+  "revisions": [
+    {
+      "id": "seg1",
+      "documentId": "doc7",
+      "paragraphe": 0,
+      "ordre": 0,
+      "texte": "L'intelligence artificielle générative ",
+      "type": "normal"
+    },
+    {
+      "id": "seg2",
+      "documentId": "doc7",
+      "paragraphe": 0,
+      "ordre": 1,
+      "texte": "est en train de ",
+      "type": "supprime"
+    },
+    {
+      "id": "seg3",
+      "documentId": "doc7",
+      "paragraphe": 0,
+      "ordre": 2,
+      "texte": "transforme ",
+      "type": "ajoute"
+    },
+    {
+      "id": "seg4",
+      "documentId": "doc7",
+      "paragraphe": 0,
+      "ordre": 3,
+      "texte": "en profondeur les pratiques pédagogiques dans l'enseignement supérieur.",
+      "type": "normal"
+    },
+    {
+      "id": "seg5",
+      "documentId": "doc7",
+      "paragraphe": 1,
+      "ordre": 0,
+      "texte": "Cette étude ",
+      "type": "normal"
+    },
+    {
+      "id": "seg6",
+      "documentId": "doc7",
+      "paragraphe": 1,
+      "ordre": 1,
+      "texte": "va essayer de montrer ",
+      "type": "supprime"
+    },
+    {
+      "id": "seg7",
+      "documentId": "doc7",
+      "paragraphe": 1,
+      "ordre": 2,
+      "texte": "analyse ",
+      "type": "ajoute"
+    },
+    {
+      "id": "seg8",
+      "documentId": "doc7",
+      "paragraphe": 1,
+      "ordre": 3,
+      "texte": "les usages observés auprès de deux cohortes d'étudiants, sur une période de six mois.",
+      "type": "normal"
+    },
+    {
+      "id": "seg9",
+      "documentId": "doc7",
+      "paragraphe": 2,
+      "ordre": 0,
+      "texte": "Les résultats ",
+      "type": "normal"
+    },
+    {
+      "id": "seg10",
+      "documentId": "doc7",
+      "paragraphe": 2,
+      "ordre": 1,
+      "texte": "sont plutôt ",
+      "type": "supprime"
+    },
+    {
+      "id": "seg11",
+      "documentId": "doc7",
+      "paragraphe": 2,
+      "ordre": 2,
+      "texte": "apparaissent ",
+      "type": "ajoute"
+    },
+    {
+      "id": "seg12",
+      "documentId": "doc7",
+      "paragraphe": 2,
+      "ordre": 3,
+      "texte": "nuancés : si l'IA accélère certaines tâches, elle interroge la construction de l'esprit critique.",
+      "type": "normal"
+    },
+    {
+      "id": "seg13",
+      "documentId": "doc6",
+      "paragraphe": 0,
+      "ordre": 0,
+      "texte": "Ce mémoire ",
+      "type": "normal"
+    },
+    {
+      "id": "seg14",
+      "documentId": "doc6",
+      "paragraphe": 0,
+      "ordre": 1,
+      "texte": "parle de ",
+      "type": "supprime"
+    },
+    {
+      "id": "seg15",
+      "documentId": "doc6",
+      "paragraphe": 0,
+      "ordre": 2,
+      "texte": "porte sur ",
+      "type": "ajoute"
+    },
+    {
+      "id": "seg16",
+      "documentId": "doc6",
+      "paragraphe": 0,
+      "ordre": 3,
+      "texte": "la responsabilité juridique des agents IA autonomes.",
+      "type": "normal"
+    },
+    {
+      "id": "seg17",
+      "documentId": "doc6",
+      "paragraphe": 1,
+      "ordre": 0,
+      "texte": "Nous ",
+      "type": "normal"
+    },
+    {
+      "id": "seg18",
+      "documentId": "doc6",
+      "paragraphe": 1,
+      "ordre": 1,
+      "texte": "avons fait ",
+      "type": "supprime"
+    },
+    {
+      "id": "seg19",
+      "documentId": "doc6",
+      "paragraphe": 1,
+      "ordre": 2,
+      "texte": "avons mené ",
+      "type": "ajoute"
+    },
+    {
+      "id": "seg20",
+      "documentId": "doc6",
+      "paragraphe": 1,
+      "ordre": 3,
+      "texte": "une analyse comparative de la jurisprudence française et européenne.",
+      "type": "normal"
+    }
+  ],
+  "messages": [],
+  "commentairesMarges": [
+    {
+      "id": "cm1",
+      "documentId": "doc7",
+      "numero": 1,
+      "texte": "Précisez la taille des cohortes ici, c'est important pour la validité méthodologique.",
+      "date": "2026-06-11T10:00:00.000Z"
+    },
+    {
+      "id": "cm2",
+      "documentId": "doc7",
+      "numero": 2,
+      "texte": "Bonne nuance. Pensez à citer une source récente pour appuyer cette affirmation.",
+      "date": "2026-06-11T10:05:00.000Z"
+    },
+    {
+      "id": "cm3",
+      "documentId": "doc6",
+      "numero": 1,
+      "texte": "Reformuler ce passage : trop proche du langage parlé.",
+      "date": "2026-07-22T14:00:00.000Z"
+    },
+    {
+      "id": "cm4",
+      "documentId": "doc6",
+      "numero": 2,
+      "texte": "Ajouter une référence à l'arrêt de la CJUE mentionné en cours.",
+      "date": "2026-07-22T14:10:00.000Z"
+    }
+  ],
+  "faq": [
+    {
+      "id": "faq1",
+      "ordre": 1,
+      "question": "Comment fonctionne le score de conformité ?",
+      "reponse": "Le score de conformité (0 à 100) mesure l'écart entre votre document et le profil méthodologique de votre encadrant. Il combine la forme (orthographe, grammaire, mise en page), le fond (argumentation, cohérence) et le taux de similitude. L'envoi officiel à l'encadrant se débloque une fois le seuil requis atteint."
+    },
+    {
+      "id": "faq2",
+      "ordre": 2,
+      "question": "L'IA modifie-t-elle mon document sans mon accord ?",
+      "reponse": "Non. L'IA ne fait que proposer des suggestions : rien n'est modifié tant que vous n'appliquez pas une correction vous-même. La mise en page d'origine est intégralement conservée, l'IA n'agit que sur le texte."
+    },
+    {
+      "id": "faq3",
+      "ordre": 3,
+      "question": "Comment me rattacher à un encadrant ?",
+      "reponse": "Saisissez le code d'invitation transmis par votre encadrant, ou recherchez-le par nom / établissement s'il est déjà référencé sur la plateforme. Le rattachement se confirme en un clic."
+    },
+    {
+      "id": "faq4",
+      "ordre": 4,
+      "question": "Dans quels formats puis-je exporter mon mémoire ?",
+      "reponse": "À tout moment, vous pouvez exporter votre document au format PDF ou Word (.docx), avec la mise en forme d'origine préservée, pour un usage hors plateforme ou une sauvegarde personnelle."
+    },
+    {
+      "id": "faq5",
+      "ordre": 5,
+      "question": "Comment l'IA apprend-elle des corrections de mon encadrant ?",
+      "reponse": "Lorsqu'un encadrant corrige directement le texte, le système capture l'écart entre la version validée par l'IA et la version corrigée. Chaque correction devient une règle prioritaire appliquée aux analyses suivantes : plus l'encadrant utilise l'outil, plus l'IA se rapproche de ses attentes réelles."
+    }
+  ],
+  "passwordResets": [],
+  "filesAttente": [
+    {
+      "id": "f1",
+      "documentId": "doc2",
+      "type": "analyse_forme",
+      "statut": "en_cours",
+      "tentatives": 1,
+      "createdAt": "2026-07-10T08:00:00.000Z"
+    },
+    {
+      "id": "f2",
+      "documentId": "doc2",
+      "type": "analyse_fond",
+      "statut": "en_attente",
+      "tentatives": 0,
+      "createdAt": "2026-07-10T08:00:05.000Z"
+    },
+    {
+      "id": "f4",
+      "documentId": "doc1",
+      "type": "extraction_texte",
+      "statut": "termine",
+      "tentatives": 1,
+      "dureeMs": 3200,
+      "createdAt": "2026-07-08T09:12:05.000Z"
+    },
+    {
+      "id": "f6",
+      "documentId": "doc5",
+      "type": "notification_email",
+      "statut": "termine",
+      "tentatives": 1,
+      "dureeMs": 450,
+      "createdAt": "2026-07-09T09:01:00.000Z"
+    }
+  ],
+  "reglesApprises": [
+    {
+      "id": "r1",
+      "encadrantId": "u2",
+      "regle": "Exiger systématiquement un diagramme d'architecture en figure 1 pour les mémoires d'informatique.",
+      "source": "Comparaison document doc7 (version validée vs corrections manuelles)",
+      "confiance": 82,
+      "statut": "adoptee",
+      "dateApprentissage": "2026-07-01T09:00:00.000Z",
+      "niveau": "generale",
+      "documentId": null,
+      "typeDocument": null,
+      "discipline": null
+    },
+    {
+      "id": "r2",
+      "encadrantId": "u2",
+      "regle": "Préférer le format IEEE même quand l'étudiant utilise initialement APA.",
+      "source": "Comparaison document doc7",
+      "confiance": 74,
+      "statut": "adoptee",
+      "dateApprentissage": "2026-07-01T09:05:00.000Z",
+      "niveau": "generale",
+      "documentId": null,
+      "typeDocument": null,
+      "discipline": null
+    },
+    {
+      "id": "r3",
+      "encadrantId": "u2",
+      "regle": "Signaler tout chapitre de plus de 20 pages sans sous-partie.",
+      "source": "Historique de corrections sur 3 mémoires précédents",
+      "confiance": 58,
+      "statut": "proposee",
+      "dateApprentissage": "2026-07-09T09:00:00.000Z",
+      "niveau": "generale",
+      "documentId": null,
+      "typeDocument": null,
+      "discipline": null
+    },
+    {
+      "id": "r4",
+      "encadrantId": "u3",
+      "regle": "Exiger un tableau récapitulatif des entretiens en annexe (durée, fonction, date).",
+      "source": "Comparaison document doc3",
+      "confiance": 79,
+      "statut": "adoptee",
+      "dateApprentissage": "2026-07-07T16:30:00.000Z",
+      "niveau": "generale",
+      "documentId": null,
+      "typeDocument": null,
+      "discipline": null
+    },
+    {
+      "id": "r5",
+      "encadrantId": "u3",
+      "regle": "Réduire le poids donné aux fautes de style mineures dans le score de forme.",
+      "source": "Corrections manuelles répétées jugées trop sévères par l'IA",
+      "confiance": 45,
+      "statut": "proposee",
+      "dateApprentissage": "2026-07-10T11:00:00.000Z",
+      "niveau": "generale",
+      "documentId": null,
+      "typeDocument": null,
+      "discipline": null
+    },
+    {
+      "id": "r6",
+      "encadrantId": "u4",
+      "regle": "Vérifier systématiquement la date de consolidation des textes de loi cités.",
+      "source": "Comparaison document doc6",
+      "confiance": 88,
+      "statut": "adoptee",
+      "dateApprentissage": "2026-07-05T09:00:00.000Z",
+      "niveau": "generale",
+      "documentId": null,
+      "typeDocument": null,
+      "discipline": null
+    }
+  ],
+  "analyses": [
+    {
+      "id": "an1",
+      "documentId": "doc3",
+      "type": "forme",
+      "score": 82,
+      "dateAnalyse": "2026-07-06T10:00:00.000Z",
+      "points": [
+        {
+          "id": "p1",
+          "libelle": "Pagination conforme",
+          "detail": "Numérotation continue et correcte détectée sur les 68 pages.",
+          "niveau": "succes"
+        },
+        {
+          "id": "p2",
+          "libelle": "Titres de niveau 3 incohérents",
+          "detail": "3 titres de section utilisent une casse différente du reste du document.",
+          "niveau": "attention"
+        },
+        {
+          "id": "p3",
+          "libelle": "Bibliographie incomplète",
+          "detail": "2 références citées dans le texte n'apparaissent pas dans la bibliographie finale.",
+          "niveau": "erreur"
+        }
+      ]
+    },
+    {
+      "id": "an2",
+      "documentId": "doc3",
+      "type": "fond",
+      "score": 60,
+      "dateAnalyse": "2026-07-06T10:05:00.000Z",
+      "points": [
+        {
+          "id": "p4",
+          "libelle": "Problématique claire",
+          "detail": "La problématique est explicitement formulée en introduction.",
+          "niveau": "succes"
+        },
+        {
+          "id": "p5",
+          "libelle": "Revue de littérature à approfondir",
+          "detail": "Seules 12 sources académiques citées, la moyenne attendue est de 25 à 30.",
+          "niveau": "attention"
+        }
+      ]
+    },
+    {
+      "id": "an4",
+      "documentId": "doc4",
+      "type": "forme",
+      "score": 85,
+      "dateAnalyse": "2026-07-03T10:00:00.000Z",
+      "points": [
+        {
+          "id": "p7",
+          "libelle": "Mise en page conforme",
+          "detail": "Respect des normes de marges et d'interligne définies par l'encadrant.",
+          "niveau": "succes"
+        },
+        {
+          "id": "p8",
+          "libelle": "Table des matières à régénérer",
+          "detail": "La table des matières ne reflète pas les derniers titres modifiés.",
+          "niveau": "attention"
+        }
+      ]
+    },
+    {
+      "id": "an5",
+      "documentId": "doc4",
+      "type": "fond",
+      "score": 68,
+      "dateAnalyse": "2026-07-03T10:05:00.000Z",
+      "points": [
+        {
+          "id": "p9",
+          "libelle": "Argumentation cohérente",
+          "detail": "Les hypothèses de recherche sont bien reliées aux résultats de l'étude de terrain.",
+          "niveau": "succes"
+        },
+        {
+          "id": "p10",
+          "libelle": "Discussion des limites insuffisante",
+          "detail": "La partie discussion ne mentionne pas les biais possibles de l'échantillon.",
+          "niveau": "attention"
+        }
+      ]
+    },
+    {
+      "id": "an7",
+      "documentId": "doc5",
+      "type": "forme",
+      "score": 90,
+      "dateAnalyse": "2026-06-29T10:00:00.000Z",
+      "points": [
+        {
+          "id": "p12",
+          "libelle": "Document exemplaire",
+          "detail": "Aucune anomalie de mise en forme détectée.",
+          "niveau": "succes"
+        }
+      ]
+    },
+    {
+      "id": "an8",
+      "documentId": "doc5",
+      "type": "fond",
+      "score": 82,
+      "dateAnalyse": "2026-06-29T10:05:00.000Z",
+      "points": [
+        {
+          "id": "p13",
+          "libelle": "Analyse juridique rigoureuse",
+          "detail": "Le raisonnement juridique est structuré et bien sourcé.",
+          "niveau": "succes"
+        }
+      ]
+    },
+    {
+      "id": "an10",
+      "documentId": "doc7",
+      "type": "forme",
+      "score": 96,
+      "dateAnalyse": "2026-06-25T10:00:00.000Z",
+      "points": [
+        {
+          "id": "p15",
+          "libelle": "Conformité totale",
+          "detail": "Toutes les normes de l'encadrant sont respectées.",
+          "niveau": "succes"
+        }
+      ]
+    },
+    {
+      "id": "an11",
+      "documentId": "doc7",
+      "type": "fond",
+      "score": 94,
+      "dateAnalyse": "2026-06-25T10:05:00.000Z",
+      "points": [
+        {
+          "id": "p16",
+          "libelle": "Contribution originale reconnue",
+          "detail": "Le modèle de recommandation proposé est validé expérimentalement.",
+          "niveau": "succes"
+        }
+      ]
+    },
+    {
+      "id": "an13",
+      "documentId": "doc8",
+      "type": "forme",
+      "score": 50,
+      "dateAnalyse": "2026-05-22T10:00:00.000Z",
+      "points": [
+        {
+          "id": "p18",
+          "libelle": "Pagination incorrecte",
+          "detail": "Numérotation absente sur les 10 premières pages.",
+          "niveau": "erreur"
+        },
+        {
+          "id": "p19",
+          "libelle": "Bibliographie non normée",
+          "detail": "Format de citation incohérent d'une référence à l'autre.",
+          "niveau": "erreur"
+        }
+      ]
+    },
+    {
+      "id": "an14",
+      "documentId": "doc8",
+      "type": "fond",
+      "score": 40,
+      "dateAnalyse": "2026-05-22T10:05:00.000Z",
+      "points": [
+        {
+          "id": "p20",
+          "libelle": "Problématique peu claire",
+          "detail": "La problématique n'est formulée qu'en conclusion, ce qui nuit à la cohérence globale.",
+          "niveau": "erreur"
+        }
+      ]
+    }
+  ],
+  "encadrants": [
+    {
+      "id": "u2",
+      "nom": "Leroux",
+      "prenom": "Jérôme",
+      "email": "j.leroux@memoai.fr",
+      "filiere": null
+    },
+    {
+      "id": "u3",
+      "nom": "Sarr",
+      "prenom": "Fatou",
+      "email": "f.sarr@memoai.fr",
+      "filiere": null
+    },
+    {
+      "id": "u4",
+      "nom": "Belhadj",
+      "prenom": "Karim",
+      "email": "k.belhadj@memoai.fr",
+      "filiere": null
+    }
+  ],
+  "invitations": [],
+  "commentaires-marge": [
+    {
+      "id": "cm1",
+      "documentId": "doc7",
+      "numero": 1,
+      "texte": "Précisez la taille des cohortes ici, c'est important pour la validité méthodologique.",
+      "date": "2026-06-11T10:00:00.000Z"
+    },
+    {
+      "id": "cm2",
+      "documentId": "doc7",
+      "numero": 2,
+      "texte": "Bonne nuance. Pensez à citer une source récente pour appuyer cette affirmation.",
+      "date": "2026-06-11T10:05:00.000Z"
+    },
+    {
+      "id": "cm3",
+      "documentId": "doc6",
+      "numero": 1,
+      "texte": "Reformuler ce passage : trop proche du langage parlé.",
+      "date": "2026-07-22T14:00:00.000Z"
+    },
+    {
+      "id": "cm4",
+      "documentId": "doc6",
+      "numero": 2,
+      "texte": "Ajouter une référence à l'arrêt de la CJUE mentionné en cours.",
+      "date": "2026-07-22T14:10:00.000Z"
+    }
+  ],
+  "files-attente": [
+    {
+      "id": "f1",
+      "documentId": "doc2",
+      "type": "analyse_forme",
+      "statut": "en_cours",
+      "tentatives": 1,
+      "createdAt": "2026-07-10T08:00:00.000Z"
+    },
+    {
+      "id": "f2",
+      "documentId": "doc2",
+      "type": "analyse_fond",
+      "statut": "en_attente",
+      "tentatives": 0,
+      "createdAt": "2026-07-10T08:00:05.000Z"
+    },
+    {
+      "id": "f4",
+      "documentId": "doc1",
+      "type": "extraction_texte",
+      "statut": "termine",
+      "tentatives": 1,
+      "dureeMs": 3200,
+      "createdAt": "2026-07-08T09:12:05.000Z"
+    },
+    {
+      "id": "f6",
+      "documentId": "doc5",
+      "type": "notification_email",
+      "statut": "termine",
+      "tentatives": 1,
+      "dureeMs": 450,
+      "createdAt": "2026-07-09T09:01:00.000Z"
+    }
+  ],
+  "regles-apprises": [
+    {
+      "id": "r1",
+      "encadrantId": "u2",
+      "regle": "Exiger systématiquement un diagramme d'architecture en figure 1 pour les mémoires d'informatique.",
+      "source": "Comparaison document doc7 (version validée vs corrections manuelles)",
+      "confiance": 82,
+      "statut": "adoptee",
+      "dateApprentissage": "2026-07-01T09:00:00.000Z",
+      "niveau": "generale",
+      "documentId": null,
+      "typeDocument": null,
+      "discipline": null
+    },
+    {
+      "id": "r2",
+      "encadrantId": "u2",
+      "regle": "Préférer le format IEEE même quand l'étudiant utilise initialement APA.",
+      "source": "Comparaison document doc7",
+      "confiance": 74,
+      "statut": "adoptee",
+      "dateApprentissage": "2026-07-01T09:05:00.000Z",
+      "niveau": "generale",
+      "documentId": null,
+      "typeDocument": null,
+      "discipline": null
+    },
+    {
+      "id": "r3",
+      "encadrantId": "u2",
+      "regle": "Signaler tout chapitre de plus de 20 pages sans sous-partie.",
+      "source": "Historique de corrections sur 3 mémoires précédents",
+      "confiance": 58,
+      "statut": "proposee",
+      "dateApprentissage": "2026-07-09T09:00:00.000Z",
+      "niveau": "generale",
+      "documentId": null,
+      "typeDocument": null,
+      "discipline": null
+    },
+    {
+      "id": "r4",
+      "encadrantId": "u3",
+      "regle": "Exiger un tableau récapitulatif des entretiens en annexe (durée, fonction, date).",
+      "source": "Comparaison document doc3",
+      "confiance": 79,
+      "statut": "adoptee",
+      "dateApprentissage": "2026-07-07T16:30:00.000Z",
+      "niveau": "generale",
+      "documentId": null,
+      "typeDocument": null,
+      "discipline": null
+    },
+    {
+      "id": "r5",
+      "encadrantId": "u3",
+      "regle": "Réduire le poids donné aux fautes de style mineures dans le score de forme.",
+      "source": "Corrections manuelles répétées jugées trop sévères par l'IA",
+      "confiance": 45,
+      "statut": "proposee",
+      "dateApprentissage": "2026-07-10T11:00:00.000Z",
+      "niveau": "generale",
+      "documentId": null,
+      "typeDocument": null,
+      "discipline": null
+    },
+    {
+      "id": "r6",
+      "encadrantId": "u4",
+      "regle": "Vérifier systématiquement la date de consolidation des textes de loi cités.",
+      "source": "Comparaison document doc6",
+      "confiance": 88,
+      "statut": "adoptee",
+      "dateApprentissage": "2026-07-05T09:00:00.000Z",
+      "niveau": "generale",
+      "documentId": null,
+      "typeDocument": null,
+      "discipline": null
+    }
+  ],
+  "profils-encadrant": [
+    {
+      "id": "pe1",
+      "encadrantId": "u2",
+      "typeDocument": "master",
+      "discipline": "Informatique",
+      "nom": "Master - Informatique",
+      "actif": true,
+      "guidesRedaction": [
+        {
+          "id": "gr1",
+          "titre": "Guide de rédaction Master Informatique 2026",
+          "description": "Structure attendue : introduction, état de l'art, contribution, évaluation, conclusion.",
+          "ajouteLe": "2026-01-10T08:00:00.000Z"
+        },
+        {
+          "id": "gr2",
+          "titre": "Charte de citation IEEE",
+          "description": "Toutes les références doivent suivre le format IEEE numéroté.",
+          "ajouteLe": "2026-01-12T08:00:00.000Z"
+        }
+      ],
+      "memoiresModeles": [
+        {
+          "id": "mm1",
+          "titre": "Mémoire modèle - Systèmes distribués (2025, mention TB)",
+          "description": "Exemple de mémoire ayant obtenu la mention très bien, à utiliser comme référence de structure.",
+          "ajouteLe": "2026-01-10T08:10:00.000Z"
+        }
+      ],
+      "normes": [
+        {
+          "id": "n1",
+          "titre": "Pagination et mise en page",
+          "description": "Marges 2,5 cm, interligne 1,5, police Times New Roman 12pt, pagination en pied de page.",
+          "ajouteLe": "2026-01-10T08:20:00.000Z"
+        },
+        {
+          "id": "n2",
+          "titre": "Longueur attendue",
+          "description": "Entre 60 et 90 pages hors annexes.",
+          "ajouteLe": "2026-01-10T08:25:00.000Z"
+        }
+      ],
+      "exigences": [
+        {
+          "id": "ex1",
+          "titre": "Reproductibilité",
+          "description": "Le code source et les jeux de données utilisés doivent être déposés en annexe ou via un dépôt Git.",
+          "ajouteLe": "2026-01-11T09:00:00.000Z"
+        }
+      ],
+      "contraintes": null,
+      "seuilSoumission": 75,
+      "seuilCategorieMinimum": 50,
+      "updatedAt": "2026-01-12T08:00:00.000Z"
+    },
+    {
+      "id": "pe2",
+      "encadrantId": "u3",
+      "typeDocument": "master",
+      "discipline": "Sciences de gestion",
+      "nom": "Master - Sciences de gestion",
+      "actif": true,
+      "guidesRedaction": [
+        {
+          "id": "gr3",
+          "titre": "Guide de rédaction Sciences de gestion",
+          "description": "Problématique managériale, revue de littérature, méthodologie, résultats, discussion.",
+          "ajouteLe": "2026-01-13T08:00:00.000Z"
+        }
+      ],
+      "memoiresModeles": [
+        {
+          "id": "mm2",
+          "titre": "Mémoire modèle - Transformation digitale des PME (2024)",
+          "description": "Bon exemple d'articulation entre revue de littérature et étude de terrain.",
+          "ajouteLe": "2026-01-13T08:15:00.000Z"
+        }
+      ],
+      "normes": [
+        {
+          "id": "n3",
+          "titre": "Norme APA 7",
+          "description": "Toutes les citations et la bibliographie doivent suivre la norme APA 7e édition.",
+          "ajouteLe": "2026-01-13T08:20:00.000Z"
+        }
+      ],
+      "exigences": [
+        {
+          "id": "ex2",
+          "titre": "Étude de terrain obligatoire",
+          "description": "Minimum 10 entretiens semi-directifs ou 100 réponses à questionnaire.",
+          "ajouteLe": "2026-01-14T09:00:00.000Z"
+        }
+      ],
+      "contraintes": null,
+      "seuilSoumission": 75,
+      "seuilCategorieMinimum": 50,
+      "updatedAt": "2026-01-14T09:00:00.000Z"
+    },
+    {
+      "id": "pe3",
+      "encadrantId": "u4",
+      "typeDocument": "master",
+      "discipline": "Droit du numérique",
+      "nom": "Master - Droit du numérique",
+      "actif": true,
+      "guidesRedaction": [
+        {
+          "id": "gr4",
+          "titre": "Guide de rédaction Droit du numérique",
+          "description": "Plan en deux parties/deux sous-parties imposé, annonce de plan explicite.",
+          "ajouteLe": "2026-01-15T08:00:00.000Z"
+        }
+      ],
+      "memoiresModeles": [],
+      "normes": [
+        {
+          "id": "n4",
+          "titre": "Citation des textes de loi",
+          "description": "Toute référence législative doit inclure le numéro d'article et la date de version consolidée.",
+          "ajouteLe": "2026-01-15T08:30:00.000Z"
+        }
+      ],
+      "exigences": [
+        {
+          "id": "ex3",
+          "titre": "Actualité juridique",
+          "description": "Au moins 5 sources de moins de 2 ans doivent être citées.",
+          "ajouteLe": "2026-01-16T09:00:00.000Z"
+        }
+      ],
+      "contraintes": null,
+      "seuilSoumission": 75,
+      "seuilCategorieMinimum": 50,
+      "updatedAt": "2026-01-16T09:00:00.000Z"
+    }
+  ],
+  "public": {
+    "encadrants": [
+      {
+        "id": "u2",
+        "nom": "Leroux",
+        "prenom": "Jérôme",
+        "email": "j.leroux@memoai.fr",
+        "filiere": null
+      },
+      {
+        "id": "u3",
+        "nom": "Sarr",
+        "prenom": "Fatou",
+        "email": "f.sarr@memoai.fr",
+        "filiere": null
+      },
+      {
+        "id": "u4",
+        "nom": "Belhadj",
+        "prenom": "Karim",
+        "email": "k.belhadj@memoai.fr",
+        "filiere": null
+      }
+    ],
+    "faq": [
+      {
+        "id": "faq1",
+        "ordre": 1,
+        "question": "Comment fonctionne le score de conformité ?",
+        "reponse": "Le score de conformité (0 à 100) mesure l'écart entre votre document et le profil méthodologique de votre encadrant. Il combine la forme (orthographe, grammaire, mise en page), le fond (argumentation, cohérence) et le taux de similitude. L'envoi officiel à l'encadrant se débloque une fois le seuil requis atteint."
+      },
+      {
+        "id": "faq2",
+        "ordre": 2,
+        "question": "L'IA modifie-t-elle mon document sans mon accord ?",
+        "reponse": "Non. L'IA ne fait que proposer des suggestions : rien n'est modifié tant que vous n'appliquez pas une correction vous-même. La mise en page d'origine est intégralement conservée, l'IA n'agit que sur le texte."
+      },
+      {
+        "id": "faq3",
+        "ordre": 3,
+        "question": "Comment me rattacher à un encadrant ?",
+        "reponse": "Saisissez le code d'invitation transmis par votre encadrant, ou recherchez-le par nom / établissement s'il est déjà référencé sur la plateforme. Le rattachement se confirme en un clic."
+      },
+      {
+        "id": "faq4",
+        "ordre": 4,
+        "question": "Dans quels formats puis-je exporter mon mémoire ?",
+        "reponse": "À tout moment, vous pouvez exporter votre document au format PDF ou Word (.docx), avec la mise en forme d'origine préservée, pour un usage hors plateforme ou une sauvegarde personnelle."
+      },
+      {
+        "id": "faq5",
+        "ordre": 5,
+        "question": "Comment l'IA apprend-elle des corrections de mon encadrant ?",
+        "reponse": "Lorsqu'un encadrant corrige directement le texte, le système capture l'écart entre la version validée par l'IA et la version corrigée. Chaque correction devient une règle prioritaire appliquée aux analyses suivantes : plus l'encadrant utilise l'outil, plus l'IA se rapproche de ses attentes réelles."
+      }
+    ],
+    "temoignages": [
+      {
+        "id": "temoignage1",
+        "ordre": 1,
+        "nom": "Amina Diallo",
+        "role": "Étudiante en Master 2 Informatique - Université Paris-Saclay",
+        "citation": "Le score de conformité m'a évité plusieurs allers-retours inutiles avec mon encadrant : je corrige la forme avant même de lui envoyer mon document."
+      },
+      {
+        "id": "temoignage2",
+        "ordre": 2,
+        "nom": "Jérôme Leroux",
+        "role": "Encadrant - Université Paris-Saclay",
+        "citation": "Je passe enfin mon temps de relecture sur le fond scientifique. Les corrections répétitives de forme sont déjà faites quand le document arrive sur mon bureau."
+      },
+      {
+        "id": "temoignage3",
+        "ordre": 3,
+        "nom": "Lucas Petit",
+        "role": "Étudiant en Master 2 Droit du numérique - Université Lumière Lyon 2",
+        "citation": "Le tuteur IA explique pourquoi une correction est suggérée, pas seulement quoi corriger. J'ai l'impression de progresser, pas juste de suivre des instructions."
+      },
+      {
+        "id": "temoignage4",
+        "ordre": 4,
+        "nom": "Fatou Sarr",
+        "role": "Encadrante - Université Paris-Saclay",
+        "citation": "Configurer mes exigences une fois (normes, grille d'évaluation) puis les voir appliquées automatiquement à chaque étudiant m'a fait gagner un temps considérable."
+      }
+    ]
+  }
+}
