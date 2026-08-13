@@ -7,9 +7,6 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
-  // Bundle de sortie autonome (serveur Node minimal + dépendances strictement nécessaires)
-  // voir https://nextjs.org/docs/app/api-reference/config/next-config-js/output.
-  output: "standalone",
 };
 
 export default nextConfig;
