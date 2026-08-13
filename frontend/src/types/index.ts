@@ -18,13 +18,11 @@ export type RoleInscription = Exclude<Role, "admin">;
 
 export interface User {
   id: string;
-  firebaseUid?: string; // Relie ce profil à un compte Firebase Authentication.
   role: Role;
   nom: string;
   prenom: string;
   email: string;
   motDePasse?: string; // DÉPRÉCIÉ (ancien système JWT/bcrypt) : jamais renvoyé par l'API.
-  provider?: string; // "password" | "google.com" (fournisseur Firebase)
   avatarUrl?: string;
   encadrantId?: string; // Renseigné si role === "etudiant"
   // Programme d'études (ex. « Master 2 Informatique »), libellé libre : seul contexte académique

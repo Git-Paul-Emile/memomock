@@ -12,7 +12,6 @@ import { toast } from "sonner";
 import { useAuth, CODE_PROFIL_INCOMPLET } from "@/context/auth-context";
 import { espaceParDefaut, lienOnboarding } from "@/components/layout/route-guard";
 import { useApiList } from "@/hooks/use-api-list";
-import { messageErreurFirebase } from "@/lib/firebase-errors";
 import { ApiError } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -85,7 +84,7 @@ export default function RegisterPage() {
       toast.success(`Compte créé, bienvenue ${user.prenom} !`);
       router.push(lienOnboarding(user.role) ?? espaceParDefaut(user.role));
     } catch (err) {
-      toast.error(messageErreurFirebase(err, "Impossible de créer le compte."));
+      toast.error(err instanceof ApiError ? err.message : "Impossible de créer le compte.");
     } finally {
       setIsSubmitting(false);
     }

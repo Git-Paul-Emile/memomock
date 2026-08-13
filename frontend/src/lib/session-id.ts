@@ -1,13 +1,9 @@
 /**
  * Id de session stable par appareil/navigateur (spec écran H8-H9, "Sessions actives"). Généré
- * une seule fois et conservé en `localStorage` : transmis à `POST /auth/sync` (voir
- * context/auth-context.tsx) pour enregistrer la ligne `SessionConnexion`, puis à CHAQUE requête
- * authentifiée (en-tête `X-Session-Id`, voir lib/api.ts) pour que le backend puisse rejeter les
- * requêtes d'un appareil dont la session a été révoquée (voir "Déconnecter les autres sessions"
- * dans /parametres) - une révocation réellement immédiate et par appareil, contrairement à
- * `admin.auth().revokeRefreshTokens`, qui est par UTILISATEUR côté Firebase (voir
- * backend/src/lib/auth-provider/firebase.provider.js) et ne s'applique qu'au prochain
- * rafraîchissement de jeton (jusqu'à ~1h de délai).
+ * une seule fois et conservé en `localStorage` : transmis à chaque requête authentifiée
+ * (en-tête `X-Session-Id`, voir lib/api.ts) pour que le backend puisse rejeter les requêtes
+ * d'un appareil dont la session a été révoquée (voir "Déconnecter les autres sessions"
+ * dans /parametres) - une révocation réellement immédiate et par appareil.
  *
  * Module séparé de auth-context.tsx et api.ts (qui l'utilisent tous les deux) pour éviter toute
  * dépendance circulaire entre eux.

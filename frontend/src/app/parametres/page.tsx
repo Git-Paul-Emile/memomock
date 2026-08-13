@@ -3,7 +3,6 @@
 import * as React from "react";
 import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { FirebaseError } from "@/lib/firebase";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -107,7 +106,7 @@ export default function ParametresPage() {
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
     try {
-      // L'e-mail est la source de vérité de Firebase (non modifiable ici) : on ne l'envoie pas
+      // L'e-mail n'est pas modifiable ici : on ne l'envoie pas
       // au backend, dont le validateur de mise à jour de profil (strict) ne l'accepte pas.
       const { email: _email, ...misAJourData } = values;
       const misAJour = await apiPatch<PublicUser>("users", user.id, misAJourData);
@@ -193,7 +192,7 @@ export default function ParametresPage() {
     }
   };
 
-  // Spec écran H8-H9 : révoque les jetons Firebase des autres appareils (voir
+  // Spec écran H8-H9 : révoque les sessions des autres appareils (voir
   // POST /api/users/me/revoquer-sessions côté backend) et retire leurs lignes SessionConnexion.
   // La session courante (identifiée par sessionIdCourante) est explicitement préservée.
   const handleRevoquerSessions = async () => {
@@ -209,9 +208,7 @@ export default function ParametresPage() {
     }
   };
 
-  // Écran H6 : ré-authentification + changement de mot de passe (voir auth-context.tsx). Les
-  // codes Firebase les plus probables sont traduits explicitement ; le reste retombe sur un
-  // message générique plutôt que d'exposer un code technique à l'utilisateur.
+  // Écran H6 : changement de mot de passe (voir auth-context.tsx).
   const handleChangerMotDePasse = async () => {
     if (nouveauMotDePasse.length < 8) {
       toast.error("Le nouveau mot de passe doit contenir au moins 8 caractères.");
@@ -229,15 +226,8 @@ export default function ParametresPage() {
       setMotDePasseActuel("");
       setNouveauMotDePasse("");
       setConfirmationMotDePasse("");
-    } catch (err) {
-      const code = err instanceof FirebaseError ? err.code : undefined;
-      if (code === "auth/wrong-password" || code === "auth/invalid-credential") {
-        toast.error("Mot de passe actuel incorrect.");
-      } else if (code === "auth/weak-password") {
-        toast.error("Ce mot de passe est trop faible.");
-      } else {
-        toast.error("Impossible de modifier le mot de passe pour le moment.");
-      }
+    } catch {
+      toast.error("Impossible de modifier le mot de passe pour le moment.");
     } finally {
       setMotDePasseEnCours(false);
     }
@@ -381,8 +371,7 @@ export default function ParametresPage() {
         </CardContent>
       </Card>
 
-      {user.provider !== "google.com" && (
-        <Card>
+      <Card>
           <CardHeader>
             <CardTitle className="text-base">Sécurité</CardTitle>
             <CardDescription>
@@ -447,7 +436,6 @@ export default function ParametresPage() {
             </Dialog>
           </CardContent>
         </Card>
-      )}
 
       <Card>
         <CardHeader>

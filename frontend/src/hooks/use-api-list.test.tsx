@@ -6,9 +6,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useApiList } from "@/hooks/use-api-list";
 import { apiList } from "@/lib/api";
 
-// `lib/api` importe `lib/firebase` (initialisation du SDK Firebase) : on le mocke entièrement
-// pour tester la logique du hook (TanStack Query) de façon isolée, sans dépendance réseau ni
-// SDK externe.
+// `lib/api` utilise un stockage localStorage pour le jeton mock : on le mocke entièrement
+// pour tester la logique du hook (TanStack Query) de façon isolée, sans dépendance réseau.
 vi.mock("@/lib/api", () => ({
   apiList: vi.fn(),
 }));

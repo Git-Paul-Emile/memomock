@@ -6,7 +6,7 @@
  * uniquement responsables de l'affichage (séparation des responsabilités).
  *
  * Authentification : chaque requête embarque le jeton d'identité de l'utilisateur courant (voir
- * `getToken` ci-dessous), généré par le shim Firebase local (frontend/src/lib/firebase.ts).
+ * `getToken` ci-dessous), stocké localement en mode mock.
  *
  * Conventions REST respectées :
  *  - Client-serveur : le frontend ne connaît que l'URL de l'API (json-server sur :4000).
@@ -16,7 +16,6 @@
  *  - json-server gère automatiquement la pagination et le filtrage via _page, _limit, _sort, _order.
  */
 
-import { auth } from "./firebase";
 import { obtenirSessionId } from "./session-id";
 
 // API json-server : mock local, données dans frontend/data.json
@@ -53,18 +52,19 @@ async function erreurDepuisReponse(res: Response): Promise<ApiError> {
 }
 
 /**
- * Jeton d'identité Firebase de l'utilisateur courant, ou `null` si personne n'est connecté.
- * `auth.authStateReady()` attend que Firebase ait fini de restaurer la session depuis son
- * stockage persistant avant de lire `auth.currentUser` : sans cet appel, un rechargement de
- * page pourrait renvoyer `null` à tort pendant les premières millisecondes, alors que
- * l'utilisateur est bel et bien connecté.
+ * Jeton d'identité mock de l'utilisateur courant, ou `null` si personne n'est connecté.
+ * Stocké en localStorage lors de la connexion.
  */
 async function getToken(): Promise<string | null> {
   if (typeof window === "undefined") return null;
-  await auth.authStateReady();
-  const utilisateurCourant = auth.currentUser;
-  if (!utilisateurCourant) return null;
-  return utilisateurCourant.getIdToken();
+  const raw = localStorage.getItem("memoai_mock_user");
+  if (!raw) return null;
+  try {
+    const user = JSON.parse(raw) as { id: string };
+    return `mock-token-${user.id}`;
+  } catch {
+    return null;
+  }
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {

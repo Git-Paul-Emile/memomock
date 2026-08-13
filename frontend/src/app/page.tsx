@@ -73,8 +73,8 @@ export default function Home() {
       .catch(() => setFaq([]));
   }, []);
 
-  // Ne bloque JAMAIS l'affichage sur `isLoading` seul : c'est l'état pendant lequel Firebase
-  // résout la session côté client (IndexedDB, illisible en SSR) - il vaut systématiquement
+  // Ne bloque JAMAIS l'affichage sur `isLoading` seul : c'est l'état pendant lequel l'auth
+  // résout la session côté client (localStorage, illisible en SSR) - il vaut systématiquement
   // `true` au premier rendu serveur. Gater dessus rendrait l'intégralité du contenu public de
   // cette page (spec écran A1) invisible sans JavaScript, y compris pour les moteurs de
   // recherche. On n'affiche l'écran de chargement qu'une fois `user` confirmé (redirection vers

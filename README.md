@@ -13,9 +13,7 @@ mémo de cadrage. Le dépôt contient deux projets :
 - **react-hook-form + zod** pour la validation de formulaires
 - **recharts** pour les graphiques du tableau de bord de supervision
 - **sonner** pour les notifications toast
-- **Backend** : Node.js/Express, **Prisma** + **PostgreSQL** (données académiques), **Firestore**
-  (profils utilisateur), authentification déléguée à **Firebase Authentication** (plus de
-  JWT/mots de passe gérés par ce projet) - voir `backend/README.md` pour le détail
+- **Backend** : Node.js/Express, **Prisma** + **PostgreSQL** (données académiques).
 
 ## Démarrage rapide
 
@@ -56,34 +54,17 @@ cd frontend
 npm run dev      # Frontend sur :3000
 ```
 
-## Fonctionnalités d'authentification (Firebase Authentication)
+## Authentification (mock)
 
-- **E-mail / mot de passe** : inscription et connexion via le SDK Firebase Web
-  (`createUserWithEmailAndPassword` / `signInWithEmailAndPassword`, voir
-  `frontend/src/context/auth-context.tsx`). Après un succès Firebase, le frontend appelle
-  `POST /api/auth/sync` pour créer/récupérer le profil applicatif (rôle, encadrant assigné...)
-  côté Prisma - voir `backend/src/modules/auth`.
+- **E-mail / mot de passe** : inscription et connexion via l'API json-server mock
+  (`POST /users`, `GET /users?email=...`), voir `frontend/src/context/auth-context.tsx`.
 - **Afficher/masquer le mot de passe** sur tous les champs de saisie (`components/ui/password-input.tsx`).
-- **Mot de passe oublié (réel)** : `sendPasswordResetEmail` envoie un vrai e-mail Firebase avec
-  un lien vers `/reinitialiser-mot-de-passe?mode=resetPassword&oobCode=...` ; cette page vérifie
-  le code (`verifyPasswordResetCode`) puis confirme la réinitialisation
-  (`confirmPasswordReset`), entièrement côté client.
-- **Connexion avec Google (réelle)** : popup OAuth Google native (`signInWithPopup` +
-  `GoogleAuthProvider`), plus aucune simulation. La photo de profil Google est reprise comme
-  avatar ; à défaut (inscription par e-mail), l'interface affiche un avatar par défaut basé sur
-  les initiales.
+- **Mot de passe oublié** : en mode mock, met à jour directement le mot de passe dans `data.json`
+  et renvoie un succès.
 - **Téléphone obligatoire, non vérifié** : le numéro est collecté à l'inscription (champ requis)
-  mais il n'y a plus de vérification par code OTP - la connexion par téléphone/WhatsApp a été
-  retirée (voir `backend/src/modules/auth/auth.service.js`, champ `telephoneVerifie` toujours à
-  `false`). Seuls e-mail/mot de passe et Google restent des méthodes de connexion.
-- **Vérification des jetons côté serveur** : chaque requête API embarque le jeton d'identité
-  Firebase (`Authorization: Bearer <idToken>`), vérifié par le SDK Admin Firebase
-  (`backend/src/lib/firebaseAdmin.js` + `middleware/auth.js`) avant d'être relié au profil
-  applicatif correspondant (`firebaseUid`). Ce profil (rôle, nom, encadrant assigné...) vit
-  désormais dans **Firestore**, pas dans PostgreSQL (voir `backend/src/modules/users/users.repository.js`)
-  - seules les données strictement académiques (documents, analyses, profils encadrant...)
-  restent en PostgreSQL/Prisma. Mots de passe et jetons ne sont donc jamais gérés manuellement
-  par ce projet - Firebase en est l'unique source de vérité.
+  mais il n'y a pas de vérification par code OTP.
+- **Sessions actives** : chaque connexion génère un identifiant de session stocké en localStorage,
+  visible dans `/parametres` avec possibilité de révoquer les autres sessions.
 
 ## Stockage des fichiers et notifications
 
@@ -112,7 +93,7 @@ npm run dev      # Frontend sur :3000
   analyses, notifications, messages) - accessible depuis `/parametres`.
 - **Droit à l'effacement** (art. 17) : `POST /api/users/me/anonymiser` anonymise
   irréversiblement les données identifiantes (nom, e-mail, téléphone, avatar) et supprime le
-  compte Firebase associé (connexion définitivement impossible). Les enregistrements
+  compte (connexion définitivement impossible). Les enregistrements
   académiques (documents, analyses) sont conservés mais détachés de l'identité - voir le
   commentaire de la route pour la justification (contraintes de clé étrangère + traçabilité
   académique légitime), une pratique reconnue par la CNIL lorsqu'une suppression totale n'est
@@ -138,7 +119,7 @@ frontend/                     Frontend Next.js (voir frontend/package.json)
       shared/                      Toolbar, pagination, empty state, badges, jauge de score
       auth/                        Sélecteur de compte Google simulé
       profil/, documents/          Composants métier spécifiques
-    context/auth-context.tsx      Authentification (session mock, voir lib/firebase.ts)
+    context/auth-context.tsx      Authentification (mock json-server)
     hooks/use-api-list.ts         Hook générique de consommation REST paginée/triée/filtrée
     lib/api.ts                     Client HTTP (pagination _page/_limit, tri _sort/_order, recherche q=)
     lib/mock-ai.ts                 Petits utilitaires pour l'écran de correction interactive
@@ -158,7 +139,7 @@ frontend/                     Frontend Next.js (voir frontend/package.json)
   (`/etudiant`, `/encadrant`, `/admin`) vérifie le rôle de l'utilisateur connecté et redirige
   si nécessaire.
 - **API REST conforme aux 6 contraintes REST** : client-serveur, sans état (le jeton d'identité
-  Firebase est envoyé à chaque requête via le header `Authorization`), cache (GET non forcés en
+  est envoyé à chaque requête via le header `Authorization`), cache (GET non forcés en
   `no-store`), interface uniforme (ressources nommées au pluriel, verbes HTTP standards),
   système en couches (routes → controllers/services → Prisma), et pagination/tri/filtre/
   recherche disponibles sur toutes les listes.
@@ -167,17 +148,10 @@ frontend/                     Frontend Next.js (voir frontend/package.json)
   entière (`ElementReference`, `PointAnalyse`) reliées par clé étrangère, tout en conservant
   exactement la même forme de réponse JSON côté frontend (voir `backend/src/modules/analyses`
   et `backend/src/modules/profils-encadrant`).
-- **Deux bases, deux natures de données** : les profils utilisateur (rôle, nom, encadrant
-  assigné...) vivent dans **Firestore**, tandis que les données strictement académiques
-  (documents, analyses, messages, profils encadrant...) restent en **PostgreSQL/Prisma**.
-  PostgreSQL ne peut pas référencer un document Firestore par clé étrangère : les champs comme
-  `Document.etudiantId` sont donc des identifiants scalaires « mous », sans contrainte FK ni
-  cascade automatique - voir le commentaire en tête de `backend/prisma/schema.prisma`.
-- **Sécurité** : authentification déléguée à Firebase (mots de passe jamais gérés par ce
-  projet) ; jetons d'identité vérifiés côté serveur via le SDK Admin Firebase avant chaque
-  accès aux routes protégées (`requireAuth`) ; autorisations fines par rôle et par propriété
-  des données (`utils/rbac.js`) ; validation stricte des entrées (Zod) ; limitation de débit et
-  en-têtes de sécurité HTTP (`helmet`) - voir `backend/README.md` pour le détail complet.
+- **Sécurité** : authentification mockée (mots de passe stockés en clair dans `data.json` pour le
+  développement) ; jetons d'identité vérifiés côté serveur ; autorisations fines par rôle et par
+  propriété des données (`utils/rbac.js`) ; validation stricte des entrées (Zod) ; limitation de
+  débit et en-têtes de sécurité HTTP (`helmet`) - voir `backend/README.md` pour le détail complet.
 - **Contenu IA réel (OpenAI), avec repli simulé** : les analyses forme/fond
   (`backend/src/workers/analyse.worker.js`) et les embeddings du profil méthodologique
   (`backend/src/lib/embeddings`) utilisent un vrai LLM (OpenAI `gpt-4o-mini` +
@@ -198,8 +172,8 @@ frontend/                     Frontend Next.js (voir frontend/package.json)
   authentification externe requise.
 - **Données mockées locales** : `frontend/data.json` contient 12 utilisateurs, 8 documents, 3 encadrants,
   et 10+ autres collections. json-server expose ces données sous forme d'API REST sur `http://localhost:4000`.
-  Aucune dépendance externe (Firebase, Render, PostgreSQL) - tout est local et auto-contenu.
-- **Authentification** : complètement mockée via `frontend/src/lib/firebase.ts` qui utilise json-server
+  Aucune dépendance externe - tout est local et auto-contenu.
+- **Authentification** : complètement mockée via `frontend/src/context/auth-context.tsx` qui utilise json-server
   comme backend d'authentification. Les tokens sont au format `mock-token-{userId}`. 
 - **Vérifié localement** : lint, tests et build du frontend - voir le workflow CI.
   UptimeRobot, intervalle 5 min) qui l'appelle régulièrement empêche la mise en veille.

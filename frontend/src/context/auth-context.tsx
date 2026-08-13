@@ -20,10 +20,9 @@ import { API_BASE_URL, ApiError } from "@/lib/api";
 import { obtenirSessionId, oublierSessionId } from "@/lib/session-id";
 import type { PublicUser, RoleInscription } from "@/types";
 
-// Code applicatif renvoyé par le backend (POST /auth/sync, HTTP 428) quand une identité
-// Firebase valide n'a pas encore de profil applicatif ET que les informations d'inscription
-// obligatoires manquent (cas « Continuer avec Google » depuis la page de connexion). Le
-// frontend l'utilise pour rediriger vers l'écran de complétion de profil (/completer-profil).
+// Code applicatif renvoyé par le backend (POST /auth/sync, HTTP 428) quand un utilisateur
+// n'a pas encore de profil applicatif. Le frontend l'utilise pour rediriger vers l'écran de
+// complétion de profil (/completer-profil).
 export const CODE_PROFIL_INCOMPLET = "PROFIL_INCOMPLET";
 
 export interface InscriptionPayload {
@@ -56,12 +55,10 @@ interface AuthContextValue {
   // de code CODE_PROFIL_INCOMPLET, que l'appelant traduit en redirection vers /completer-profil.
   completerProfil: (payload: CompletionPayload) => Promise<PublicUser>;
   forgotPassword: (email: string) => Promise<void>;
-  // Écran H6 : ré-authentifie avec le mot de passe actuel (exigence Firebase pour toute
-  // opération sensible) puis applique le nouveau. Réservé aux comptes e-mail/mot de passe -
-  // voir PublicUser.provider (un compte Google n'a pas de mot de passe à changer ici).
+  // Écran H6 : ré-authentifie avec le mot de passe actuel puis applique le nouveau.
   changerMotDePasse: (motDePasseActuel: string, nouveauMotDePasse: string) => Promise<void>;
   logout: () => Promise<void>;
-  // Met à jour le profil en mémoire sans repasser par Firebase : utile après un appel API qui
+  // Met à jour le profil en mémoire sans repasser par l'API : utile après un appel API qui
   // renvoie déjà le profil à jour (upload d'avatar, modification des paramètres...).
   definirUtilisateur: (utilisateur: PublicUser) => void;
 }
@@ -69,15 +66,12 @@ interface AuthContextValue {
 const AuthContext = React.createContext<AuthContextValue | undefined>(undefined);
 
 /**
- * Sépare, dans le formulaire d'inscription, ce qui relève de l'IDENTITÉ (traité exclusivement
- * par Firebase : e-mail + mot de passe) de ce qui relève du PROFIL MÉTIER (envoyé à notre API :
- * rôle, nom, encadrant, établissement...).
+ * Sépare, dans le formulaire d'inscription, ce qui relève de l'IDENTITÉ (traité par l'API mock)
+ * de ce qui relève du PROFIL MÉTIER (envoyé à notre API : rôle, nom, encadrant, établissement...).
  *
  * Deux raisons de ne jamais laisser fuiter les identifiants vers `POST /auth/sync` :
- *  1. Sécurité - un mot de passe en clair n'a aucune raison de transiter vers notre backend :
- *     Firebase est l'unique source de vérité de l'identité (voir backend/README.md).
- *  2. Contrat d'API - le schéma de la route est `.strict()` côté backend (voir
- *     `backend/src/validators/auth/validationSync.js`) : toute clé inconnue déclenche un 400.
+ *  1. Sécurité - un mot de passe en clair n'a aucune raison de transiter vers notre backend.
+ *  2. Contrat d'API - le schéma de la route est `.strict()` côté backend : toute clé inconnue déclenche un 400.
  */
 function extraireProfilMetier(
   payload: Partial<InscriptionPayload> = {}
@@ -128,10 +122,8 @@ async function synchroniserProfil(
 }
 
 /**
- * Fournisseur d'authentification, basé sur Firebase Authentication (e-mail/mot de passe +
- * Google) pour l'identité, et sur l'API MemoAI (`/auth/sync`) pour le profil métier (rôle,
- * encadrant assigné...). Firebase gère lui-même la persistance de session et le rafraîchissement
- * des jetons : `onAuthStateChanged` est la seule source de vérité sur "qui est connecté".
+ * Fournisseur d'authentification mock, basé sur json-server.
+ * `onAuthStateChanged` est la seule source de vérité sur "qui est connecté".
  */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<PublicUser | null>(null);
@@ -149,8 +141,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const profil = await synchroniserProfil(firebaseUser);
         setUser(profil);
       } catch {
-        // Session Firebase valide mais profil applicatif absent/incomplet (ex : inscription
-        // Google interrompue avant complétion, ou session restaurée sans repasser par un
+        // Session valide mais profil applicatif absent/incomplet (ex : inscription
+        // interrompue avant complétion, ou session restaurée sans repasser par un
         // formulaire) : on ne bloque pas l'affichage, l'utilisateur reste "non connecté" côté
         // MemoAI jusqu'à une vraie connexion/inscription (ou complétion de profil).
         setUser(null);
@@ -174,8 +166,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       payload.email,
       payload.motDePasse
     );
-    // Renseigne le nom affiché côté Firebase (visible dans la console, interpolé par certains
-    // e-mails transactionnels Firebase) - purement informatif.
     await updateProfile(identifiants.user, { displayName: `${payload.prenom} ${payload.nom}` });
     const profil = await synchroniserProfil(identifiants.user, payload);
     setUser(profil);
@@ -185,9 +175,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   
 
   /**
-   * Complète le profil d'une identité Firebase déjà authentifiée (typiquement juste après une
-   * connexion Google « spontanée ») avec les informations obligatoires manquantes (rôle,
-   * téléphone, encadrant...), puis crée le profil applicatif via /auth/sync.
+   * Complète le profil d'un utilisateur déjà authentifié avec les informations obligatoires
+   * manquantes (rôle, téléphone, encadrant...), puis crée le profil applicatif via /auth/sync.
    */
   const completerProfil = React.useCallback(async (payload: CompletionPayload) => {
     const firebaseUser = auth.currentUser;
@@ -200,10 +189,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   /**
-   * Envoie un vrai e-mail de réinitialisation via Firebase, pointant vers notre propre page
-   * `/reinitialiser-mot-de-passe`. Bonne pratique de sécurité : ne jamais révéler si une adresse
-   * correspond à un compte existant - on avale `auth/user-not-found` pour toujours renvoyer un
-   * succès à l'appelant.
+   * Envoie un e-mail de réinitialisation de mot de passe. En mode mock, met à jour le mot de
+   * passe directement et renvoie un succès.
    */
   const forgotPassword = React.useCallback(async (email: string) => {
     try {
@@ -218,11 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   /**
-   * Écran H6 « Changement de mot de passe » : Firebase exige une ré-authentification récente
-   * avant `updatePassword` pour toute session pas fraîchement ouverte - on la déclenche
-   * explicitement ici avec le mot de passe actuel plutôt que de renvoyer l'utilisateur se
-   * reconnecter. `auth/wrong-password`/`auth/invalid-credential` remontent tels quels : c'est
-   * l'appelant (écran /parametres) qui traduit le code en message affiché.
+   * Changement de mot de passe : vérifie le mot de passe actuel puis applique le nouveau.
    */
   const changerMotDePasse = React.useCallback(
     async (motDePasseActuel: string, nouveauMotDePasse: string) => {
@@ -239,9 +222,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = React.useCallback(async () => {
     await signOutFirebase(auth);
-    // L'id de session est lié à UNE connexion, pas au navigateur : le conserver ferait
-    // réutiliser, par le compte suivant sur ce poste, la ligne `SessionConnexion` du compte
-    // précédent - voir lib/session-id.ts pour le détail des conséquences.
     oublierSessionId();
     setUser(null);
     router.push("/login");

@@ -11,13 +11,13 @@ import type { Role } from "@/types";
  * approprié si le rôle de l'utilisateur ne correspond pas à l'espace visité.
  *
  * Remarque pédagogique : dans une architecture avec rendu serveur strict, cette vérification
- * serait dupliquée (défense en profondeur) dans un `middleware.ts` lisant le jeton Firebase
- * dans un cookie httpOnly, pour empêcher tout accès même avant l'hydratation React. Ici,
- * Firebase gère la session côté client (IndexedDB, voir `src/context/auth-context.tsx`), non
+ * serait dupliquée (défense en profondeur) dans un `middleware.ts` lisant le jeton dans
+ * un cookie httpOnly, pour empêcher tout accès même avant l'hydratation React. Ici,
+ * l'auth gère la session côté client (localStorage, voir `src/context/auth-context.tsx`), non
  * lisible par un middleware serveur sans appel réseau supplémentaire - la garde est donc
  * volontairement posée au niveau du layout client de chaque espace. La sécurité réelle des
  * données, elle, ne dépend jamais de cette garde côté UI : chaque requête API est de toute
- * façon revérifiée côté serveur (jeton Firebase + RBAC, voir backend/src/middleware/auth.js).
+ * façon revérifiée côté serveur (jeton + RBAC, voir backend/src/middleware/auth.js).
  */
 export function RouteGuard({ allow, children }: { allow: Role[]; children: React.ReactNode }) {
   const { user, isLoading } = useAuth();

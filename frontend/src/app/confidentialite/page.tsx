@@ -109,10 +109,9 @@ export default function ConfidentialitePage() {
           <section>
             <h2 className="mb-1 font-medium text-foreground">7. Sécurité</h2>
             <p>
-              L&apos;authentification est déléguée à Firebase (mots de passe jamais stockés par nos
-              soins), les échanges sont chiffrés (HTTPS), et l&apos;accès à vos données est
-              strictement limité à vous-même, votre encadrant assigné et les administrateurs de la
-              plateforme.
+              L&apos;authentification est gérée localement (mots de passe stockés de manière mockée),
+              les échanges sont chiffrés (HTTPS), et l&apos;accès à vos données est strictement limité
+              à vous-même, votre encadrant assigné et les administrateurs de la plateforme.
             </p>
           </section>
         </CardContent>

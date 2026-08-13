@@ -8,11 +8,10 @@ import { z } from "zod";
 import { GraduationCap, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { auth } from "@/lib/firebase";
 import { useAuth } from "@/context/auth-context";
 import { espaceParDefaut, lienOnboarding } from "@/components/layout/route-guard";
 import { useApiList } from "@/hooks/use-api-list";
-import { messageErreurFirebase } from "@/lib/firebase-errors";
+import { ApiError } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -40,10 +39,8 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 /**
- * Écran de complétion de profil, atteint après une inscription via Google « spontanée »
- * (bouton « Continuer avec Google » de la page de connexion) : Firebase fournit déjà l'identité
- * (nom, e-mail), mais le rôle, le téléphone et (pour un étudiant) l'encadrant restent à choisir
- * avant que le compte soit utilisable. Voir auth-context.completerProfil / backend /auth/sync.
+ * Écran de complétion de profil, atteint après une inscription si des informations obligatoires
+ * manquent (rôle, téléphone, encadrant...) avant que le compte soit utilisable.
  */
 export default function CompleterProfilPage() {
   const { user, isLoading, completerProfil } = useAuth();
@@ -66,7 +63,7 @@ export default function CompleterProfilPage() {
 
   const encadrantId = watch("encadrantId");
 
-  // Garde-fous : sans identité Firebase, il n'y a rien à compléter → retour à la connexion. Si
+  // Garde-fous : si l'utilisateur n'est pas connecté, retour à la connexion. Si
   // un profil complet existe déjà (rechargement), on renvoie l'utilisateur vers son espace.
   React.useEffect(() => {
     if (isLoading) return;
@@ -74,7 +71,7 @@ export default function CompleterProfilPage() {
       router.replace(espaceParDefaut(user.role));
       return;
     }
-    if (!auth.currentUser) router.replace("/login");
+    router.replace("/login");
   }, [isLoading, user, router]);
 
   const onSubmit = async (values: FormValues) => {
@@ -88,7 +85,7 @@ export default function CompleterProfilPage() {
       toast.success(`Profil complété, bienvenue ${profil.prenom} !`);
       router.push(lienOnboarding(profil.role) ?? espaceParDefaut(profil.role));
     } catch (err) {
-      toast.error(messageErreurFirebase(err, "Impossible de compléter votre profil."));
+      toast.error(err instanceof ApiError ? err.message : "Impossible de compléter votre profil.");
     } finally {
       setIsSubmitting(false);
     }

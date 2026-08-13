@@ -11,7 +11,6 @@ import { toast } from "sonner";
 
 import { useAuth, CODE_PROFIL_INCOMPLET } from "@/context/auth-context";
 import { espaceParDefaut } from "@/components/layout/route-guard";
-import { messageErreurFirebase } from "@/lib/firebase-errors";
 import { ApiError } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -59,7 +58,7 @@ export default function LoginPage() {
       toast.success(`Bienvenue, ${user.prenom} !`);
       router.push(espaceParDefaut(user.role));
     } catch (err) {
-      toast.error(messageErreurFirebase(err, "Adresse e-mail ou mot de passe incorrect."));
+      toast.error(err instanceof ApiError ? err.message : "Adresse e-mail ou mot de passe incorrect.");
     } finally {
       setIsSubmitting(false);
     }
@@ -72,7 +71,7 @@ export default function LoginPage() {
       await forgotPassword(oubliEmail.trim());
       setOubliEnvoye(true);
     } catch (err) {
-      toast.error(messageErreurFirebase(err, "Impossible d'envoyer l'e-mail pour le moment."));
+      toast.error(err instanceof ApiError ? err.message : "Impossible d'envoyer l'e-mail pour le moment.");
     } finally {
       setOubliEnCours(false);
     }
