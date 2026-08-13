@@ -204,7 +204,8 @@ export default function RegisterPage() {
                     </Select>
                   </div>
                 </>
-              )}
+               )}
+            </form>
             <p className="mt-2 text-center text-xs text-muted-foreground">
               
             </p>

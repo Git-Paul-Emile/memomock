@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import dynamic from "next/dynamic";
-import { BarChart3, Clock, RefreshCw, Target } from "lucide-react";
+import { BarChart3, Clock, Info, RefreshCw, Target } from "lucide-react";
 
 import { useAuth } from "@/context/auth-context";
 import { useApiList } from "@/hooks/use-api-list";
@@ -27,6 +27,19 @@ const RepartitionChart = dynamic(
 );
 
 const STATUTS_DECISION_FINALE = new Set(["valide", "rejete", "refuse"]);
+
+function InfoCarte({ label }: { label: string }) {
+  return (
+    <span
+      aria-label={label}
+      className="inline-flex rounded-full text-muted-foreground/70"
+      role="img"
+      title={label}
+    >
+      <Info className="size-3.5" />
+    </span>
+  );
+}
 
 /**
  * Écran « Statistiques d'encadrement » (spec écrans E73-E77, consolidés) : temps moyen de
@@ -79,8 +92,8 @@ export default function EncadrantStatistiquesPage() {
   const repartitionParType = React.useMemo(() => {
     const compteurs: Partial<Record<TypeDocument, number>> = {};
     documents.forEach((d) => {
-      if (!d.typeDocument) return;
-      compteurs[d.typeDocument] = (compteurs[d.typeDocument] ?? 0) + 1;
+      const type = d.typeDocument ?? "master";
+      compteurs[type] = (compteurs[type] ?? 0) + 1;
     });
     return Object.entries(compteurs).map(([type, valeur]) => ({
       statut: LIBELLES_TYPE_DOCUMENT[type as TypeDocument],
@@ -122,6 +135,7 @@ export default function EncadrantStatistiquesPage() {
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <Target className="size-4" />
               Score moyen
+              <InfoCarte label="Moyenne des scores de conformite des documents suivis." />
             </CardTitle>
           </CardHeader>
           <CardContent className="text-2xl font-semibold">
@@ -132,6 +146,7 @@ export default function EncadrantStatistiquesPage() {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <RefreshCw className="size-4" />
+              <InfoCarte label="Nombre moyen de versions ou cycles de revision par document suivi." />
               Cycles de révision moyens
             </CardTitle>
           </CardHeader>
@@ -143,6 +158,7 @@ export default function EncadrantStatistiquesPage() {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <Clock className="size-4" />
+              <InfoCarte label="Delai moyen entre la soumission et une decision finale: validation, rejet ou refus." />
               Temps moyen jusqu&apos;à décision
             </CardTitle>
           </CardHeader>
@@ -168,6 +184,10 @@ export default function EncadrantStatistiquesPage() {
         <CardContent className="h-64">
           {isLoading ? (
             <Skeleton className="h-full w-full" />
+          ) : repartitionParType.length === 0 ? (
+            <p className="flex h-full items-center justify-center text-sm text-muted-foreground">
+              Aucun type de document disponible.
+            </p>
           ) : (
             <RepartitionChart data={repartitionParType} />
           )}

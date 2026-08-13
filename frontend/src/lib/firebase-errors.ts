@@ -25,7 +25,7 @@ const MESSAGES: Record<string, string> = {
 };
 
 export function messageErreurFirebase(err: unknown, messageParDefaut: string): string {
-  if (err instanceof FirebaseError) {
+  if (err instanceof FirebaseError && err.code) {
     return MESSAGES[err.code] ?? messageParDefaut;
   }
   if (err instanceof Error) return err.message || messageParDefaut;

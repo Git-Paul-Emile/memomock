@@ -123,6 +123,7 @@ async function synchroniserProfil(
     nom: user.nom,
     prenom: user.prenom,
     role: user.role,
+    createdAt: user.createdAt,
   };
 }
 
