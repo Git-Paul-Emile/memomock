@@ -19,7 +19,18 @@
 import { obtenirSessionId } from "./session-id";
 
 // API json-server : mock local, données dans frontend/data.json
-const API_ROOT_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+function resolveApiRootUrl() {
+  const configuredUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+  if (typeof window === "undefined") return configuredUrl;
+
+  const isRemoteApp = !["localhost", "127.0.0.1"].includes(window.location.hostname);
+  const targetsLocalApi = configuredUrl.includes("localhost") || configuredUrl.includes("127.0.0.1");
+  if (isRemoteApp && targetsLocalApi) return "/api/mock";
+
+  return configuredUrl;
+}
+
+const API_ROOT_URL = resolveApiRootUrl();
 export const API_BASE_URL = API_ROOT_URL;
 // Health check (json-server /db endpoint)
 export const API_HEALTH_URL = `${API_ROOT_URL}`;
