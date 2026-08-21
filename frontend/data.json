@@ -17,7 +17,8 @@
       "scoreCoherence": 0,
       "typeDocument": "master",
       "discipline": "Informatique",
-      "profilEncadrantId": "pe1"
+      "profilEncadrantId": "pe1",
+      "dateSoutenancePrevue": "2026-11-15"
     },
     {
       "id": "doc2",
@@ -155,7 +156,102 @@
       "profilEncadrantId": "pe1"
     }
   ],
-  "notifications": [],
+  "notifications": [
+    {
+      "userId": "u2",
+      "titre": "Nouveau livrable déposé",
+      "message": "Amina Diallo a déposé « Démonstration en ligne ».",
+      "type": "soumission",
+      "lu": false,
+      "date": "2026-08-21T17:46:20.659Z",
+      "lienDocumentId": "doc1",
+      "id": 1
+    },
+    {
+      "userId": "u5",
+      "titre": "Livrable conforme",
+      "message": "« Cahier des charges » a été validé par votre encadrant.",
+      "type": "correction",
+      "lu": false,
+      "date": "2026-08-21T17:47:32.469Z",
+      "lienDocumentId": "doc1",
+      "id": 2
+    },
+    {
+      "userId": "u5",
+      "titre": "Livrable à corriger",
+      "message": "« Démonstration en ligne » nécessite une correction : Le lien de démonstration renvoie une erreur 404.",
+      "type": "correction",
+      "lu": false,
+      "date": "2026-08-21T17:47:34.369Z",
+      "lienDocumentId": "doc1",
+      "id": 3
+    },
+    {
+      "userId": "u5",
+      "titre": "Chapitre validé",
+      "message": "« Méthodologie » a été validé par votre encadrant.",
+      "type": "validation",
+      "lu": false,
+      "date": "2026-08-21T19:06:32.013Z",
+      "lienDocumentId": "doc1",
+      "id": 4
+    },
+    {
+      "userId": "u5",
+      "titre": "Rappel : échéance dépassée",
+      "message": "Votre encadrant vous rappelle qu'une ou plusieurs échéances de suivi sont dépassées.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-08-21T19:45:52.153Z",
+      "id": 5
+    },
+    {
+      "userId": "u6",
+      "titre": "Rappel : échéance dépassée",
+      "message": "Votre encadrant vous rappelle qu'une ou plusieurs échéances de suivi sont dépassées.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-08-21T19:45:52.153Z",
+      "id": 6
+    },
+    {
+      "userId": "u3",
+      "titre": "Nouvelle demande d'encadrement",
+      "message": "Test Lot4 souhaite être encadré·e par vous.",
+      "type": "systeme",
+      "lu": false,
+      "date": "2026-08-21T20:14:17.951Z",
+      "id": 7
+    },
+    {
+      "userId": "LHn0Z_M",
+      "titre": "Demande d'encadrement acceptée",
+      "message": "Votre encadrant a accepté votre demande. Vous pouvez soumettre votre premier document.",
+      "type": "systeme",
+      "lu": false,
+      "date": "2026-08-21T20:14:23.358Z",
+      "id": 8
+    },
+    {
+      "userId": "u5",
+      "titre": "Message de votre encadrant",
+      "message": "Tous les étudiants doivent corriger la pagination de leur document.",
+      "type": "systeme",
+      "lu": false,
+      "date": "2026-08-21T20:29:33.459Z",
+      "id": 9
+    },
+    {
+      "userId": "u6",
+      "titre": "Message de votre encadrant",
+      "message": "Tous les étudiants doivent corriger la pagination de leur document.",
+      "type": "systeme",
+      "lu": false,
+      "date": "2026-08-21T20:29:33.459Z",
+      "id": 10
+    }
+  ],
   "logsErreurs": [],
   "users": [
     {
@@ -176,7 +272,12 @@
       "email": "j.leroux@memoai.fr",
       "createdAt": "2026-01-06T09:00:00.000Z",
       "password": "encadrant123",
-      "telephoneVerifie": false
+      "telephoneVerifie": false,
+      "domainesExpertise": [
+        "Intelligence artificielle",
+        "Génie logiciel"
+      ],
+      "disponible": true
     },
     {
       "id": "u3",
@@ -186,7 +287,12 @@
       "email": "f.sarr@memoai.fr",
       "createdAt": "2026-01-06T09:05:00.000Z",
       "password": "encadrant123",
-      "telephoneVerifie": false
+      "telephoneVerifie": false,
+      "domainesExpertise": [
+        "Stratégie d'entreprise",
+        "Transformation digitale"
+      ],
+      "disponible": true
     },
     {
       "id": "u4",
@@ -196,7 +302,12 @@
       "email": "k.belhadj@memoai.fr",
       "createdAt": "2026-01-06T09:10:00.000Z",
       "password": "encadrant123",
-      "telephoneVerifie": false
+      "telephoneVerifie": false,
+      "domainesExpertise": [
+        "Droit du numérique",
+        "RGPD"
+      ],
+      "disponible": false
     },
     {
       "id": "u5",
@@ -206,6 +317,9 @@
       "email": "amina.diallo@etu.memoai.fr",
       "encadrantId": "u2",
       "filiere": "Master 2 Informatique",
+      "etablissementId": "etab1",
+      "classeId": "classe1",
+      "groupeId": "groupe1",
       "createdAt": "2026-02-01T10:00:00.000Z",
       "password": "etudiant123",
       "telephoneVerifie": false
@@ -218,6 +332,8 @@
       "email": "y.morel@etu.memoai.fr",
       "encadrantId": "u2",
       "filiere": "Master 2 Informatique",
+      "etablissementId": "etab1",
+      "classeId": "classe1",
       "createdAt": "2026-02-01T10:05:00.000Z",
       "password": "etudiant123",
       "telephoneVerifie": false
@@ -230,6 +346,8 @@
       "email": "c.bernard@etu.memoai.fr",
       "encadrantId": "u3",
       "filiere": "Master 2 Sciences de gestion",
+      "etablissementId": "etab1",
+      "classeId": "classe2",
       "createdAt": "2026-02-02T10:00:00.000Z",
       "password": "etudiant123",
       "telephoneVerifie": false
@@ -242,6 +360,8 @@
       "email": "m.ba@etu.memoai.fr",
       "encadrantId": "u3",
       "filiere": "Master 2 Sciences de gestion",
+      "etablissementId": "etab1",
+      "classeId": "classe2",
       "createdAt": "2026-02-02T10:10:00.000Z",
       "password": "etudiant123",
       "telephoneVerifie": false
@@ -254,6 +374,7 @@
       "email": "l.petit@etu.memoai.fr",
       "encadrantId": "u4",
       "filiere": "Master 2 Droit du numérique",
+      "classeId": "classe3",
       "createdAt": "2026-02-03T10:00:00.000Z",
       "password": "etudiant123",
       "telephoneVerifie": false
@@ -266,6 +387,7 @@
       "email": "s.rossi@etu.memoai.fr",
       "encadrantId": "u4",
       "filiere": "Master 2 Droit du numérique",
+      "classeId": "classe3",
       "createdAt": "2026-02-03T10:15:00.000Z",
       "password": "etudiant123",
       "telephoneVerifie": false
@@ -289,6 +411,85 @@
       "createdAt": "2026-01-05T09:15:00.000Z",
       "password": "admin123",
       "telephoneVerifie": false
+    },
+    {
+      "id": "u13",
+      "role": "admin_etablissement",
+      "nom": "Ndiaye",
+      "prenom": "Cheikh",
+      "email": "direction@paris-saclay.memoai.fr",
+      "etablissementId": "etab1",
+      "createdAt": "2026-01-06T08:00:00.000Z",
+      "password": "etablissement123",
+      "telephoneVerifie": false
+    }
+  ],
+  "etablissements": [
+    {
+      "id": "etab1",
+      "nom": "Université Paris-Saclay",
+      "adminId": "u13",
+      "createdAt": "2026-01-06T08:00:00.000Z"
+    }
+  ],
+  "filieres": [
+    {
+      "id": "fil1",
+      "etablissementId": "etab1",
+      "nom": "Informatique",
+      "createdAt": "2026-01-06T08:05:00.000Z"
+    },
+    {
+      "id": "fil2",
+      "etablissementId": "etab1",
+      "nom": "Sciences de gestion",
+      "createdAt": "2026-01-06T08:06:00.000Z"
+    }
+  ],
+  "classes": [
+    {
+      "id": "classe1",
+      "etablissementId": "etab1",
+      "filiereId": "fil1",
+      "nom": "Master Informatique — Promotion 2026",
+      "niveau": "master",
+      "code": "CLASSE-INFO26",
+      "encadrantIds": [
+        "u2"
+      ],
+      "createdAt": "2026-01-06T08:10:00.000Z"
+    },
+    {
+      "id": "classe2",
+      "etablissementId": "etab1",
+      "filiereId": "fil2",
+      "nom": "Master Sciences de gestion — Promotion 2026",
+      "niveau": "master",
+      "code": "CLASSE-GEST26",
+      "encadrantIds": [
+        "u3"
+      ],
+      "createdAt": "2026-01-06T08:11:00.000Z"
+    },
+    {
+      "id": "classe3",
+      "etablissementId": null,
+      "filiereId": null,
+      "nom": "Master Droit du numérique — Cohorte 2026",
+      "niveau": "master",
+      "code": "CLASSE-DROIT26",
+      "encadrantIds": [
+        "u4"
+      ],
+      "createdAt": "2026-01-16T09:00:00.000Z"
+    }
+  ],
+  "groupes": [
+    {
+      "id": "groupe1",
+      "classeId": "classe1",
+      "nom": "Groupe A",
+      "createdAt": "2026-01-06T08:15:00.000Z"
     }
   ],
   "temoignages": [
@@ -665,6 +866,45 @@
   ],
   "analyses": [
     {
+      "id": "an-struct-doc1",
+      "documentId": "doc1",
+      "type": "structure",
+      "score": 60,
+      "dateAnalyse": "2026-08-15T09:30:00.000Z",
+      "points": [
+        {
+          "id": "ps1",
+          "libelle": "Introduction",
+          "detail": "Chapitre identifié, structure conforme au canevas.",
+          "niveau": "succes"
+        },
+        {
+          "id": "ps2",
+          "libelle": "État de l'art",
+          "detail": "Chapitre identifié, revue de littérature développée.",
+          "niveau": "succes"
+        },
+        {
+          "id": "ps3",
+          "libelle": "Méthodologie",
+          "detail": "Chapitre présent, mais le choix de l'échantillon n'est pas justifié.",
+          "niveau": "attention"
+        },
+        {
+          "id": "ps4",
+          "libelle": "Résultats",
+          "detail": "Chapitre attendu par le canevas mais non identifié dans le document déposé.",
+          "niveau": "erreur"
+        },
+        {
+          "id": "ps5",
+          "libelle": "Conclusion",
+          "detail": "Chapitre attendu par le canevas mais non identifié dans le document déposé.",
+          "niveau": "erreur"
+        }
+      ]
+    },
+    {
       "id": "an1",
       "documentId": "doc3",
       "type": "forme",
@@ -815,6 +1055,21 @@
       ]
     },
     {
+      "id": "an12",
+      "documentId": "doc7",
+      "type": "coherence",
+      "score": 94,
+      "dateAnalyse": "2026-06-25T10:10:00.000Z",
+      "points": [
+        {
+          "id": "p17",
+          "libelle": "Cohérence introduction / résultats",
+          "detail": "La problématique annoncée en introduction est bien reprise et discutée dans les résultats et la conclusion.",
+          "niveau": "succes"
+        }
+      ]
+    },
+    {
       "id": "an13",
       "documentId": "doc8",
       "type": "forme",
@@ -857,21 +1112,39 @@
       "nom": "Leroux",
       "prenom": "Jérôme",
       "email": "j.leroux@memoai.fr",
-      "filiere": null
+      "filiere": null,
+      "domainesExpertise": [
+        "Intelligence artificielle",
+        "Génie logiciel"
+      ],
+      "disponible": true,
+      "nbEtudiantsSuivis": 2
     },
     {
       "id": "u3",
       "nom": "Sarr",
       "prenom": "Fatou",
       "email": "f.sarr@memoai.fr",
-      "filiere": null
+      "filiere": null,
+      "domainesExpertise": [
+        "Stratégie d'entreprise",
+        "Transformation digitale"
+      ],
+      "disponible": true,
+      "nbEtudiantsSuivis": 2
     },
     {
       "id": "u4",
       "nom": "Belhadj",
       "prenom": "Karim",
       "email": "k.belhadj@memoai.fr",
-      "filiere": null
+      "filiere": null,
+      "domainesExpertise": [
+        "Droit du numérique",
+        "RGPD"
+      ],
+      "disponible": false,
+      "nbEtudiantsSuivis": 2
     }
   ],
   "invitations": [],
@@ -1073,10 +1346,55 @@
           "ajouteLe": "2026-01-11T09:00:00.000Z"
         }
       ],
+      "livrablesAttendus": [
+        {
+          "id": "ld1",
+          "nom": "Cahier des charges",
+          "description": "Périmètre fonctionnel et technique du projet.",
+          "type": "fichier",
+          "obligatoire": true,
+          "ajouteLe": "2026-01-12T08:00:00.000Z"
+        },
+        {
+          "id": "ld2",
+          "nom": "Maquette UX/UI",
+          "description": "Maquettes des écrans principaux (Figma, PDF...).",
+          "type": "fichier",
+          "obligatoire": false,
+          "dateEcheance": "2026-08-15",
+          "ajouteLe": "2026-01-12T08:00:00.000Z"
+        },
+        {
+          "id": "ld3",
+          "nom": "Dépôt de code (GitHub)",
+          "description": "Lien vers le dépôt Git contenant le code source du projet.",
+          "type": "lien",
+          "obligatoire": true,
+          "ajouteLe": "2026-01-12T08:00:00.000Z"
+        },
+        {
+          "id": "ld4",
+          "nom": "Démonstration en ligne",
+          "description": "URL de l'application déployée ou d'une vidéo de démonstration.",
+          "type": "lien",
+          "obligatoire": false,
+          "dateEcheance": "2026-09-01",
+          "ajouteLe": "2026-01-12T08:00:00.000Z"
+        },
+        {
+          "id": "c5a11848-65a2-4c25-ab3a-04db71097f23",
+          "nom": "Rapport de tests utilisateurs",
+          "description": "Synthèse des tests utilisateurs menés sur le prototype.",
+          "type": "fichier",
+          "obligatoire": false,
+          "ajouteLe": "2026-08-21T17:48:15.784Z"
+        }
+      ],
+      "canevasId": "canevas1",
       "contraintes": null,
       "seuilSoumission": 75,
       "seuilCategorieMinimum": 50,
-      "updatedAt": "2026-01-12T08:00:00.000Z"
+      "updatedAt": "2026-08-21T17:48:15.784Z"
     },
     {
       "id": "pe2",
@@ -1117,6 +1435,24 @@
           "ajouteLe": "2026-01-14T09:00:00.000Z"
         }
       ],
+      "livrablesAttendus": [
+        {
+          "id": "ld5",
+          "nom": "Étude de marché",
+          "description": "Analyse du marché cible et de la concurrence.",
+          "type": "fichier",
+          "obligatoire": true,
+          "ajouteLe": "2026-01-14T09:00:00.000Z"
+        },
+        {
+          "id": "ld6",
+          "nom": "Plan d'affaires",
+          "description": "Business plan synthétique du projet étudié.",
+          "type": "fichier",
+          "obligatoire": false,
+          "ajouteLe": "2026-01-14T09:00:00.000Z"
+        }
+      ],
       "contraintes": null,
       "seuilSoumission": 75,
       "seuilCategorieMinimum": 50,
@@ -1154,10 +1490,567 @@
           "ajouteLe": "2026-01-16T09:00:00.000Z"
         }
       ],
+      "livrablesAttendus": [
+        {
+          "id": "ld7",
+          "nom": "Synthèse de veille juridique",
+          "description": "Recueil commenté des textes et décisions récents en lien avec le sujet.",
+          "type": "fichier",
+          "obligatoire": true,
+          "ajouteLe": "2026-01-16T09:00:00.000Z"
+        }
+      ],
       "contraintes": null,
       "seuilSoumission": 75,
       "seuilCategorieMinimum": 50,
       "updatedAt": "2026-01-16T09:00:00.000Z"
+    }
+  ],
+  "livrables": [
+    {
+      "id": "liv1",
+      "documentId": "doc1",
+      "definitionId": "ld1",
+      "nom": "Cahier des charges",
+      "type": "fichier",
+      "obligatoire": true,
+      "statut": "valide",
+      "nomFichier": "cahier_des_charges_diallo.pdf",
+      "tailleOctets": 245000,
+      "urlExterne": null,
+      "commentaireEncadrant": null,
+      "dateDepot": "2026-08-15T10:00:00.000Z",
+      "dateVerification": "2026-08-21T17:47:32.469Z",
+      "createdAt": "2026-08-15T10:00:00.000Z",
+      "updatedAt": "2026-08-21T17:47:32.469Z"
+    },
+    {
+      "id": "liv2",
+      "documentId": "doc1",
+      "definitionId": "ld3",
+      "nom": "Dépôt de code (GitHub)",
+      "type": "lien",
+      "obligatoire": true,
+      "statut": "valide",
+      "nomFichier": null,
+      "tailleOctets": null,
+      "urlExterne": "https://github.com/amina-diallo/memoire-ia-pedagogie",
+      "commentaireEncadrant": null,
+      "dateDepot": "2026-08-10T09:00:00.000Z",
+      "dateVerification": "2026-08-11T08:30:00.000Z",
+      "createdAt": "2026-08-10T09:00:00.000Z",
+      "updatedAt": "2026-08-11T08:30:00.000Z"
+    },
+    {
+      "documentId": "doc1",
+      "definitionId": "ld4",
+      "nom": "Démonstration en ligne",
+      "type": "lien",
+      "obligatoire": false,
+      "statut": "en_correction",
+      "urlExterne": "https://demo.memoai-assistant.fr/amina",
+      "nomFichier": null,
+      "tailleOctets": null,
+      "dateDepot": "2026-08-21T17:46:20.659Z",
+      "createdAt": "2026-08-21T17:46:20.659Z",
+      "updatedAt": "2026-08-21T17:47:34.369Z",
+      "id": "eGDql_k",
+      "commentaireEncadrant": "Le lien de démonstration renvoie une erreur 404.",
+      "dateVerification": "2026-08-21T17:47:34.369Z"
+    }
+  ],
+  "canevas": [
+    {
+      "id": "canevas1",
+      "encadrantId": "u2",
+      "nom": "Canevas Master Informatique 2026",
+      "description": "Structure standard attendue pour un mémoire de Master Informatique.",
+      "createdAt": "2026-01-12T08:30:00.000Z",
+      "updatedAt": "2026-01-12T08:30:00.000Z"
+    }
+  ],
+  "chapitres-canevas": [
+    {
+      "id": "chap1",
+      "canevasId": "canevas1",
+      "titre": "Introduction",
+      "description": "Contexte, problématique et annonce du plan.",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "chap2",
+      "canevasId": "canevas1",
+      "titre": "État de l'art",
+      "description": "Revue de littérature et positionnement scientifique.",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "chap3",
+      "canevasId": "canevas1",
+      "titre": "Méthodologie",
+      "description": "Démarche et protocole retenus.",
+      "obligatoire": true,
+      "ordre": 2
+    },
+    {
+      "id": "chap4",
+      "canevasId": "canevas1",
+      "titre": "Résultats",
+      "description": "Présentation et analyse critique des résultats.",
+      "obligatoire": true,
+      "ordre": 3,
+      "dateEcheance": "2026-08-20"
+    },
+    {
+      "id": "chap5",
+      "canevasId": "canevas1",
+      "titre": "Conclusion",
+      "description": "Synthèse, limites et perspectives.",
+      "obligatoire": true,
+      "ordre": 4,
+      "dateEcheance": "2026-09-15"
+    }
+  ],
+  "criteres-chapitre": [
+    {
+      "id": "crit1",
+      "chapitreId": "chap1",
+      "libelle": "Contexte",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit2",
+      "chapitreId": "chap1",
+      "libelle": "Problématique",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "crit3",
+      "chapitreId": "chap1",
+      "libelle": "Annonce du plan",
+      "obligatoire": false,
+      "ordre": 2
+    },
+    {
+      "id": "crit4",
+      "chapitreId": "chap2",
+      "libelle": "Revue de littérature",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit5",
+      "chapitreId": "chap2",
+      "libelle": "Positionnement scientifique",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "crit6",
+      "chapitreId": "chap3",
+      "libelle": "Choix méthodologiques justifiés",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit7",
+      "chapitreId": "chap3",
+      "libelle": "Protocole décrit",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "crit8",
+      "chapitreId": "chap4",
+      "libelle": "Présentation des résultats",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit9",
+      "chapitreId": "chap4",
+      "libelle": "Analyse critique",
+      "obligatoire": false,
+      "ordre": 1
+    },
+    {
+      "id": "crit10",
+      "chapitreId": "chap5",
+      "libelle": "Synthèse",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit11",
+      "chapitreId": "chap5",
+      "libelle": "Limites et perspectives",
+      "obligatoire": false,
+      "ordre": 1
+    }
+  ],
+  "validations-chapitre": [
+    {
+      "id": "vc1",
+      "documentId": "doc1",
+      "chapitreId": "chap1",
+      "statut": "en_attente",
+      "verrouille": false,
+      "commentaire": null,
+      "dateDecision": "2026-08-16T09:00:00.000Z",
+      "createdAt": "2026-08-16T09:00:00.000Z",
+      "updatedAt": "2026-08-21T19:06:33.679Z"
+    },
+    {
+      "id": "vc2",
+      "documentId": "doc1",
+      "chapitreId": "chap2",
+      "statut": "valide",
+      "verrouille": true,
+      "commentaire": null,
+      "dateDecision": "2026-08-16T09:05:00.000Z",
+      "createdAt": "2026-08-16T09:05:00.000Z",
+      "updatedAt": "2026-08-16T09:05:00.000Z"
+    },
+    {
+      "id": "vc3",
+      "documentId": "doc1",
+      "chapitreId": "chap3",
+      "statut": "valide",
+      "verrouille": true,
+      "commentaire": null,
+      "dateDecision": "2026-08-21T19:06:32.013Z",
+      "createdAt": "2026-08-16T09:10:00.000Z",
+      "updatedAt": "2026-08-21T19:06:32.013Z"
+    }
+  ],
+  "grilles-evaluation": [
+    {
+      "id": "pe1",
+      "profilEncadrantId": "pe1",
+      "criteres": [
+        {
+          "id": "cg1",
+          "libelle": "Problématique",
+          "poids": 14,
+          "ordre": 0
+        },
+        {
+          "id": "cg2",
+          "libelle": "Revue de littérature",
+          "poids": 16,
+          "ordre": 1
+        },
+        {
+          "id": "cg3",
+          "libelle": "Méthodologie",
+          "poids": 20,
+          "ordre": 2
+        },
+        {
+          "id": "cg4",
+          "libelle": "Analyse",
+          "poids": 20,
+          "ordre": 3
+        },
+        {
+          "id": "cg5",
+          "libelle": "Discussion",
+          "poids": 15,
+          "ordre": 4
+        },
+        {
+          "id": "cg6",
+          "libelle": "Conclusion",
+          "poids": 5,
+          "ordre": 5
+        },
+        {
+          "id": "cg7",
+          "libelle": "Forme",
+          "poids": 10,
+          "ordre": 6
+        }
+      ],
+      "updatedAt": "2026-08-21T19:21:30.162Z"
+    },
+    {
+      "id": "pe2",
+      "profilEncadrantId": "pe2",
+      "criteres": [
+        {
+          "id": "34288bae-2383-42e7-8c03-9ed0286e8592",
+          "libelle": "Problématique",
+          "poids": 15,
+          "ordre": 0
+        },
+        {
+          "id": "af341332-dc14-488b-82de-400ea19d6d3b",
+          "libelle": "Revue de littérature",
+          "poids": 15,
+          "ordre": 1
+        },
+        {
+          "id": "5e00c050-0c10-49cb-94a7-e83de371461a",
+          "libelle": "Méthodologie",
+          "poids": 20,
+          "ordre": 2
+        },
+        {
+          "id": "881eb1e9-4879-47e6-b486-090eee72f494",
+          "libelle": "Analyse",
+          "poids": 20,
+          "ordre": 3
+        },
+        {
+          "id": "f352369d-e4ed-4fce-ab9f-9ad73441526f",
+          "libelle": "Discussion",
+          "poids": 15,
+          "ordre": 4
+        },
+        {
+          "id": "b5ed367f-1e86-41ec-8c7d-6a0ff6da573a",
+          "libelle": "Conclusion",
+          "poids": 5,
+          "ordre": 5
+        },
+        {
+          "id": "a83947fb-83cf-4520-a7ae-6fa041fe1c31",
+          "libelle": "Forme",
+          "poids": 10,
+          "ordre": 6
+        }
+      ],
+      "updatedAt": "2026-08-21T19:22:13.908Z"
+    }
+  ],
+  "disponibilites-encadrant": [
+    {
+      "id": "dispo1",
+      "encadrantId": "u2",
+      "jourSemaine": 1,
+      "heureDebut": "18:00",
+      "heureFin": "21:00"
+    },
+    {
+      "id": "dispo2",
+      "encadrantId": "u2",
+      "jourSemaine": 3,
+      "heureDebut": "18:00",
+      "heureFin": "20:00"
+    }
+  ],
+  "seances": [
+    {
+      "id": "seance1",
+      "encadrantId": "u2",
+      "etudiantId": "u5",
+      "documentId": "doc1",
+      "titre": "Séance 1",
+      "tache": "Cahier des charges",
+      "dateHeure": "2026-08-10T18:00:00.000Z",
+      "statut": "effectuee",
+      "notes": null,
+      "createdAt": "2026-08-01T09:00:00.000Z",
+      "updatedAt": "2026-08-10T19:00:00.000Z"
+    },
+    {
+      "id": "seance2",
+      "encadrantId": "u2",
+      "etudiantId": "u5",
+      "documentId": "doc1",
+      "titre": "Séance 2",
+      "tache": "Méthodologie",
+      "dateHeure": "2026-08-17T18:00:00.000Z",
+      "statut": "planifiee",
+      "notes": null,
+      "createdAt": "2026-08-01T09:00:00.000Z",
+      "updatedAt": "2026-08-01T09:00:00.000Z"
+    },
+    {
+      "id": "seance3",
+      "encadrantId": "u2",
+      "etudiantId": "u5",
+      "documentId": "doc1",
+      "titre": "Séance 3",
+      "tache": "Livrables",
+      "dateHeure": "2026-08-28T18:00:00.000Z",
+      "statut": "planifiee",
+      "notes": null,
+      "createdAt": "2026-08-01T09:00:00.000Z",
+      "updatedAt": "2026-08-01T09:00:00.000Z"
+    },
+    {
+      "id": "seance4",
+      "encadrantId": "u2",
+      "etudiantId": "u5",
+      "documentId": "doc1",
+      "titre": "Séance 4",
+      "tache": "Rédaction / relecture",
+      "dateHeure": "2026-09-10T18:00:00.000Z",
+      "statut": "planifiee",
+      "notes": null,
+      "createdAt": "2026-08-01T09:00:00.000Z",
+      "updatedAt": "2026-08-01T09:00:00.000Z"
+    },
+    {
+      "encadrantId": "u2",
+      "etudiantId": "u6",
+      "titre": "Séance 1",
+      "tache": "Définition du sujet",
+      "dateHeure": "2026-08-24T17:00:00.000Z",
+      "statut": "planifiee",
+      "createdAt": "2026-08-21T19:45:54.569Z",
+      "updatedAt": "2026-08-21T19:45:54.569Z",
+      "id": "Aeih3NU"
+    },
+    {
+      "encadrantId": "u2",
+      "etudiantId": "u6",
+      "titre": "Séance 2",
+      "tache": "Cahier des charges",
+      "dateHeure": "2026-09-14T17:00:00.000Z",
+      "statut": "planifiee",
+      "createdAt": "2026-08-21T19:45:54.569Z",
+      "updatedAt": "2026-08-21T19:45:54.569Z",
+      "id": "V7MTyhM"
+    },
+    {
+      "encadrantId": "u2",
+      "etudiantId": "u6",
+      "titre": "Séance 3",
+      "tache": "UX/UI",
+      "dateHeure": "2026-10-05T17:00:00.000Z",
+      "statut": "planifiee",
+      "createdAt": "2026-08-21T19:45:54.569Z",
+      "updatedAt": "2026-08-21T19:45:54.569Z",
+      "id": "SrSfOG0"
+    },
+    {
+      "encadrantId": "u2",
+      "etudiantId": "u6",
+      "titre": "Séance 4",
+      "tache": "Conception",
+      "dateHeure": "2026-10-26T17:00:00.000Z",
+      "statut": "planifiee",
+      "createdAt": "2026-08-21T19:45:54.569Z",
+      "updatedAt": "2026-08-21T19:45:54.569Z",
+      "id": "uqXRf8m"
+    },
+    {
+      "encadrantId": "u2",
+      "etudiantId": "u6",
+      "titre": "Séance 5",
+      "tache": "Rédaction / relecture",
+      "dateHeure": "2026-11-16T17:00:00.000Z",
+      "statut": "planifiee",
+      "createdAt": "2026-08-21T19:45:54.569Z",
+      "updatedAt": "2026-08-21T19:45:54.569Z",
+      "id": "VrVAdI0"
+    }
+  ],
+  "demandes-encadrement": [],
+  "reponses-commentaire": [
+    {
+      "id": "rc1",
+      "commentaireMargeId": "cm1",
+      "documentId": "doc7",
+      "auteur": "etudiant",
+      "texte": "Bonne remarque, j'ajoute la taille des deux cohortes (32 et 28 étudiants) dans la version suivante.",
+      "date": "2026-06-11T15:00:00.000Z"
+    },
+    {
+      "id": "rc2",
+      "commentaireMargeId": "cm1",
+      "documentId": "doc7",
+      "auteur": "encadrant",
+      "texte": "Parfait, merci.",
+      "date": "2026-06-11T16:00:00.000Z"
+    },
+    {
+      "commentaireMargeId": "cm1",
+      "documentId": "doc7",
+      "auteur": "etudiant",
+      "texte": "Merci, je corrige aussi la bibliographie en conséquence.",
+      "date": "2026-08-21T20:14:38.427Z",
+      "id": "WVWV-wn"
+    }
+  ],
+  "versions": [
+    {
+      "id": "vd1",
+      "documentId": "doc7",
+      "numero": 3,
+      "statut": "valide",
+      "scoreConformite": 95,
+      "scoreForme": 96,
+      "scoreFond": 94,
+      "scoreCoherence": 94,
+      "urlFichier": null,
+      "texteExtrait": "L'intelligence artificielle générative transforme en profondeur les pratiques pédagogiques dans l'enseignement supérieur.\nCette étude analyse les usages observés auprès de deux cohortes d'étudiants, sur une période de six mois.\nLes résultats apparaissent nuancés : si l'IA accélère certaines tâches, elle interroge la construction de l'esprit critique.",
+      "auteur": "encadrant",
+      "createdAt": "2026-06-10T09:00:00.000Z"
+    }
+  ],
+  "forfaits": [
+    {
+      "id": "forfait-gratuit",
+      "nom": "Gratuit",
+      "description": "Pour découvrir la plateforme avec une petite promotion.",
+      "prixMensuel": 0,
+      "maxEtudiants": 20,
+      "maxEncadrants": 3,
+      "fonctionnalites": [
+        "Analyse IA de base",
+        "1 canevas par encadrant"
+      ],
+      "miseEnRelationPayante": false,
+      "ordre": 0
+    },
+    {
+      "id": "forfait-etablissement",
+      "nom": "Établissement",
+      "description": "Pour une école ou un département gérant plusieurs classes.",
+      "prixMensuel": 199,
+      "maxEtudiants": 300,
+      "maxEncadrants": 30,
+      "fonctionnalites": [
+        "Classes et groupes illimités",
+        "Canevas et grilles illimités",
+        "Statistiques d'encadrement",
+        "Support prioritaire"
+      ],
+      "miseEnRelationPayante": false,
+      "ordre": 1
+    },
+    {
+      "id": "forfait-etablissement-pro",
+      "nom": "Établissement Pro",
+      "description": "Pour un établissement multi-filières avec mise en relation étudiant/encadreur.",
+      "prixMensuel": 499,
+      "maxEtudiants": null,
+      "maxEncadrants": null,
+      "fonctionnalites": [
+        "Étudiants et encadreurs illimités",
+        "Mise en relation étudiant/encadreur assistée",
+        "Statistiques avancées",
+        "Support dédié"
+      ],
+      "miseEnRelationPayante": true,
+      "ordre": 2
+    }
+  ],
+  "abonnements": [
+    {
+      "id": "abo1",
+      "etablissementId": "etab1",
+      "forfaitId": "forfait-etablissement",
+      "statut": "actif",
+      "dateDebut": "2026-01-06T08:00:00.000Z",
+      "dateRenouvellement": "2026-09-06T08:00:00.000Z"
     }
   ],
   "public": {

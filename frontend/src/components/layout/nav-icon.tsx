@@ -18,6 +18,8 @@ import {
   BarChart3,
   FolderKanban,
   GitBranch,
+  CalendarClock,
+  CreditCard,
   type LucideIcon,
 } from "lucide-react";
 
@@ -41,6 +43,8 @@ const ICONS: Record<string, LucideIcon> = {
   BarChart3,
   FolderKanban,
   GitBranch,
+  CalendarClock,
+  CreditCard,
 };
 
 export function NavIcon({ name, className }: { name: string; className?: string }) {

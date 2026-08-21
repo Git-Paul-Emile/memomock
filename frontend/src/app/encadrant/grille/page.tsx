@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { apiGet, apiList, apiPut } from "@/lib/api";
+import { apiGet, apiList, apiPost, apiPut } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import type { CritereGrille, GrilleEvaluation, ProfilEncadrant } from "@/types";
 
@@ -61,12 +61,16 @@ export default function GrilleEvaluationPage() {
   const profilSelectionne =
     profilsState.find((p) => p.id === profilSelectionneId) ?? profilsState[0] ?? null;
 
-  const { data: grilleChargee, isLoading: chargementGrille } =
-    useApiResource<GrilleEvaluation | null>(
-      ["grille-evaluation", profilSelectionne?.id],
-      () => apiGet<GrilleEvaluation | null>("grilles-evaluation", profilSelectionne!.id),
-      { enabled: !!profilSelectionne }
-    );
+  const {
+    data: grilleChargee,
+    isLoading: chargementGrille,
+    refetch: refetchGrille,
+  } = useApiResource<GrilleEvaluation | null>(
+    ["grille-evaluation", profilSelectionne?.id],
+    () =>
+      apiGet<GrilleEvaluation>("grilles-evaluation", profilSelectionne!.id).catch(() => null),
+    { enabled: !!profilSelectionne }
+  );
 
   // Ajustement pendant le rendu plutôt qu'un `useEffect` + `setState` (voir useSyncedState) :
   // mémoïsé pour ne changer de référence qu'au chargement effectif d'un profil différent, sinon
@@ -115,15 +119,29 @@ export default function GrilleEvaluationPage() {
     }
     setEnCours(true);
     try {
-      await apiPut<GrilleEvaluation>("grilles-evaluation", profilSelectionne.id, {
-        criteres: criteres.map((c, i) => ({
-          ...(c.id.startsWith("nouveau-") ? {} : { id: c.id }),
-          libelle: c.libelle.trim(),
-          poids: c.poids,
-          ordre: i,
-        })),
-      });
+      const critieresAEnregistrer: CritereGrille[] = criteres.map((c, i) => ({
+        id: c.id.startsWith("nouveau-") ? crypto.randomUUID() : c.id,
+        libelle: c.libelle.trim(),
+        poids: c.poids,
+        ordre: i,
+      }));
+      const corps = {
+        id: profilSelectionne.id,
+        profilEncadrantId: profilSelectionne.id,
+        criteres: critieresAEnregistrer,
+        updatedAt: new Date().toISOString(),
+      };
+      // `GrilleEvaluation.id === profilEncadrantId` (relation 1-1) : le mock (json-server) ne
+      // crée pas de ressource via PUT sur un id inexistant (contrairement à PATCH/POST) - premier
+      // enregistrement en POST, mises à jour suivantes en PUT. Sans cette distinction, la toute
+      // première sauvegarde d'une grille échouait systématiquement (bug préexistant).
+      if (grilleChargee) {
+        await apiPut<GrilleEvaluation>("grilles-evaluation", profilSelectionne.id, corps);
+      } else {
+        await apiPost<GrilleEvaluation>("grilles-evaluation", corps);
+      }
       toast.success("Grille d'évaluation enregistrée.");
+      refetchGrille();
     } catch {
       toast.error("L'enregistrement a échoué. Réessayez dans quelques instants.");
     } finally {

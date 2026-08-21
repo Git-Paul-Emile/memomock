@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { useAuth, CODE_PROFIL_INCOMPLET } from "@/context/auth-context";
 import { espaceParDefaut, lienOnboarding } from "@/components/layout/route-guard";
 import { useApiList } from "@/hooks/use-api-list";
-import { ApiError } from "@/lib/api";
+import { apiPatch, apiPost, ApiError } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -28,16 +28,17 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { APP_NAME } from "@/lib/constants";
-import type { PublicUser, RoleInscription } from "@/types";
+import type { EncadrantPublic, Etablissement, RoleInscription } from "@/types";
 
 // Format international strict (ex : +221771234567) : "+" et indicatif pays obligatoires. Même
 // règle que côté backend (voir backend/src/validators/auth/schemaTelephone.js).
 const TELEPHONE_REGEX = /^\+[1-9]\d{7,14}$/;
 
-// Seuls deux rôles sont proposés : la plateforme met en relation un étudiant et son encadrant,
-// sans passer par une institution. `admin` n'est pas un rôle qu'on demande - voir RoleInscription.
+// Trois rôles auto-inscriptibles : étudiant, encadrant, et administrateur d'établissement (une
+// école crée elle-même son espace, spec section 6). `admin` (super-admin plateforme) n'est pas un
+// rôle qu'on demande - voir RoleInscription.
 const schemaBase = z.object({
-  role: z.enum(["etudiant", "encadrant"]),
+  role: z.enum(["etudiant", "encadrant", "admin_etablissement"]),
   prenom: z.string().min(2, "Prénom trop court"),
   nom: z.string().min(2, "Nom trop court"),
   email: z.string().email("Adresse e-mail invalide"),
@@ -45,6 +46,7 @@ const schemaBase = z.object({
   motDePasse: z.string().min(6, "6 caractères minimum"),
   filiere: z.string().optional(),
   encadrantId: z.string().optional(),
+  etablissementNom: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof schemaBase>;
@@ -56,8 +58,10 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   
   // Endpoint public dédié (voir backend/src/modules/public) : accessible avant même la création
-  // du compte, contrairement à /users qui est protégé.
-  const { data: encadrants } = useApiList<PublicUser>("public/encadrants", { limite: 100 });
+  // du compte, contrairement à /users qui est protégé. Corrigé pour pointer vers la ressource
+  // top-level réellement exposée par le mock (`/encadrants`) - `/public/encadrants` (imbriquée)
+  // renvoyait un 404 systématique, y compris via `/api/mock` en déploiement distant.
+  const { data: encadrants } = useApiList<EncadrantPublic>("encadrants", { limite: 100 });
 
   const {
     register,
@@ -78,9 +82,21 @@ export default function RegisterPage() {
       toast.error("Merci de sélectionner votre encadrant.");
       return;
     }
+    if (role === "admin_etablissement" && !values.etablissementNom?.trim()) {
+      toast.error("Merci d'indiquer le nom de votre établissement.");
+      return;
+    }
     setIsSubmitting(true);
     try {
       const user = await creerCompte({ ...values, role });
+      if (role === "admin_etablissement") {
+        const etablissement = await apiPost<Etablissement>("etablissements", {
+          nom: values.etablissementNom!.trim(),
+          adminId: user.id,
+          createdAt: new Date().toISOString(),
+        });
+        await apiPatch("users", user.id, { etablissementId: etablissement.id });
+      }
       toast.success(`Compte créé, bienvenue ${user.prenom} !`);
       router.push(lienOnboarding(user.role) ?? espaceParDefaut(user.role));
     } catch (err) {
@@ -104,8 +120,8 @@ export default function RegisterPage() {
             <CardDescription>Choisissez votre profil pour commencer.</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="mb-5 grid grid-cols-2 gap-2">
-              {(["etudiant", "encadrant"] as const).map((r) => (
+            <div className="mb-5 grid grid-cols-3 gap-2">
+              {(["etudiant", "encadrant", "admin_etablissement"] as const).map((r) => (
                 <button
                   key={r}
                   type="button"
@@ -120,7 +136,7 @@ export default function RegisterPage() {
                       : "text-muted-foreground hover:bg-accent"
                   )}
                 >
-                  {r === "etudiant" ? "Étudiant·e" : "Encadrant·e"}
+                  {r === "etudiant" ? "Étudiant·e" : r === "encadrant" ? "Encadrant·e" : "Établissement"}
                 </button>
               ))}
             </div>
@@ -201,13 +217,30 @@ export default function RegisterPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Pas encore d&apos;encadrant ? Choisissez-en un provisoirement, vous pourrez
+                      rejoindre une classe par code juste après.
+                    </p>
                   </div>
                 </>
                )}
+
+              {role === "admin_etablissement" && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="etablissementNom">Nom de l&apos;établissement</Label>
+                  <Input
+                    id="etablissementNom"
+                    placeholder="Ex : École Supérieure X"
+                    {...register("etablissementNom")}
+                  />
+                </div>
+              )}
+
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="size-4 animate-spin" />}
+                Créer un compte
+              </Button>
             </form>
-            <p className="mt-2 text-center text-xs text-muted-foreground">
-              
-            </p>
 
             <p className="mt-4 text-center text-sm text-muted-foreground">
               Déjà un compte ?{" "}

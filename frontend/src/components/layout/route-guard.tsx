@@ -55,6 +55,8 @@ export function espaceParDefaut(role: Role): string {
       return "/encadrant/dashboard";
     case "admin":
       return "/admin/supervision";
+    case "admin_etablissement":
+      return "/etablissement/dashboard";
   }
 }
 
@@ -73,6 +75,10 @@ export function lienOnboarding(role: Role): string | null {
     // le retrait de la notion d'établissement (voir backend auth.service), il est attribué par
     // un administrateur déjà en place ou par le seed. Il n'y a donc pas de « première fois ».
     case "admin":
+      return null;
+    // La création de l'établissement se fait directement dans le formulaire d'inscription (voir
+    // /register) - pas d'étape d'onboarding séparée.
+    case "admin_etablissement":
       return null;
   }
 }

@@ -2,10 +2,18 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { FileText, MessageSquareText, TrendingUp, UploadCloud } from "lucide-react";
+import {
+  AlertTriangle,
+  CalendarClock,
+  FileText,
+  MessageSquareText,
+  TrendingUp,
+  UploadCloud,
+} from "lucide-react";
 
 import { useAuth } from "@/context/auth-context";
 import { useApiList } from "@/hooks/use-api-list";
+import { useApiResource } from "@/hooks/use-api-resource";
 import { PageHeader } from "@/components/shared/page-header";
 import { Toolbar } from "@/components/shared/toolbar";
 import { Pagination } from "@/components/shared/pagination";
@@ -28,10 +36,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { apiGet, apiList } from "@/lib/api";
+import { resoudreChapitres } from "@/lib/canevas";
 import { STATUT_DOCUMENT_LABELS, STATUTS_FILTRABLES } from "@/lib/constants";
 import { lienDocumentEtudiant } from "@/lib/document-routing";
-import { formatDate } from "@/lib/utils";
-import type { DocumentSubmission } from "@/types";
+import { resoudreLivrables } from "@/lib/livrables";
+import { partitionnerSeances, retardsDocument, retardsSeances } from "@/lib/retards";
+import { formatDate, formatDateTime } from "@/lib/utils";
+import type {
+  ChapitreCanevas,
+  CritereChapitre,
+  DocumentSubmission,
+  Livrable,
+  ProfilEncadrant,
+  Seance,
+  ValidationChapitre,
+} from "@/types";
 
 export default function EtudiantDashboardPage() {
   const { user } = useAuth();
@@ -63,6 +83,64 @@ export default function EtudiantDashboardPage() {
       )
     : 0;
 
+  const documentPrincipal =
+    [...tousLesDocuments].sort((a, b) => b.dateMaj.localeCompare(a.dateMaj))[0] ?? null;
+
+  // Feature 82 : "prochaines étapes" dans le tableau de bord étudiant.
+  const { data: seances } = useApiList<Seance>("seances", {
+    filtres: { etudiantId: user?.id },
+    tri: "dateHeure",
+    ordre: "asc",
+    limite: 100,
+  });
+  const prochaineSeance = partitionnerSeances(seances).aVenir[0] ?? null;
+
+  const { data: nbRetards } = useApiResource<number>(
+    ["retards-etudiant", user?.id, documentPrincipal?.id],
+    async () => {
+      const seancesRes = await apiList<Seance>("seances", {
+        filtres: { etudiantId: user!.id },
+        limite: 100,
+      });
+      let retardsDoc: ReturnType<typeof retardsDocument> = [];
+      if (documentPrincipal?.profilEncadrantId) {
+        const profil = await apiGet<ProfilEncadrant>(
+          "profils-encadrant",
+          documentPrincipal.profilEncadrantId
+        ).catch(() => null);
+        if (profil) {
+          const livrablesRes = await apiList<Livrable>("livrables", {
+            filtres: { documentId: documentPrincipal.id },
+            limite: 50,
+          });
+          const livrablesAffiches = resoudreLivrables(profil.livrablesAttendus, livrablesRes.data);
+          let chapitresAffiches: ReturnType<typeof resoudreChapitres> = [];
+          if (profil.canevasId) {
+            const [chapitresRes, criteresRes, validationsRes] = await Promise.all([
+              apiList<ChapitreCanevas>("chapitres-canevas", {
+                filtres: { canevasId: profil.canevasId },
+                limite: 100,
+              }),
+              apiList<CritereChapitre>("criteres-chapitre", { limite: 500 }),
+              apiList<ValidationChapitre>("validations-chapitre", {
+                filtres: { documentId: documentPrincipal.id },
+                limite: 100,
+              }),
+            ]);
+            chapitresAffiches = resoudreChapitres(
+              chapitresRes.data,
+              criteresRes.data,
+              validationsRes.data
+            );
+          }
+          retardsDoc = retardsDocument(documentPrincipal, livrablesAffiches, chapitresAffiches);
+        }
+      }
+      return retardsDoc.length + retardsSeances(seancesRes.data).length;
+    },
+    { enabled: !!user }
+  );
+
   return (
     <div>
       <PageHeader
@@ -78,7 +156,7 @@ export default function EtudiantDashboardPage() {
         }
       />
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -106,6 +184,45 @@ export default function EtudiantDashboardPage() {
           </CardHeader>
           <CardContent className="text-2xl font-semibold">{scoreMoyen} / 100</CardContent>
         </Card>
+        <Link href="/etudiant/planning">
+          <Card className="transition-colors hover:bg-accent/50">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <AlertTriangle className="size-4" />
+                En retard
+              </CardTitle>
+            </CardHeader>
+            <CardContent
+              className={`text-2xl font-semibold ${nbRetards ? "text-destructive" : ""}`}
+            >
+              {nbRetards ?? 0}
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/etudiant/planning">
+          <Card className="transition-colors hover:bg-accent/50">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <CalendarClock className="size-4" />
+                Prochaine étape
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm font-medium">
+              {prochaineSeance ? (
+                <>
+                  <p className="truncate">{prochaineSeance.titre}</p>
+                  <p className="text-xs font-normal text-muted-foreground">
+                    {formatDateTime(prochaineSeance.dateHeure)}
+                  </p>
+                </>
+              ) : (
+                <span className="text-xs font-normal text-muted-foreground">
+                  Aucune séance planifiée
+                </span>
+              )}
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       <Card>

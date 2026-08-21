@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Check, Download, FileText, FileType, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, Download, Eye, FileText, FileType, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { useApiResource } from "@/hooks/use-api-resource";
@@ -85,12 +85,20 @@ export default function ExportPage() {
         title="Exporter le document"
         description="Téléchargez une version de votre mémoire avec sa mise en forme d'origine préservée."
         actions={
-          <Button variant="outline" size="sm" asChild>
-            <Link href={`/etudiant/documents/${id}/correction`}>
-              <ArrowLeft className="size-4" />
-              Retour au document
-            </Link>
-          </Button>
+          <>
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/etudiant/documents/${id}/apercu`}>
+                <Eye className="size-4" />
+                Prévisualiser
+              </Link>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/etudiant/documents/${id}/correction`}>
+                <ArrowLeft className="size-4" />
+                Retour au document
+              </Link>
+            </Button>
+          </>
         }
       />
 

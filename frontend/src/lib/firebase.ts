@@ -93,7 +93,8 @@ export async function signInWithEmailAndPassword(
 export async function createUserWithEmailAndPassword(
   _auth: unknown,
   email: string,
-  password: string
+  password: string,
+  donneesSupplementaires: Record<string, unknown> = {}
 ) {
   const existing = await fetch(`${API_BASE_URL}/users?email=${encodeURIComponent(email)}`, {
     headers: { "Content-Type": "application/json" },
@@ -110,6 +111,10 @@ export async function createUserWithEmailAndPassword(
     nom: "",
     prenom: "",
     telephoneVerifie: false,
+    // Écrase les valeurs par défaut ci-dessus avec le formulaire réel (rôle choisi, nom, prénom,
+    // téléphone, filiere, encadrantId...) - avant ce correctif, ces champs étaient ignorés et
+    // chaque inscription créait un compte "étudiant" vide quel que soit le formulaire rempli.
+    ...donneesSupplementaires,
   };
 
   const sessionId = obtenirSessionId();

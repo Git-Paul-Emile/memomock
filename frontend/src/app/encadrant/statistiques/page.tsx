@@ -6,8 +6,10 @@ import { BarChart3, Clock, Info, RefreshCw, Target } from "lucide-react";
 
 import { useAuth } from "@/context/auth-context";
 import { useApiList } from "@/hooks/use-api-list";
+import { useApiResource } from "@/hooks/use-api-resource";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -17,8 +19,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { apiGet, apiList } from "@/lib/api";
+import { resoudreChapitres } from "@/lib/canevas";
 import { LIBELLES_TYPE_DOCUMENT } from "@/types";
-import type { DocumentSubmission, PublicUser, TypeDocument } from "@/types";
+import type {
+  ChapitreCanevas,
+  CritereChapitre,
+  DocumentSubmission,
+  ProfilEncadrant,
+  PublicUser,
+  TypeDocument,
+  ValidationChapitre,
+} from "@/types";
 
 // `recharts` chargé paresseusement côté client uniquement - même principe que /admin/statistiques.
 const RepartitionChart = dynamic(
@@ -50,14 +62,17 @@ function InfoCarte({ label }: { label: string }) {
  */
 export default function EncadrantStatistiquesPage() {
   const { user } = useAuth();
+  // Corrige un bug préexistant : ces deux requêtes n'étaient pas filtrées par encadrant, chaque
+  // encadrant voyait donc les statistiques de toute la plateforme.
   const { data: documents, isLoading: chargementDocuments } = useApiList<DocumentSubmission>(
     "documents",
-    { limite: 200 }
+    { limite: 200, filtres: { encadrantId: user?.id } }
   );
   const { data: utilisateurs, isLoading: chargementUtilisateurs } = useApiList<PublicUser>(
     "users",
     {
       limite: 200,
+      filtres: { encadrantId: user?.id },
     }
   );
 
@@ -119,6 +134,51 @@ export default function EncadrantStatistiquesPage() {
   );
 
   const isLoading = chargementDocuments || chargementUtilisateurs;
+
+  // Progression (spec section 83) : part des chapitres validés parmi le canevas du document actif
+  // le plus récent de chaque étudiant - même mécanique que `resoudreChapitres` (lot canevas).
+  const { data: progressionParEtudiant } = useApiResource<Record<string, number | null>>(
+    ["progression-etudiants", user?.id, documents.map((d) => d.id).join(",")],
+    async () => {
+      const resultat: Record<string, number | null> = {};
+      for (const etu of etudiants) {
+        const docsEtudiant = documents
+          .filter((d) => d.etudiantId === etu.id)
+          .sort((a, b) => b.dateMaj.localeCompare(a.dateMaj));
+        const doc = docsEtudiant[0];
+        if (!doc?.profilEncadrantId) {
+          resultat[etu.id] = null;
+          continue;
+        }
+        const profil = await apiGet<ProfilEncadrant>(
+          "profils-encadrant",
+          doc.profilEncadrantId
+        ).catch(() => null);
+        if (!profil?.canevasId) {
+          resultat[etu.id] = null;
+          continue;
+        }
+        const [chapitresRes, criteresRes, validationsRes] = await Promise.all([
+          apiList<ChapitreCanevas>("chapitres-canevas", {
+            filtres: { canevasId: profil.canevasId },
+            limite: 100,
+          }),
+          apiList<CritereChapitre>("criteres-chapitre", { limite: 500 }),
+          apiList<ValidationChapitre>("validations-chapitre", {
+            filtres: { documentId: doc.id },
+            limite: 100,
+          }),
+        ]);
+        const chapitres = resoudreChapitres(chapitresRes.data, criteresRes.data, validationsRes.data);
+        resultat[etu.id] =
+          chapitres.length === 0
+            ? null
+            : Math.round((chapitres.filter((c) => c.statut === "valide").length / chapitres.length) * 100);
+      }
+      return resultat;
+    },
+    { enabled: !isLoading && etudiants.length > 0 }
+  );
 
   if (!user) return null;
 
@@ -212,18 +272,32 @@ export default function EncadrantStatistiquesPage() {
                   <TableHead>Étudiant</TableHead>
                   <TableHead>Documents</TableHead>
                   <TableHead>Score moyen</TableHead>
+                  <TableHead>Progression</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {statsParEtudiant.map(({ etudiant, nbDocuments, score }) => (
-                  <TableRow key={etudiant.id}>
-                    <TableCell className="font-medium">
-                      {etudiant.prenom} {etudiant.nom}
-                    </TableCell>
-                    <TableCell>{nbDocuments}</TableCell>
-                    <TableCell>{score} %</TableCell>
-                  </TableRow>
-                ))}
+                {statsParEtudiant.map(({ etudiant, nbDocuments, score }) => {
+                  const progression = progressionParEtudiant?.[etudiant.id] ?? null;
+                  return (
+                    <TableRow key={etudiant.id}>
+                      <TableCell className="font-medium">
+                        {etudiant.prenom} {etudiant.nom}
+                      </TableCell>
+                      <TableCell>{nbDocuments}</TableCell>
+                      <TableCell>{score} %</TableCell>
+                      <TableCell>
+                        {progression === null ? (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <Progress value={progression} className="h-1.5 w-24" />
+                            <span className="text-xs text-muted-foreground">{progression}%</span>
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           )}

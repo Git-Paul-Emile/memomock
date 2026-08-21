@@ -6,6 +6,8 @@ import { useParams } from "next/navigation";
 import { ArrowLeft, MessageSquare, Star } from "lucide-react";
 
 import { useApiResource } from "@/hooks/use-api-resource";
+import { useSyncedState } from "@/hooks/use-synced-state";
+import { FilCommentaire } from "@/components/documents/fil-commentaire";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,13 +15,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiGet, apiList } from "@/lib/api";
-import type { CommentaireMarge, DocumentSubmission, PublicUser, RevisionSegment } from "@/types";
+import type {
+  CommentaireMarge,
+  DocumentSubmission,
+  PublicUser,
+  ReponseCommentaire,
+  RevisionSegment,
+} from "@/types";
 
 interface DonneesRetour {
   document: DocumentSubmission;
   encadrant: PublicUser | null;
   segments: RevisionSegment[];
   commentaires: CommentaireMarge[];
+  reponses: ReponseCommentaire[];
 }
 
 /**
@@ -54,12 +63,16 @@ export default function RetourEncadrantPage() {
     ["document-retour-etudiant", id],
     async () => {
       const doc = await apiGet<DocumentSubmission>("documents", id);
-      const [enc, rev, com] = await Promise.all([
+      const [enc, rev, com, rep] = await Promise.all([
         apiGet<PublicUser>("users", doc.encadrantId).catch(() => null),
         apiList<RevisionSegment>("revisions", { filtres: { documentId: id }, limite: 500 }),
         apiList<CommentaireMarge>("commentaires-marge", {
           filtres: { documentId: id },
           limite: 100,
+        }),
+        apiList<ReponseCommentaire>("reponses-commentaire", {
+          filtres: { documentId: id },
+          limite: 200,
         }),
       ]);
       return {
@@ -67,6 +80,7 @@ export default function RetourEncadrantPage() {
         encadrant: enc,
         segments: rev.data,
         commentaires: com.data.sort((a, b) => a.numero - b.numero),
+        reponses: rep.data,
       };
     }
   );
@@ -74,6 +88,7 @@ export default function RetourEncadrantPage() {
   const document = data?.document ?? null;
   const encadrant = data?.encadrant ?? null;
   const commentaires = data?.commentaires ?? [];
+  const [reponses, setReponses] = useSyncedState<ReponseCommentaire[]>(data?.reponses, []);
 
   // Regroupe les segments par paragraphe (triés par ordre) pour reconstituer le texte corrigé.
   const paragraphes = React.useMemo(() => {
@@ -190,6 +205,13 @@ export default function RetourEncadrantPage() {
                       </Badge>
                       <p className="text-sm text-muted-foreground">{c.texte}</p>
                     </div>
+                    <FilCommentaire
+                      commentaireMargeId={c.id}
+                      documentId={document.id}
+                      role="etudiant"
+                      reponses={reponses.filter((r) => r.commentaireMargeId === c.id)}
+                      onReponseAjoutee={(r) => setReponses((prev) => [...prev, r])}
+                    />
                     {index !== commentaires.length - 1 && <Separator className="mt-3" />}
                   </div>
                 ))

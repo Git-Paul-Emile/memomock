@@ -7,10 +7,13 @@ import { toast } from "sonner";
 
 import { useAuth } from "@/context/auth-context";
 import { useApiList } from "@/hooks/use-api-list";
+import { useApiResource } from "@/hooks/use-api-resource";
 import { useSyncedState } from "@/hooks/use-synced-state";
+import { PanneauLivrables } from "@/components/livrables/panneau-livrables";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,11 +27,22 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { apiPatch } from "@/lib/api";
+import { PanneauChapitres } from "@/components/canevas/panneau-chapitres";
+import { apiGet, apiList, apiPatch, apiPost } from "@/lib/api";
+import { resoudreChapitres } from "@/lib/canevas";
 import { lienDocumentEtudiant } from "@/lib/document-routing";
+import { resoudreLivrables, type LivrableAffiche } from "@/lib/livrables";
+import { joursRestants } from "@/lib/retards";
 import { formatDate } from "@/lib/utils";
 import { LIBELLES_TYPE_DOCUMENT } from "@/types";
-import type { DocumentSubmission } from "@/types";
+import type {
+  ChapitreCanevas,
+  CritereChapitre,
+  DocumentSubmission,
+  Livrable,
+  ProfilEncadrant,
+  ValidationChapitre,
+} from "@/types";
 
 interface ChampsProjet {
   sujet: string;
@@ -81,6 +95,109 @@ export default function MonProjetPage() {
     [document]
   );
   const [champs, setChamps] = useSyncedState<ChampsProjet>(champsSource, CHAMPS_VIDES);
+
+  const { data: livrablesData, refetch: refetchLivrables } = useApiResource(
+    ["projet-livrables", document?.id],
+    async () => {
+      const [profil, livrablesRes, validationsRes] = await Promise.all([
+        document!.profilEncadrantId
+          ? apiGet<ProfilEncadrant>("profils-encadrant", document!.profilEncadrantId)
+          : Promise.resolve(null),
+        apiList<Livrable>("livrables", { filtres: { documentId: document!.id }, limite: 50 }),
+        apiList<ValidationChapitre>("validations-chapitre", {
+          filtres: { documentId: document!.id },
+          limite: 100,
+        }),
+      ]);
+
+      let chapitres: ChapitreCanevas[] = [];
+      let criteres: CritereChapitre[] = [];
+      if (profil?.canevasId) {
+        const [chapitresRes, criteresRes] = await Promise.all([
+          apiList<ChapitreCanevas>("chapitres-canevas", {
+            filtres: { canevasId: profil.canevasId },
+            limite: 100,
+          }),
+          apiList<CritereChapitre>("criteres-chapitre", { limite: 500 }),
+        ]);
+        chapitres = chapitresRes.data;
+        criteres = criteresRes.data;
+      }
+
+      return {
+        definitions: profil?.livrablesAttendus ?? [],
+        livrables: livrablesRes.data,
+        chapitres,
+        criteres,
+        validations: validationsRes.data,
+      };
+    },
+    { enabled: !!document }
+  );
+
+  const livrablesAffiches = resoudreLivrables(
+    livrablesData?.definitions ?? [],
+    livrablesData?.livrables ?? []
+  );
+
+  const chapitresAffiches = resoudreChapitres(
+    livrablesData?.chapitres ?? [],
+    livrablesData?.criteres ?? [],
+    livrablesData?.validations ?? []
+  );
+
+  const deposerLivrable = async (
+    item: LivrableAffiche,
+    valeurs: { fichier?: File; urlExterne?: string }
+  ) => {
+    if (!document) return;
+    const maintenant = new Date().toISOString();
+    const champsDepot = valeurs.fichier
+      ? { nomFichier: valeurs.fichier.name, tailleOctets: valeurs.fichier.size, urlExterne: null }
+      : { urlExterne: valeurs.urlExterne, nomFichier: null, tailleOctets: null };
+
+    try {
+      if (item.livrable) {
+        await apiPatch<Livrable>("livrables", item.livrable.id, {
+          ...champsDepot,
+          statut: "soumis",
+          commentaireEncadrant: null,
+          dateDepot: maintenant,
+          updatedAt: maintenant,
+        });
+      } else {
+        await apiPost<Livrable>("livrables", {
+          documentId: document.id,
+          definitionId: item.definitionId,
+          nom: item.nom,
+          type: item.type,
+          obligatoire: item.obligatoire,
+          statut: "soumis",
+          ...champsDepot,
+          dateDepot: maintenant,
+          createdAt: maintenant,
+          updatedAt: maintenant,
+        });
+      }
+
+      if (document.encadrantId) {
+        await apiPost("notifications", {
+          userId: document.encadrantId,
+          titre: "Nouveau livrable déposé",
+          message: `${user?.prenom} ${user?.nom} a déposé « ${item.nom} ».`,
+          type: "soumission",
+          lu: false,
+          date: maintenant,
+          lienDocumentId: document.id,
+        });
+      }
+
+      toast.success("Livrable déposé.");
+      refetchLivrables();
+    } catch {
+      toast.error("Le dépôt du livrable a échoué.");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -191,13 +308,24 @@ export default function MonProjetPage() {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="soutenance">Date de soutenance prévue</Label>
-            <Input
-              id="soutenance"
-              type="date"
-              value={champs.dateSoutenancePrevue}
-              onChange={(e) => setChamps((c) => ({ ...c, dateSoutenancePrevue: e.target.value }))}
-              className="w-full sm:w-56"
-            />
+            <div className="flex items-center gap-2">
+              <Input
+                id="soutenance"
+                type="date"
+                value={champs.dateSoutenancePrevue}
+                onChange={(e) => setChamps((c) => ({ ...c, dateSoutenancePrevue: e.target.value }))}
+                className="w-full sm:w-56"
+              />
+              {champs.dateSoutenancePrevue &&
+                (() => {
+                  const jours = joursRestants(champs.dateSoutenancePrevue);
+                  return (
+                    <Badge variant={jours < 0 ? "destructive" : jours <= 14 ? "warning" : "outline"}>
+                      {jours < 0 ? "Dépassée" : jours === 0 ? "Aujourd'hui" : `J-${jours}`}
+                    </Badge>
+                  );
+                })()}
+            </div>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
             <p className="text-xs text-muted-foreground">
@@ -222,6 +350,16 @@ export default function MonProjetPage() {
           </div>
         </CardContent>
       </Card>
+
+      <div className="mb-4">
+        <PanneauLivrables items={livrablesAffiches} role="etudiant" onDeposer={deposerLivrable} />
+      </div>
+
+      {chapitresAffiches.length > 0 && (
+        <div className="mb-4">
+          <PanneauChapitres items={chapitresAffiches} role="etudiant" />
+        </div>
+      )}
 
       <div className="flex justify-end">
         <Button variant="ghost" size="sm" asChild>

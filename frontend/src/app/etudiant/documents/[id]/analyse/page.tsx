@@ -32,8 +32,9 @@ const ONGLET_LABELS: Record<TypeAnalyse, string> = {
   forme: "Forme",
   fond: "Fond",
   coherence: "Cohérence",
+  structure: "Structure",
 };
-const TYPES_ANALYSE: TypeAnalyse[] = ["forme", "fond", "coherence"];
+const TYPES_ANALYSE: TypeAnalyse[] = ["structure", "forme", "fond", "coherence"];
 
 interface DonneesAnalyse {
   document: DocumentSubmission;

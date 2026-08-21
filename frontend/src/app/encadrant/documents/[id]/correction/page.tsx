@@ -13,6 +13,7 @@ import {
   EditeurCorrection,
   type EditeurCorrectionHandle,
 } from "@/components/documents/editeur-correction";
+import { FilCommentaire } from "@/components/documents/fil-commentaire";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +22,13 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiDelete, apiGet, apiList, apiPost } from "@/lib/api";
 import { calculerSegments, texteCourantDuParagraphe } from "@/lib/revision-diff";
-import type { CommentaireMarge, DocumentSubmission, RegleApprise, RevisionSegment } from "@/types";
+import type {
+  CommentaireMarge,
+  DocumentSubmission,
+  RegleApprise,
+  ReponseCommentaire,
+  RevisionSegment,
+} from "@/types";
 
 /**
  * Écran « Éditeur de correction » côté encadrant.
@@ -37,6 +44,7 @@ interface DonneesCorrection {
   document: DocumentSubmission;
   segments: RevisionSegment[];
   commentaires: CommentaireMarge[];
+  reponses: ReponseCommentaire[];
   regles: RegleApprise[];
 }
 
@@ -53,11 +61,15 @@ export default function CorrectionEncadrantPage() {
     ["document-correction-encadrant", id],
     async () => {
       const doc = await apiGet<DocumentSubmission>("documents", id);
-      const [rev, com, reg] = await Promise.all([
+      const [rev, com, rep, reg] = await Promise.all([
         apiList<RevisionSegment>("revisions", { filtres: { documentId: id }, limite: 500 }),
         apiList<CommentaireMarge>("commentaires-marge", {
           filtres: { documentId: id },
           limite: 100,
+        }),
+        apiList<ReponseCommentaire>("reponses-commentaire", {
+          filtres: { documentId: id },
+          limite: 200,
         }),
         apiList<RegleApprise>("regles-apprises", {
           filtres: { encadrantId: doc.encadrantId },
@@ -70,6 +82,7 @@ export default function CorrectionEncadrantPage() {
         document: doc,
         segments: rev.data,
         commentaires: com.data.sort((a, b) => a.numero - b.numero),
+        reponses: rep.data,
         regles: reg.data,
       };
     }
@@ -77,6 +90,7 @@ export default function CorrectionEncadrantPage() {
 
   const document = data?.document ?? null;
   const regles = data?.regles ?? [];
+  const [reponses, setReponses] = useSyncedState<ReponseCommentaire[]>(data?.reponses, []);
 
   // Les commentaires sont dupliqués en état local pour permettre l'ajout optimiste immédiat
   // (voir `ajouterCommentaire`) sans attendre un refetch réseau ; ils restent synchronisés
@@ -249,11 +263,20 @@ export default function CorrectionEncadrantPage() {
                 </p>
               ) : (
                 commentaires.map((c) => (
-                  <div key={c.id} className="flex items-start gap-2 rounded-lg border p-2.5">
-                    <Badge variant="warning" className="mt-0.5 shrink-0">
-                      {c.numero}
-                    </Badge>
-                    <p className="text-sm text-muted-foreground">{c.texte}</p>
+                  <div key={c.id} className="rounded-lg border p-2.5">
+                    <div className="flex items-start gap-2">
+                      <Badge variant="warning" className="mt-0.5 shrink-0">
+                        {c.numero}
+                      </Badge>
+                      <p className="text-sm text-muted-foreground">{c.texte}</p>
+                    </div>
+                    <FilCommentaire
+                      commentaireMargeId={c.id}
+                      documentId={document.id}
+                      role="encadrant"
+                      reponses={reponses.filter((r) => r.commentaireMargeId === c.id)}
+                      onReponseAjoutee={(r) => setReponses((prev) => [...prev, r])}
+                    />
                   </div>
                 ))
               )}

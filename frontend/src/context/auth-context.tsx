@@ -34,6 +34,9 @@ export interface InscriptionPayload {
   telephone: string; // Obligatoire à l'inscription (non vérifié - plus d'OTP WhatsApp).
   encadrantId?: string;
   filiere?: string;
+  // Renseigné uniquement pour role === "admin_etablissement" : sert à créer l'établissement juste
+  // après la création du compte (voir /register#onSubmit), pas persisté tel quel sur le User.
+  etablissementNom?: string;
 }
 
 // Informations collectées à l'écran de complétion de profil (inscription Google spontanée) :
@@ -118,6 +121,15 @@ async function synchroniserProfil(
     prenom: user.prenom,
     role: user.role,
     createdAt: user.createdAt,
+    avatarUrl: user.avatarUrl,
+    encadrantId: user.encadrantId,
+    filiere: user.filiere,
+    telephone: user.telephone,
+    canalNotificationPrefere: user.canalNotificationPrefere,
+    actif: user.actif,
+    etablissementId: user.etablissementId ?? null,
+    classeId: user.classeId ?? null,
+    groupeId: user.groupeId ?? null,
   };
 }
 
@@ -161,10 +173,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const register = React.useCallback(async (payload: InscriptionPayload) => {
+    const { email, motDePasse, etablissementNom: _etablissementNom, ...donneesSupplementaires } =
+      payload;
     const identifiants = await createUserWithEmailAndPassword(
       auth,
-      payload.email,
-      payload.motDePasse
+      email,
+      motDePasse,
+      donneesSupplementaires
     );
     await updateProfile(identifiants.user, { displayName: `${payload.prenom} ${payload.nom}` });
     const profil = await synchroniserProfil(identifiants.user, payload);

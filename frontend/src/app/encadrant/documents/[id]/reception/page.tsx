@@ -3,23 +3,37 @@
 import * as React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { CheckCircle2, Download, FileText, PenLine } from "lucide-react";
+import { CheckCircle2, Download, Eye, FileText, PenLine } from "lucide-react";
+
+import { toast } from "sonner";
 
 import { useApiResource } from "@/hooks/use-api-resource";
+import { PanneauLivrables } from "@/components/livrables/panneau-livrables";
 import { PageHeader } from "@/components/shared/page-header";
 import { ScoreJauge } from "@/components/shared/score-jauge";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { apiGet, apiList } from "@/lib/api";
+import { apiGet, apiList, apiPatch, apiPost } from "@/lib/api";
+import { resoudreLivrables, type LivrableAffiche } from "@/lib/livrables";
+import { joursRestants } from "@/lib/retards";
 import { formatDate, getInitials } from "@/lib/utils";
-import type { Analyse, DocumentSubmission, PointAnalyse, PublicUser } from "@/types";
+import type {
+  Analyse,
+  DocumentSubmission,
+  Livrable,
+  PointAnalyse,
+  ProfilEncadrant,
+  PublicUser,
+} from "@/types";
 
 interface DonneesReception {
   document: DocumentSubmission;
   etudiant: PublicUser | null;
   points: PointAnalyse[];
+  livrables: LivrableAffiche[];
 }
 
 /**
@@ -31,21 +45,66 @@ interface DonneesReception {
 export default function ReceptionPage() {
   const { id } = useParams<{ id: string }>();
 
-  const { data, isLoading } = useApiResource<DonneesReception>(
+  const { data, isLoading, refetch } = useApiResource<DonneesReception>(
     ["document-reception", id],
     async () => {
       const doc = await apiGet<DocumentSubmission>("documents", id);
-      const [etu, analyses] = await Promise.all([
+      const [etu, analyses, profil, livrablesRes] = await Promise.all([
         apiGet<PublicUser>("users", doc.etudiantId).catch(() => null),
         apiList<Analyse>("analyses", { filtres: { documentId: id }, limite: 10 }),
+        doc.profilEncadrantId
+          ? apiGet<ProfilEncadrant>("profils-encadrant", doc.profilEncadrantId).catch(() => null)
+          : Promise.resolve(null),
+        apiList<Livrable>("livrables", { filtres: { documentId: id }, limite: 50 }),
       ]);
-      return { document: doc, etudiant: etu, points: analyses.data.flatMap((a) => a.points) };
+      return {
+        document: doc,
+        etudiant: etu,
+        points: analyses.data.flatMap((a) => a.points),
+        livrables: resoudreLivrables(profil?.livrablesAttendus ?? [], livrablesRes.data),
+      };
     }
   );
 
   const document = data?.document ?? null;
   const etudiant = data?.etudiant ?? null;
   const points = data?.points ?? [];
+  const livrables = data?.livrables ?? [];
+
+  const verifierLivrable = async (
+    item: LivrableAffiche,
+    decision: "valide" | "en_correction",
+    commentaire: string
+  ) => {
+    if (!item.livrable || !document) return;
+    const maintenant = new Date().toISOString();
+    try {
+      await apiPatch<Livrable>("livrables", item.livrable.id, {
+        statut: decision,
+        commentaireEncadrant: decision === "en_correction" ? commentaire : null,
+        dateVerification: maintenant,
+        updatedAt: maintenant,
+      });
+
+      await apiPost("notifications", {
+        userId: document.etudiantId,
+        titre: decision === "valide" ? "Livrable conforme" : "Livrable à corriger",
+        message:
+          decision === "valide"
+            ? `« ${item.nom} » a été validé par votre encadrant.`
+            : `« ${item.nom} » nécessite une correction : ${commentaire}`,
+        type: "correction",
+        lu: false,
+        date: maintenant,
+        lienDocumentId: document.id,
+      });
+
+      toast.success(decision === "valide" ? "Livrable marqué conforme." : "Correction demandée.");
+      refetch();
+    } catch {
+      toast.error("La mise à jour du livrable a échoué.");
+    }
+  };
 
   if (isLoading || !document) {
     return (
@@ -63,6 +122,12 @@ export default function ReceptionPage() {
         description={`Version ${document.version} · ${document.nomFichier}`}
         actions={
           <>
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/encadrant/documents/${id}/apercu`}>
+                <Eye className="size-4" />
+                Prévisualiser
+              </Link>
+            </Button>
             {document.urlFichier && (
               <Button variant="outline" size="sm" asChild>
                 <a href={document.urlFichier} target="_blank" rel="noopener noreferrer">
@@ -91,8 +156,26 @@ export default function ReceptionPage() {
                   {etudiant?.filiere ?? etudiant?.email ?? ""}
                 </p>
               </div>
-              <div className="ml-auto text-xs text-muted-foreground">
-                Soumis le {formatDate(document.dateSoumission)}
+              <div className="ml-auto text-right text-xs text-muted-foreground">
+                <p>Soumis le {formatDate(document.dateSoumission)}</p>
+                {document.dateSoutenancePrevue && (
+                  <p className="mt-0.5 flex items-center justify-end gap-1.5">
+                    Soutenance : {formatDate(document.dateSoutenancePrevue)}
+                    <Badge
+                      variant={
+                        joursRestants(document.dateSoutenancePrevue) < 0
+                          ? "destructive"
+                          : joursRestants(document.dateSoutenancePrevue) <= 14
+                            ? "warning"
+                            : "outline"
+                      }
+                    >
+                      {joursRestants(document.dateSoutenancePrevue) < 0
+                        ? "Dépassée"
+                        : `J-${joursRestants(document.dateSoutenancePrevue)}`}
+                    </Badge>
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -130,6 +213,8 @@ export default function ReceptionPage() {
               )}
             </CardContent>
           </Card>
+
+          <PanneauLivrables items={livrables} role="encadrant" onVerifier={verifierLivrable} />
         </div>
 
         <div className="space-y-4">

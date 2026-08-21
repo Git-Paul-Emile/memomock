@@ -20,9 +20,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { apiPost } from "@/lib/api";
-import { formatDate } from "@/lib/utils";
-import type { Invitation } from "@/types";
+import { apiGet, apiPatch, apiPost } from "@/lib/api";
+import { formatDate, getInitials } from "@/lib/utils";
+import type { DemandeEncadrement, Invitation, PublicUser } from "@/types";
 
 /** Code d'invitation lisible, propre à un encadrant (partagé par toutes ses invitations). */
 function genererCodeInvitation() {
@@ -108,6 +108,8 @@ export default function InvitationsPage() {
       />
 
       <div className="space-y-6">
+        <CarteDemandes />
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
@@ -263,5 +265,117 @@ export default function InvitationsPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+interface DemandeAffichee {
+  demande: DemandeEncadrement;
+  etudiant: PublicUser | null;
+}
+
+/** Demandes d'encadrement en attente (spec sections 63, 65) - à accepter ou refuser. */
+function CarteDemandes() {
+  const { user } = useAuth();
+  const {
+    data: demandes,
+    isLoading,
+    refetch,
+  } = useApiList<DemandeEncadrement>("demandes-encadrement", {
+    filtres: { encadrantId: user?.id, statut: "en_attente" },
+    tri: "createdAt",
+    ordre: "desc",
+    limite: 50,
+  });
+
+  const [demandesAffichees, setDemandesAffichees] = React.useState<DemandeAffichee[]>([]);
+
+  React.useEffect(() => {
+    let annule = false;
+    Promise.all(
+      demandes.map(async (d) => ({
+        demande: d,
+        etudiant: await apiGet<PublicUser>("users", d.etudiantId).catch(() => null),
+      }))
+    ).then((res) => {
+      if (!annule) setDemandesAffichees(res);
+    });
+    return () => {
+      annule = true;
+    };
+  }, [demandes]);
+
+  const repondre = async (demande: DemandeEncadrement, accepter: boolean) => {
+    const maintenant = new Date().toISOString();
+    try {
+      if (accepter) {
+        await apiPatch("users", demande.etudiantId, { encadrantId: demande.encadrantId });
+      }
+      await apiPatch<DemandeEncadrement>("demandes-encadrement", demande.id, {
+        statut: accepter ? "acceptee" : "refusee",
+        dateReponse: maintenant,
+      });
+      await apiPost("notifications", {
+        userId: demande.etudiantId,
+        titre: accepter ? "Demande d'encadrement acceptée" : "Demande d'encadrement refusée",
+        message: accepter
+          ? "Votre encadrant a accepté votre demande. Vous pouvez soumettre votre premier document."
+          : "Votre demande d'encadrement n'a pas été retenue par cet encadrant.",
+        type: "systeme",
+        lu: false,
+        date: maintenant,
+      });
+      toast.success(accepter ? "Demande acceptée." : "Demande refusée.");
+      refetch();
+    } catch {
+      toast.error("La réponse n'a pas pu être enregistrée.");
+    }
+  };
+
+  if (!isLoading && demandesAffichees.length === 0) return null;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <UserPlus className="size-4 text-primary" />
+          Demandes reçues
+        </CardTitle>
+        <CardDescription>
+          Étudiants ayant demandé à être encadrés par vous (spec section 63).
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {isLoading ? (
+          <Skeleton className="h-16 w-full" />
+        ) : (
+          demandesAffichees.map(({ demande, etudiant }) => (
+            <div key={demande.id} className="rounded-lg border p-3">
+              <div className="flex items-start gap-3">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-medium">
+                  {etudiant ? getInitials(etudiant.nom, etudiant.prenom) : "?"}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">
+                    {etudiant ? `${etudiant.prenom} ${etudiant.nom}` : "Étudiant"}
+                  </p>
+                  {demande.message && (
+                    <p className="text-sm text-muted-foreground">{demande.message}</p>
+                  )}
+                  <p className="text-xs text-muted-foreground">{formatDate(demande.createdAt)}</p>
+                </div>
+              </div>
+              <div className="mt-2 flex gap-2">
+                <Button size="sm" onClick={() => repondre(demande, true)}>
+                  Accepter
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => repondre(demande, false)}>
+                  Refuser
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
+      </CardContent>
+    </Card>
   );
 }

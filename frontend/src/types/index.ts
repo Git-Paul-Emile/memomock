@@ -5,7 +5,10 @@
  * l'API REST réelle (Node/Express + PostgreSQL décrite dans le mémo de cadrage).
  */
 
-export type Role = "etudiant" | "encadrant" | "admin";
+// "admin_etablissement" : administrateur d'un établissement (école/université) - distinct du
+// super-admin `admin` (équipe plateforme). Réintroduit avec la hiérarchie établissement/filière/
+// classe/groupe (spec section 2), après un retrait antérieur de cette notion.
+export type Role = "etudiant" | "encadrant" | "admin" | "admin_etablissement";
 
 /**
  * Rôles qu'un visiteur peut demander lui-même à l'inscription. `admin` en est volontairement
@@ -13,6 +16,7 @@ export type Role = "etudiant" | "encadrant" | "admin";
  * s'attribuer des privilèges d'administration. Le backend applique la même restriction (voir
  * `ROLES_INSCRIPTION` dans backend/src/modules/auth/auth.service.js) ; ce type n'est que le
  * garde-fou de compilation qui empêche l'interface de proposer un choix que l'API refusera.
+ * `admin_etablissement` reste inclus : une école crée elle-même son espace (spec section 6).
  */
 export type RoleInscription = Exclude<Role, "admin">;
 
@@ -25,9 +29,15 @@ export interface User {
   motDePasse?: string; // DÉPRÉCIÉ (ancien système JWT/bcrypt) : jamais renvoyé par l'API.
   avatarUrl?: string;
   encadrantId?: string; // Renseigné si role === "etudiant"
-  // Programme d'études (ex. « Master 2 Informatique »), libellé libre : seul contexte académique
-  // porté par le profil depuis le retrait de la notion d'établissement.
+  // Programme d'études (ex. « Master 2 Informatique »), libellé libre - reste disponible même
+  // hors rattachement à un établissement (mode indépendant, spec section 95).
   filiere?: string;
+  // Rattachement à la hiérarchie établissement (spec section 2) : etablissementId seul pour un
+  // admin_etablissement ou un encadrant affilié ; classeId/groupeId en plus pour un étudiant
+  // rejoint via un code de classe (voir /rattachement-encadrant).
+  etablissementId?: string | null;
+  classeId?: string | null;
+  groupeId?: string | null;
   telephone?: string; // Format international, ex : +221772995851. Obligatoire à l'inscription,
   // mais non vérifié (l'OTP WhatsApp a été retiré).
   canalNotificationPrefere?: CanalNotification;
@@ -37,6 +47,9 @@ export interface User {
   // Libellé affiché à côté du rôle technique (spec écran F14, ex. "Coordinateur pédagogique") :
   // purement cosmétique, sans effet sur les permissions RBAC - réservé à un administrateur.
   libelleRolePersonnalise?: string | null;
+  // Réservés à role === "encadrant" (spec section 98) : utilisés pour la mise en relation.
+  domainesExpertise?: string[];
+  disponible?: boolean;
   createdAt: string;
 }
 
@@ -52,6 +65,47 @@ export interface ElementReference {
   titre: string;
   description: string;
   ajouteLe: string;
+}
+
+// Hiérarchie établissement (spec section 2) : une école/université (Etablissement) regroupe des
+// filières et des classes ; une classe appartient à une filière et se divise en groupes.
+export interface Etablissement {
+  id: string;
+  nom: string;
+  adminId: string;
+  createdAt: string;
+}
+
+export interface Filiere {
+  id: string;
+  etablissementId: string;
+  nom: string;
+  createdAt: string;
+}
+
+/**
+ * Classe (spec sections 9, 11, 12) : `etablissementId` est nullable - un encadrant en mode
+ * indépendant (spec section 95) peut créer une classe sans être rattaché à un établissement.
+ * `encadrantIds` porte plusieurs encadreurs (spec section 71, ex. répartition d'étudiants entre
+ * professeurs d'une même classe). `code` permet le rattachement d'un étudiant en autonomie (spec
+ * section 12), même mécanisme que le code d'invitation encadrant existant.
+ */
+export interface Classe {
+  id: string;
+  etablissementId: string | null;
+  filiereId: string | null;
+  nom: string;
+  niveau: TypeDocument;
+  code: string;
+  encadrantIds: string[];
+  createdAt: string;
+}
+
+export interface Groupe {
+  id: string;
+  classeId: string;
+  nom: string;
+  createdAt: string;
 }
 
 // Écran /encadrant/contraintes - règles formelles complémentaires au profil pédagogique.
@@ -75,6 +129,27 @@ export const LIBELLES_TYPE_DOCUMENT: Record<TypeDocument, string> = {
   doctorat: "Doctorat",
 };
 
+// Nature attendue d'un livrable (spec section 20) : un fichier déposé, ou un lien externe
+// (dépôt Git, application déployée...) - voir section 24-25.
+export type TypeLivrable = "fichier" | "lien";
+
+/**
+ * Livrable attendu, défini par l'encadrant au niveau du profil pédagogique (spec section 20) :
+ * s'applique à tous les documents rattachés à ce profil (même convention que guidesRedaction /
+ * normes / exigences, plutôt qu'une définition répétée par étudiant).
+ */
+export interface LivrableDefinition {
+  id: string;
+  nom: string;
+  description: string;
+  type: TypeLivrable;
+  obligatoire: boolean;
+  // Date limite indicative (spec section 76, ex. « Cahier des charges → 20 août »), appliquée à
+  // tous les documents du profil - pas de déclinaison par étudiant pour rester simple.
+  dateEcheance?: string | null;
+  ajouteLe: string;
+}
+
 // Un encadrant possède plusieurs profils (spec section 8) : un par type de document × discipline.
 export interface ProfilEncadrant {
   id: string;
@@ -87,6 +162,10 @@ export interface ProfilEncadrant {
   memoiresModeles: ElementReference[];
   normes: ElementReference[];
   exigences: ElementReference[];
+  livrablesAttendus: LivrableDefinition[];
+  // Canevas structuré (chapitres/critères) associé à ce profil (spec section 17) - distinct de
+  // `contraintes.sectionsObligatoires` (checklist plate de mise en forme, conservée telle quelle).
+  canevasId?: string | null;
   contraintes: ContraintesProfil | null;
   // Seuil de conformité (%) exigé pour transmettre un document, et seuil minimal par catégorie
   // (forme/fond/cohérence) en dessous duquel la soumission reste bloquée même si le score global
@@ -108,6 +187,62 @@ export interface GrilleEvaluation {
   id: string;
   profilEncadrantId: string;
   criteres: CritereGrille[];
+  updatedAt: string;
+}
+
+/**
+ * Canevas / template de mémoire (spec sections 14-21) : structure en chapitres, chacun portant
+ * ses propres critères obligatoires/optionnels. Entité indépendante (pas embarquée dans
+ * `ProfilEncadrant`) pour permettre la duplication/réutilisation (spec section 16, ex. « Canevas
+ * Master Informatique 2025 » → « ...2026 ») avant réattribution à un profil.
+ */
+export interface Canevas {
+  id: string;
+  encadrantId: string;
+  nom: string;
+  description?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChapitreCanevas {
+  id: string;
+  canevasId: string;
+  titre: string;
+  description?: string | null;
+  obligatoire: boolean;
+  ordre: number;
+  // Date limite indicative (spec section 76, ex. « Chapitre 1 → 5 septembre »).
+  dateEcheance?: string | null;
+}
+
+export interface CritereChapitre {
+  id: string;
+  chapitreId: string;
+  libelle: string;
+  obligatoire: boolean;
+  ordre: number;
+}
+
+// Cycle de vie de la validation d'un chapitre pour un document donné (spec section 50).
+// "en_attente" n'est jamais persisté (état par défaut d'un chapitre sans décision, voir
+// lib/canevas.ts), même convention que StatutLivrable.
+export type StatutChapitreDocument = "en_attente" | "valide" | "refuse";
+
+/**
+ * Décision de l'encadrant sur un chapitre d'un document (spec sections 50, 53-54).
+ * `verrouille` passe à `true` dès la validation - seul un déverrouillage explicite de
+ * l'encadrant (spec section 54) le repasse à `false` avec le statut réinitialisé.
+ */
+export interface ValidationChapitre {
+  id: string;
+  documentId: string;
+  chapitreId: string;
+  statut: StatutChapitreDocument;
+  verrouille: boolean;
+  commentaire?: string | null;
+  dateDecision?: string | null;
+  createdAt: string;
   updatedAt: string;
 }
 
@@ -193,9 +328,38 @@ export interface DocumentSubmission {
   pointsBloquants?: string[];
 }
 
+// Cycle de vie d'un dépôt de livrable (spec section 59) : "a_faire" n'est jamais persisté (c'est
+// l'état par défaut d'une définition sans dépôt correspondant, voir lib/livrables.ts).
+export type StatutLivrable = "a_faire" | "soumis" | "en_correction" | "valide";
+
+/**
+ * Dépôt effectif d'un livrable par l'étudiant, rattaché à un document (spec sections 57-59).
+ * `definitionId` référence `ProfilEncadrant.livrablesAttendus[].id` ; `nom`/`type`/`obligatoire`
+ * sont dupliqués depuis la définition au moment du dépôt pour ne pas changer rétroactivement si
+ * l'encadrant modifie ensuite son profil.
+ */
+export interface Livrable {
+  id: string;
+  documentId: string;
+  definitionId: string;
+  nom: string;
+  type: TypeLivrable;
+  obligatoire: boolean;
+  statut: StatutLivrable;
+  nomFichier?: string | null;
+  tailleOctets?: number | null;
+  urlExterne?: string | null;
+  commentaireEncadrant?: string | null;
+  dateDepot?: string | null;
+  dateVerification?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // "coherence" : cohérence croisée entre les grandes parties du document (spec section 13),
 // distincte du fond - voir workers/analyse.worker.js côté backend.
-export type TypeAnalyse = "forme" | "fond" | "coherence";
+// "structure" : présence des chapitres attendus par le canevas associé (spec sections 29-30).
+export type TypeAnalyse = "forme" | "fond" | "coherence" | "structure";
 export type NiveauAlerte = "info" | "succes" | "attention" | "erreur";
 
 export interface PointAnalyse {
@@ -224,7 +388,15 @@ export interface MessageCorrection {
   date: string;
 }
 
-export type TypeNotification = "soumission" | "analyse" | "correction" | "validation" | "systeme";
+// "retard" : alerte de délai dépassé (spec sections 78-79) - créée explicitement (bouton
+// "Relancer"), pas par une tâche de fond (aucun scheduler serveur dans ce projet).
+export type TypeNotification =
+  | "soumission"
+  | "analyse"
+  | "correction"
+  | "validation"
+  | "systeme"
+  | "retard";
 
 export interface Notification {
   id: string;
@@ -235,6 +407,68 @@ export interface Notification {
   lu: boolean;
   date: string;
   lienDocumentId?: string;
+}
+
+// Cycle de vie d'une séance de suivi (spec sections 72-73, 78 "séance non effectuée").
+export type StatutSeance = "planifiee" | "effectuee" | "annulee";
+
+/**
+ * Séance de suivi encadrant/étudiant (spec sections 72-73, 80). `tache` porte la proposition de
+ * travail associée à la séance (spec section 80) - remplie manuellement ou par la génération
+ * automatique de planning (spec section 75, voir lib/planning.ts).
+ */
+export interface Seance {
+  id: string;
+  encadrantId: string;
+  etudiantId: string;
+  documentId?: string | null;
+  titre: string;
+  tache?: string | null;
+  dateHeure: string;
+  dureeMinutes?: number;
+  statut: StatutSeance;
+  notes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Créneau hebdomadaire récurrent déclaré par l'encadrant (spec section 74). */
+export interface DisponibiliteEncadrant {
+  id: string;
+  encadrantId: string;
+  jourSemaine: number; // 0 (dimanche) - 6 (samedi), convention `Date.getDay()`
+  heureDebut: string; // "HH:mm"
+  heureFin: string; // "HH:mm"
+}
+
+/**
+ * Forfait/abonnement (spec section 96) : offre du catalogue plateforme, gérée par le
+ * super-admin. `miseEnRelationPayante` (spec section 97) indique, à titre informatif, si la mise
+ * en relation étudiant/encadreur est facturée sur ce forfait - le modèle économique exact n'étant
+ * pas arrêté dans le cahier des charges, aucune logique de facturation réelle n'y est attachée.
+ */
+export interface Forfait {
+  id: string;
+  nom: string;
+  description: string;
+  prixMensuel: number;
+  maxEtudiants: number | null;
+  maxEncadrants: number | null;
+  fonctionnalites: string[];
+  miseEnRelationPayante: boolean;
+  ordre: number;
+}
+
+export type StatutAbonnement = "actif" | "expire" | "annule";
+
+/** Abonnement d'un établissement à un forfait - un seul actif à la fois. */
+export interface Abonnement {
+  id: string;
+  etablissementId: string;
+  forfaitId: string;
+  statut: StatutAbonnement;
+  dateDebut: string;
+  dateRenouvellement: string | null;
 }
 
 export type StatutInvitation = "en_attente" | "acceptee" | "expiree";
@@ -313,6 +547,38 @@ export interface EncadrantPublic {
   nom: string;
   prenom: string;
   filiere?: string | null;
+  // Spec section 98 : critères de mise en relation (domaine, charge actuelle, disponibilité).
+  domainesExpertise?: string[];
+  disponible?: boolean;
+  nbEtudiantsSuivis?: number;
+}
+
+export type StatutDemandeEncadrement = "en_attente" | "acceptee" | "refusee";
+
+/**
+ * Demande d'encadrement initiée par un étudiant (spec section 63) auprès d'un encadrant qu'il ne
+ * connaît pas encore (mode "recherche" de /rattachement-encadrant) - contrairement aux modes
+ * "code" (encadrant/classe), qui rattachent immédiatement car c'est l'encadrant/l'établissement
+ * qui a initié le contact. L'encadrant accepte ou refuse (spec section 65).
+ */
+export interface DemandeEncadrement {
+  id: string;
+  etudiantId: string;
+  encadrantId: string;
+  message?: string | null;
+  statut: StatutDemandeEncadrement;
+  createdAt: string;
+  dateReponse?: string | null;
+}
+
+/** Réponse de l'étudiant ou de l'encadrant à un commentaire en marge (spec section 47). */
+export interface ReponseCommentaire {
+  id: string;
+  commentaireMargeId: string;
+  documentId: string;
+  auteur: "etudiant" | "encadrant";
+  texte: string;
+  date: string;
 }
 
 export type StatutRegle = "proposee" | "adoptee" | "ignoree";

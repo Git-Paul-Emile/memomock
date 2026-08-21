@@ -7,6 +7,7 @@ import { CheckCircle2, History, MessageSquareWarning, User, XCircle } from "luci
 import { toast } from "sonner";
 
 import { useApiResource } from "@/hooks/use-api-resource";
+import { PanneauChapitres } from "@/components/canevas/panneau-chapitres";
 import { PageHeader } from "@/components/shared/page-header";
 import { ScoreJauge } from "@/components/shared/score-jauge";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -26,28 +27,35 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { apiGet, apiList, apiPatch, apiPost } from "@/lib/api";
+import { resoudreChapitres, type ChapitreAffiche } from "@/lib/canevas";
 import { NIVEAU_ALERTE_VARIANT } from "@/lib/constants";
 import { formatDateTime, getInitials } from "@/lib/utils";
 import type {
   Analyse,
+  ChapitreCanevas,
+  CritereChapitre,
   DocumentSubmission,
   MessageCorrection,
+  ProfilEncadrant,
   PublicUser,
   TypeAnalyse,
+  ValidationChapitre,
 } from "@/types";
 
 const ONGLET_LABELS: Record<TypeAnalyse, string> = {
   forme: "Forme",
   fond: "Fond",
   coherence: "Cohérence",
+  structure: "Structure",
 };
-const TYPES_ANALYSE: TypeAnalyse[] = ["forme", "fond", "coherence"];
+const TYPES_ANALYSE: TypeAnalyse[] = ["structure", "forme", "fond", "coherence"];
 
 interface DonneesRelecture {
   document: DocumentSubmission;
   etudiant: PublicUser;
   analyses: Analyse[];
   messages: MessageCorrection[];
+  chapitres: ChapitreAffiche[];
 }
 
 export default function RelectureDocumentPage() {
@@ -58,11 +66,11 @@ export default function RelectureDocumentPage() {
   const [dialogRevisionOuvert, setDialogRevisionOuvert] = React.useState(false);
   const [dialogRefusOuvert, setDialogRefusOuvert] = React.useState(false);
 
-  const { data, isLoading } = useApiResource<DonneesRelecture>(
+  const { data, isLoading, refetch } = useApiResource<DonneesRelecture>(
     ["document-relecture", id],
     async () => {
       const doc = await apiGet<DocumentSubmission>("documents", id);
-      const [etu, listeAnalyses, listeMessages] = await Promise.all([
+      const [etu, listeAnalyses, listeMessages, profil, validations] = await Promise.all([
         apiGet<PublicUser>("users", doc.etudiantId),
         apiList<Analyse>("analyses", { filtres: { documentId: id }, limite: 10 }),
         apiList<MessageCorrection>("messages", {
@@ -71,7 +79,26 @@ export default function RelectureDocumentPage() {
           tri: "date",
           ordre: "asc",
         }),
+        doc.profilEncadrantId
+          ? apiGet<ProfilEncadrant>("profils-encadrant", doc.profilEncadrantId).catch(() => null)
+          : Promise.resolve(null),
+        apiList<ValidationChapitre>("validations-chapitre", {
+          filtres: { documentId: id },
+          limite: 100,
+        }),
       ]);
+
+      let chapitres: ChapitreAffiche[] = [];
+      if (profil?.canevasId) {
+        const [chapitresRes, criteresRes] = await Promise.all([
+          apiList<ChapitreCanevas>("chapitres-canevas", {
+            filtres: { canevasId: profil.canevasId },
+            limite: 100,
+          }),
+          apiList<CritereChapitre>("criteres-chapitre", { limite: 500 }),
+        ]);
+        chapitres = resoudreChapitres(chapitresRes.data, criteresRes.data, validations.data);
+      }
 
       if (doc.statut === "pret_pour_encadrant") {
         await apiPatch("documents", id, {
@@ -85,6 +112,7 @@ export default function RelectureDocumentPage() {
         etudiant: etu,
         analyses: listeAnalyses.data,
         messages: listeMessages.data,
+        chapitres,
       };
     }
   );
@@ -93,6 +121,103 @@ export default function RelectureDocumentPage() {
   const etudiant = data?.etudiant ?? null;
   const analyses = data?.analyses ?? [];
   const messages = data?.messages ?? [];
+  const chapitres = data?.chapitres ?? [];
+
+  const validerChapitre = async (item: ChapitreAffiche) => {
+    if (!document) return;
+    const maintenant = new Date().toISOString();
+    try {
+      if (item.validation) {
+        await apiPatch<ValidationChapitre>("validations-chapitre", item.validation.id, {
+          statut: "valide",
+          verrouille: true,
+          commentaire: null,
+          dateDecision: maintenant,
+          updatedAt: maintenant,
+        });
+      } else {
+        await apiPost<ValidationChapitre>("validations-chapitre", {
+          documentId: document.id,
+          chapitreId: item.chapitreId,
+          statut: "valide",
+          verrouille: true,
+          commentaire: null,
+          dateDecision: maintenant,
+          createdAt: maintenant,
+          updatedAt: maintenant,
+        });
+      }
+      await apiPost("notifications", {
+        userId: document.etudiantId,
+        titre: "Chapitre validé",
+        message: `« ${item.titre} » a été validé par votre encadrant.`,
+        type: "validation",
+        lu: false,
+        date: maintenant,
+        lienDocumentId: document.id,
+      });
+      toast.success(`Chapitre « ${item.titre} » validé.`);
+      refetch();
+    } catch {
+      toast.error("La validation du chapitre a échoué.");
+    }
+  };
+
+  const refuserChapitre = async (item: ChapitreAffiche, commentaireRefus: string) => {
+    if (!document) return;
+    const maintenant = new Date().toISOString();
+    try {
+      if (item.validation) {
+        await apiPatch<ValidationChapitre>("validations-chapitre", item.validation.id, {
+          statut: "refuse",
+          verrouille: false,
+          commentaire: commentaireRefus,
+          dateDecision: maintenant,
+          updatedAt: maintenant,
+        });
+      } else {
+        await apiPost<ValidationChapitre>("validations-chapitre", {
+          documentId: document.id,
+          chapitreId: item.chapitreId,
+          statut: "refuse",
+          verrouille: false,
+          commentaire: commentaireRefus,
+          dateDecision: maintenant,
+          createdAt: maintenant,
+          updatedAt: maintenant,
+        });
+      }
+      await apiPost("notifications", {
+        userId: document.etudiantId,
+        titre: "Chapitre à revoir",
+        message: `« ${item.titre} » nécessite une correction : ${commentaireRefus}`,
+        type: "validation",
+        lu: false,
+        date: maintenant,
+        lienDocumentId: document.id,
+      });
+      toast.success(`Chapitre « ${item.titre} » refusé.`);
+      refetch();
+    } catch {
+      toast.error("Le refus du chapitre a échoué.");
+    }
+  };
+
+  const deverrouillerChapitre = async (item: ChapitreAffiche) => {
+    if (!item.validation) return;
+    try {
+      await apiPatch<ValidationChapitre>("validations-chapitre", item.validation.id, {
+        statut: "en_attente",
+        verrouille: false,
+        commentaire: null,
+        updatedAt: new Date().toISOString(),
+      });
+      toast.success(`Chapitre « ${item.titre} » déverrouillé.`);
+      refetch();
+    } catch {
+      toast.error("Le déverrouillage a échoué.");
+    }
+  };
 
   const valider = async () => {
     if (!document) return;
@@ -300,6 +425,16 @@ export default function RelectureDocumentPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {chapitres.length > 0 && (
+        <PanneauChapitres
+          items={chapitres}
+          role="encadrant"
+          onValider={validerChapitre}
+          onRefuser={refuserChapitre}
+          onDeverrouiller={deverrouillerChapitre}
+        />
+      )}
 
       {!dejaTraite ? (
         <Card>
