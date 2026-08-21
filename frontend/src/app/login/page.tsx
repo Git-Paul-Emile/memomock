@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { GraduationCap, Loader2, Mail } from "lucide-react";
+import { GraduationCap, Loader2, Mail, UserRound, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth, CODE_PROFIL_INCOMPLET } from "@/context/auth-context";
@@ -35,6 +35,11 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
+const COMPTES_DEMO = {
+  etudiant: { email: "amina.diallo@etu.memoai.fr", motDePasse: "etudiant123" },
+  encadrant: { email: "j.leroux@memoai.fr", motDePasse: "encadrant123" },
+} as const;
+
 export default function LoginPage() {
   const { login, forgotPassword } = useAuth();
   const router = useRouter();
@@ -48,8 +53,15 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
+
+  const remplirCompteDemo = (compte: keyof typeof COMPTES_DEMO) => {
+    const { email, motDePasse } = COMPTES_DEMO[compte];
+    setValue("email", email, { shouldValidate: true });
+    setValue("motDePasse", motDePasse, { shouldValidate: true });
+  };
 
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
@@ -91,6 +103,25 @@ export default function LoginPage() {
             <CardDescription>Accédez à votre espace étudiant ou encadrant.</CardDescription>
           </CardHeader>
           <CardContent>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => remplirCompteDemo("etudiant")}
+              >
+                <UserRound className="size-4" />
+                Étudiant·e
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => remplirCompteDemo("encadrant")}
+              >
+                <UsersRound className="size-4" />
+                Encadrant·e
+              </Button>
+            </div>
 
             <div className="my-4 flex items-center gap-3">
               <Separator className="flex-1" />
