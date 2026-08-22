@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { CheckCircle2, MessageSquarePlus, Sparkles, Undo2 } from "lucide-react";
+import { CheckCircle2, Highlighter, MessageSquarePlus, Sparkles, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { useApiResource } from "@/hooks/use-api-resource";
@@ -22,12 +22,14 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiDelete, apiGet, apiList, apiPost } from "@/lib/api";
 import { calculerSegments, texteCourantDuParagraphe } from "@/lib/revision-diff";
+import { cn } from "@/lib/utils";
 import type {
   CommentaireMarge,
   DocumentSubmission,
   RegleApprise,
   ReponseCommentaire,
   RevisionSegment,
+  Surlignage,
 } from "@/types";
 
 /**
@@ -46,6 +48,7 @@ interface DonneesCorrection {
   commentaires: CommentaireMarge[];
   reponses: ReponseCommentaire[];
   regles: RegleApprise[];
+  surlignages: Surlignage[];
 }
 
 export default function CorrectionEncadrantPage() {
@@ -61,7 +64,7 @@ export default function CorrectionEncadrantPage() {
     ["document-correction-encadrant", id],
     async () => {
       const doc = await apiGet<DocumentSubmission>("documents", id);
-      const [rev, com, rep, reg] = await Promise.all([
+      const [rev, com, rep, reg, sur] = await Promise.all([
         apiList<RevisionSegment>("revisions", { filtres: { documentId: id }, limite: 500 }),
         apiList<CommentaireMarge>("commentaires-marge", {
           filtres: { documentId: id },
@@ -77,6 +80,7 @@ export default function CorrectionEncadrantPage() {
           ordre: "desc",
           limite: 5,
         }),
+        apiList<Surlignage>("surlignages", { filtres: { documentId: id }, limite: 200 }),
       ]);
       return {
         document: doc,
@@ -84,6 +88,7 @@ export default function CorrectionEncadrantPage() {
         commentaires: com.data.sort((a, b) => a.numero - b.numero),
         reponses: rep.data,
         regles: reg.data,
+        surlignages: sur.data,
       };
     }
   );
@@ -99,6 +104,9 @@ export default function CorrectionEncadrantPage() {
     data?.commentaires,
     []
   );
+
+  // Même principe : dupliqué en état local pour un toggle optimiste immédiat.
+  const [surlignages, setSurlignages] = useSyncedState<Surlignage[]>(data?.surlignages, []);
 
   const paragraphes = React.useMemo(() => {
     const segments = data?.segments ?? [];
@@ -175,6 +183,29 @@ export default function CorrectionEncadrantPage() {
     }
   };
 
+  // Surlignage par paragraphe (spec section 5, #43) - togglable, pas de sélection de caractères
+  // (voir mémo de cadrage) : le modèle de correction de ce projet raisonne déjà par paragraphe
+  // (RevisionSegment, CommentaireMarge), c'est le niveau de granularité retenu ici aussi.
+  const basculerSurlignage = async (paragraphe: number) => {
+    if (!document) return;
+    const existant = surlignages.find((s) => s.paragraphe === paragraphe);
+    try {
+      if (existant) {
+        await apiDelete("surlignages", existant.id);
+        setSurlignages((prev) => prev.filter((s) => s.id !== existant.id));
+      } else {
+        const cree = await apiPost<Surlignage>("surlignages", {
+          documentId: document.id,
+          paragraphe,
+          date: new Date().toISOString(),
+        });
+        setSurlignages((prev) => [...prev, cree]);
+      }
+    } catch {
+      toast.error("Le surlignage n'a pas pu être mis à jour.");
+    }
+  };
+
   if (isLoading || !document) {
     return (
       <div className="mx-auto max-w-5xl space-y-4">
@@ -248,6 +279,43 @@ export default function CorrectionEncadrantPage() {
                 </Button>
               </div>
             </div>
+
+            {paragraphesTexte.length > 0 && (
+              <div className="rounded-lg border bg-muted/30 p-3">
+                <p className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                  <Highlighter className="size-3.5" />
+                  Surligner un paragraphe pour l&apos;étudiant
+                </p>
+                <div className="space-y-1.5">
+                  {paragraphesTexte.map((texte, index) => {
+                    const surligne = surlignages.some((s) => s.paragraphe === index);
+                    return (
+                      <div
+                        key={index}
+                        className={cn(
+                          "flex items-center gap-2 rounded-md border px-2 py-1.5",
+                          surligne && "border-warning/50 bg-warning/15"
+                        )}
+                      >
+                        <span className="flex-1 truncate text-xs text-muted-foreground">
+                          {texte || "(paragraphe vide)"}
+                        </span>
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant={surligne ? "default" : "outline"}
+                          className="size-7 shrink-0"
+                          onClick={() => basculerSurlignage(index)}
+                          title={surligne ? "Retirer le surlignage" : "Surligner ce paragraphe"}
+                        >
+                          <Highlighter className="size-3.5" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 

@@ -16,7 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { apiGet, apiList, apiPatch, apiPost } from "@/lib/api";
-import { libelleAuteur, progresserScore } from "@/lib/mock-ai";
+import { genererReponseTuteur, libelleAuteur, progresserScore } from "@/lib/mock-ai";
 import { SEUIL_SCORE_CONFORMITE } from "@/lib/constants";
 import { cn, formatDateTime } from "@/lib/utils";
 import type { DocumentSubmission, MessageCorrection } from "@/types";
@@ -74,13 +74,19 @@ export default function CorrectionDocumentPage() {
     setEnvoiEnCours(true);
 
     try {
-      // Le backend crée les deux messages (étudiant puis IA) et renvoie les deux - voir
-      // POST /api/ia/tuteur (modules/ia), qui appelle un vrai LLM si disponible pour ce document,
-      // avec repli automatique sur une réponse simulée sinon (voir backend/README.md).
-      const { messageEtudiant, messageIA } = await apiPost<{
-        messageEtudiant: MessageCorrection;
-        messageIA: MessageCorrection;
-      }>("ia/tuteur", { documentId: document.id, message: contenu });
+      const maintenant = new Date().toISOString();
+      const messageEtudiant = await apiPost<MessageCorrection>("messages", {
+        documentId: document.id,
+        auteur: "etudiant",
+        contenu,
+        date: maintenant,
+      });
+      const messageIA = await apiPost<MessageCorrection>("messages", {
+        documentId: document.id,
+        auteur: "ia",
+        contenu: genererReponseTuteur(),
+        date: new Date().toISOString(),
+      });
       setMessages((prev) => [...prev, messageEtudiant, messageIA]);
 
       const nouveauScoreFond = progresserScore(document.scoreFond);

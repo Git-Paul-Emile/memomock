@@ -494,6 +494,14 @@ export interface RevisionSegment {
   type: TypeSegment;
 }
 
+/** Paragraphe surligné par l'encadrant pour attirer l'attention de l'étudiant (spec section 5, #43). */
+export interface Surlignage {
+  id: string;
+  documentId: string;
+  paragraphe: number; // même indexation 0-based que RevisionSegment.paragraphe
+  date: string;
+}
+
 /** Commentaire ponctuel laissé par l'encadrant en marge d'un passage. */
 export interface CommentaireMarge {
   id: string;

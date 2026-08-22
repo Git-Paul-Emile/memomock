@@ -29,10 +29,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { apiPost } from "@/lib/api";
+import { apiPatch } from "@/lib/api";
 import { diffTexte } from "@/lib/diff";
 import { cn, formatDateTime } from "@/lib/utils";
-import type { DocumentSubmission, VersionDocument } from "@/types";
+import type { VersionDocument } from "@/types";
 
 /**
  * Historique des versions d'un document (spec section 29, écrans D69-D72) : un instantané par
@@ -87,11 +87,16 @@ export function HistoriqueVersions({
   const restaurer = async (version: VersionDocument) => {
     setRestaurationEnCours(version.id);
     try {
-      await apiPost(`versions/${version.id}/restaurer`, {});
-      // Filet de sécurité déjà exposé (voir documents.service#relancerAnalyse) : les scores
-      // affichés doivent refléter le contenu restauré, pas ceux de la version remplacée.
-      await apiPost<DocumentSubmission>(`documents/${documentId}/relancer-analyse`, {});
-      toast.success(`Version V${version.numero} restaurée. Nouvelle analyse en cours.`);
+      await apiPatch("documents", documentId, {
+        statut: version.statut,
+        scoreConformite: version.scoreConformite,
+        scoreForme: version.scoreForme,
+        scoreFond: version.scoreFond,
+        scoreCoherence: version.scoreCoherence,
+        urlFichier: version.urlFichier,
+        dateMaj: new Date().toISOString(),
+      });
+      toast.success(`Version V${version.numero} restaurée.`);
       setSelection([]);
       refetch();
     } catch {

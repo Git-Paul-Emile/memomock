@@ -15,7 +15,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { apiGet, apiPost, apiUpload } from "@/lib/api";
+import { apiGet, apiPatch, apiPost } from "@/lib/api";
+import { lancerAnalyseSimulee } from "@/lib/mock-ai";
 import { formatFileSize } from "@/lib/utils";
 import type { DocumentSubmission, PublicUser } from "@/types";
 
@@ -93,12 +94,13 @@ function SoumissionContenu() {
     if (!fichier || !documentId) return;
     setIsSubmitting(true);
     try {
-      const formData = new FormData();
-      formData.append("fichier", fichier);
-      const document = await apiUpload<DocumentSubmission>(
-        `documents/${documentId}/importer-fichier`,
-        formData
-      );
+      const document = await apiPatch<DocumentSubmission>("documents", documentId, {
+        nomFichier: fichier.name,
+        tailleOctets: fichier.size,
+        statut: "analyse_en_cours",
+        dateMaj: new Date().toISOString(),
+      });
+      void lancerAnalyseSimulee(document.id);
 
       if (document.encadrantId) {
         await apiPost("notifications", {
@@ -133,17 +135,22 @@ function SoumissionContenu() {
     setIsSubmitting(true);
     try {
       const maintenant = new Date().toISOString();
-      // Upload réel : le fichier part vers Cloudinary via le backend (voir
-      // POST /api/documents/upload), qui crée directement le Document avec l'URL renvoyée -
-      // contrairement à l'ancien flux qui n'enregistrait que le nom/la taille du fichier sans
-      // jamais le stocker réellement.
-      const formData = new FormData();
-      formData.append("fichier", fichier);
-      formData.append("titre", values.titre);
-      formData.append("etudiantId", user.id);
-      formData.append("encadrantId", user.encadrantId);
-
-      const document = await apiUpload<DocumentSubmission>("documents/upload", formData);
+      const document = await apiPost<DocumentSubmission>("documents", {
+        etudiantId: user.id,
+        encadrantId: user.encadrantId,
+        titre: values.titre,
+        nomFichier: fichier.name,
+        tailleOctets: fichier.size,
+        statut: "analyse_en_cours",
+        scoreConformite: 0,
+        scoreForme: 0,
+        scoreFond: 0,
+        scoreCoherence: 0,
+        dateSoumission: maintenant,
+        dateMaj: maintenant,
+        version: 1,
+      });
+      void lancerAnalyseSimulee(document.id);
 
       await apiPost("notifications", {
         userId: user.encadrantId,

@@ -101,18 +101,15 @@ export default function JumeauNumeriquePage() {
     }
     setEnCoursAdoption(true);
     try {
-      const misAJour = await apiPatch<RegleApprise>(
-        "regles-apprises",
-        `${regleAAdopter.id}/adopter`,
-        {
-          niveau: niveauChoisi,
-          ...(niveauChoisi === "ponctuelle" || niveauChoisi === "projet"
-            ? { documentId: regleAAdopter.documentId }
-            : {}),
-          ...(niveauChoisi === "type_document" ? { typeDocument: typeDocumentChoisi } : {}),
-          ...(niveauChoisi === "discipline" ? { discipline: disciplineChoisie.trim() } : {}),
-        }
-      );
+      const misAJour = await apiPatch<RegleApprise>("regles-apprises", regleAAdopter.id, {
+        statut: "adoptee",
+        niveau: niveauChoisi,
+        ...(niveauChoisi === "ponctuelle" || niveauChoisi === "projet"
+          ? { documentId: regleAAdopter.documentId }
+          : {}),
+        ...(niveauChoisi === "type_document" ? { typeDocument: typeDocumentChoisi } : {}),
+        ...(niveauChoisi === "discipline" ? { discipline: disciplineChoisie.trim() } : {}),
+      });
       setRegles((prev) => prev.map((r) => (r.id === misAJour.id ? misAJour : r)));
       toast.success("Règle adoptée par votre jumeau numérique.");
       setRegleAAdopter(null);

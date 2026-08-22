@@ -15,12 +15,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiGet, apiList } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import type {
   CommentaireMarge,
   DocumentSubmission,
   PublicUser,
   ReponseCommentaire,
   RevisionSegment,
+  Surlignage,
 } from "@/types";
 
 interface DonneesRetour {
@@ -29,6 +31,7 @@ interface DonneesRetour {
   segments: RevisionSegment[];
   commentaires: CommentaireMarge[];
   reponses: ReponseCommentaire[];
+  surlignages: Surlignage[];
 }
 
 /**
@@ -63,7 +66,7 @@ export default function RetourEncadrantPage() {
     ["document-retour-etudiant", id],
     async () => {
       const doc = await apiGet<DocumentSubmission>("documents", id);
-      const [enc, rev, com, rep] = await Promise.all([
+      const [enc, rev, com, rep, sur] = await Promise.all([
         apiGet<PublicUser>("users", doc.encadrantId).catch(() => null),
         apiList<RevisionSegment>("revisions", { filtres: { documentId: id }, limite: 500 }),
         apiList<CommentaireMarge>("commentaires-marge", {
@@ -74,6 +77,7 @@ export default function RetourEncadrantPage() {
           filtres: { documentId: id },
           limite: 200,
         }),
+        apiList<Surlignage>("surlignages", { filtres: { documentId: id }, limite: 200 }),
       ]);
       return {
         document: doc,
@@ -81,6 +85,7 @@ export default function RetourEncadrantPage() {
         segments: rev.data,
         commentaires: com.data.sort((a, b) => a.numero - b.numero),
         reponses: rep.data,
+        surlignages: sur.data,
       };
     }
   );
@@ -89,6 +94,11 @@ export default function RetourEncadrantPage() {
   const encadrant = data?.encadrant ?? null;
   const commentaires = data?.commentaires ?? [];
   const [reponses, setReponses] = useSyncedState<ReponseCommentaire[]>(data?.reponses, []);
+
+  const paragraphesSurlignes = React.useMemo(
+    () => new Set((data?.surlignages ?? []).map((s) => s.paragraphe)),
+    [data?.surlignages]
+  );
 
   // Regroupe les segments par paragraphe (triés par ordre) pour reconstituer le texte corrigé.
   const paragraphes = React.useMemo(() => {
@@ -143,6 +153,10 @@ export default function RetourEncadrantPage() {
           <span className="inline-block h-3 w-4 rounded-sm bg-warning/30" />
           <span className="text-muted-foreground">Commentaire en marge</span>
         </span>
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-3 w-4 rounded-sm bg-warning/15 ring-1 ring-warning/50" />
+          <span className="text-muted-foreground">Paragraphe surligné</span>
+        </span>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
@@ -158,7 +172,14 @@ export default function RetourEncadrantPage() {
               </p>
             ) : (
               paragraphes.map((paragraphe, i) => (
-                <p key={i} className="text-sm">
+                <p
+                  key={i}
+                  className={cn(
+                    "text-sm",
+                    paragraphesSurlignes.has(i) &&
+                      "-mx-2 rounded bg-warning/15 px-2 py-1 ring-1 ring-warning/50"
+                  )}
+                >
                   {paragraphe.map((segment) => (
                     <SegmentTexte key={segment.id} segment={segment} />
                   ))}

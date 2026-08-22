@@ -27,14 +27,14 @@
       "titre": "Optimisation des architectures microservices sous charge variable",
       "nomFichier": "morel_memoire_v1.pdf",
       "tailleOctets": 1230456,
-      "statut": "analyse_en_cours",
-      "scoreConformite": 0,
-      "scoreForme": 0,
-      "scoreFond": 0,
+      "statut": "analyse_terminee",
+      "scoreConformite": 72,
+      "scoreForme": 74,
+      "scoreFond": 68,
       "dateSoumission": "2026-07-09T14:30:00.000Z",
       "version": 1,
-      "dateMaj": "2026-07-09T14:30:00.000Z",
-      "scoreCoherence": 0,
+      "dateMaj": "2026-08-21T22:44:15.858Z",
+      "scoreCoherence": 74,
       "typeDocument": "master",
       "discipline": "Informatique",
       "profilEncadrantId": "pe1"
@@ -1104,6 +1104,108 @@
           "niveau": "erreur"
         }
       ]
+    },
+    {
+      "documentId": "doc2",
+      "type": "forme",
+      "score": 74,
+      "points": [
+        {
+          "id": "doc2-1787352255607-forme-0",
+          "libelle": "Pagination conforme",
+          "detail": "Numérotation continue et correcte détectée sur l'ensemble du document.",
+          "niveau": "succes"
+        },
+        {
+          "id": "doc2-1787352255607-forme-1",
+          "libelle": "Espacements irréguliers",
+          "detail": "Certains paragraphes présentent un interligne différent du reste du document.",
+          "niveau": "attention"
+        },
+        {
+          "id": "doc2-1787352255607-forme-2",
+          "libelle": "Sommaire absent",
+          "detail": "Aucune table des matières n'a été détectée en début de document.",
+          "niveau": "erreur"
+        }
+      ],
+      "dateAnalyse": "2026-08-21T22:44:15.607Z",
+      "id": "U0a51SR"
+    },
+    {
+      "documentId": "doc2",
+      "type": "fond",
+      "score": 68,
+      "points": [
+        {
+          "id": "doc2-1787352255607-fond-0",
+          "libelle": "Transitions à renforcer",
+          "detail": "Le lien logique entre certaines sous-parties gagnerait à être explicité.",
+          "niveau": "attention"
+        },
+        {
+          "id": "doc2-1787352255607-fond-1",
+          "libelle": "Sources à diversifier",
+          "detail": "Une part importante des références provient d'un nombre restreint d'auteurs.",
+          "niveau": "attention"
+        },
+        {
+          "id": "doc2-1787352255607-fond-2",
+          "libelle": "Analyse critique insuffisante",
+          "detail": "Certains résultats sont présentés sans mise en perspective ni discussion.",
+          "niveau": "erreur"
+        }
+      ],
+      "dateAnalyse": "2026-08-21T22:44:15.607Z",
+      "id": "6MCpYwU"
+    },
+    {
+      "documentId": "doc2",
+      "type": "coherence",
+      "score": 74,
+      "points": [
+        {
+          "id": "doc2-1787352255607-coherence-0",
+          "libelle": "Contradiction entre l'introduction et la conclusion",
+          "detail": "L'annonce de plan ne correspond pas exactement au déroulé final.",
+          "niveau": "erreur"
+        },
+        {
+          "id": "doc2-1787352255607-coherence-1",
+          "libelle": "Redondances entre parties",
+          "detail": "Certains points sont développés à l'identique dans deux sections distinctes.",
+          "niveau": "attention"
+        }
+      ],
+      "dateAnalyse": "2026-08-21T22:44:15.607Z",
+      "id": "GklvlB-"
+    },
+    {
+      "documentId": "doc2",
+      "type": "structure",
+      "score": 89,
+      "points": [
+        {
+          "id": "doc2-1787352255607-structure-0",
+          "libelle": "Chapitre trop court",
+          "detail": "Une partie du document est nettement plus courte que ce qu'attend le canevas.",
+          "niveau": "attention"
+        },
+        {
+          "id": "doc2-1787352255607-structure-1",
+          "libelle": "Chapitres attendus présents",
+          "detail": "Toutes les parties du canevas de l'encadrant ont été identifiées dans le document.",
+          "niveau": "succes"
+        },
+        {
+          "id": "doc2-1787352255607-structure-2",
+          "libelle": "Découpage équilibré",
+          "detail": "La longueur des chapitres reste cohérente avec le plan attendu.",
+          "niveau": "succes"
+        }
+      ],
+      "dateAnalyse": "2026-08-21T22:44:15.607Z",
+      "id": "yWuJnoD"
     }
   ],
   "encadrants": [
@@ -2139,5 +2241,8 @@
         "citation": "Configurer mes exigences une fois (normes, grille d'évaluation) puis les voir appliquées automatiquement à chaque étudiant m'a fait gagner un temps considérable."
       }
     ]
-  }
+  },
+  "sessions": [],
+  "demandes-support": [],
+  "surlignages": []
 }

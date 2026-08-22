@@ -67,13 +67,23 @@ export default function NouveauDocumentPage() {
     }
     setIsSubmitting(true);
     try {
-      const document = await apiPost<DocumentSubmission>("documents/brouillon", {
-        titre: values.titre,
+      const maintenant = new Date().toISOString();
+      const document = await apiPost<DocumentSubmission>("documents", {
+        etudiantId: user.id,
         encadrantId: user.encadrantId,
+        titre: values.titre,
         typeDocument: values.typeDocument,
         discipline: values.discipline,
         ...(values.sujet ? { sujet: values.sujet } : {}),
         ...(values.problematique ? { problematique: values.problematique } : {}),
+        statut: "brouillon",
+        scoreConformite: 0,
+        scoreForme: 0,
+        scoreFond: 0,
+        scoreCoherence: 0,
+        dateSoumission: maintenant,
+        dateMaj: maintenant,
+        version: 1,
       });
       toast.success("Document créé. Importez maintenant votre fichier.");
       router.push(`/etudiant/soumission?documentId=${document.id}`);

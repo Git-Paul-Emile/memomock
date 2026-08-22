@@ -13,9 +13,9 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { apiPost } from "@/lib/api";
+import type { DemandeSupport } from "@/types";
 
-// Écran public A8 (spec ESPACE PUBLIC) : formulaire de contact accessible sans compte, relayé
-// vers l'adresse support par e-mail réel (voir POST /api/public/contact côté backend).
+// Écran public A8 (spec ESPACE PUBLIC) : formulaire de contact accessible sans compte.
 export default function ContactPage() {
   const [email, setEmail] = React.useState("");
   const [sujet, setSujet] = React.useState("");
@@ -29,10 +29,16 @@ export default function ContactPage() {
     }
     setEnvoiEnCours(true);
     try {
-      await apiPost("public/contact", {
+      const maintenant = new Date().toISOString();
+      await apiPost<DemandeSupport>("demandes-support", {
+        userId: null,
         email: email.trim(),
         sujet: sujet.trim(),
         message: message.trim(),
+        statut: "nouvelle",
+        reponse: null,
+        createdAt: maintenant,
+        updatedAt: maintenant,
       });
       toast.success("Votre demande a été envoyée. Nous vous répondrons sous 24 h ouvrées.");
       setSujet("");

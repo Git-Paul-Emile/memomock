@@ -33,11 +33,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { apiGet, apiPatch, apiPost, apiUpload } from "@/lib/api";
+import { apiDelete, apiGet, apiList, apiPatch } from "@/lib/api";
 import { obtenirSessionId } from "@/lib/session-id";
 import { getInitials } from "@/lib/utils";
 import { ROLE_LABELS } from "@/lib/constants";
-import type { CanalNotification, PublicUser, SessionConnexion } from "@/types";
+import type {
+  CanalNotification,
+  DocumentSubmission,
+  Notification,
+  PublicUser,
+  SessionConnexion,
+} from "@/types";
 
 const CANAL_LABELS: Record<CanalNotification, string> = {
   email: "E-mail + dans l'application",
@@ -80,7 +86,13 @@ export default function ParametresPage() {
 
   const { data: sessions = [], isLoading: sessionsChargement } = useQuery({
     queryKey: ["sessions-actives", user?.id],
-    queryFn: () => apiGet<SessionConnexion[]>("users", "me/sessions"),
+    queryFn: async () => {
+      const res = await apiList<SessionConnexion>("sessions", {
+        filtres: { userId: user!.id },
+        limite: 50,
+      });
+      return res.data;
+    },
     enabled: !!user,
   });
 
@@ -129,9 +141,13 @@ export default function ParametresPage() {
     }
     setAvatarEnCours(true);
     try {
-      const formData = new FormData();
-      formData.append("fichier", fichier);
-      const misAJour = await apiUpload<PublicUser>("users/avatar", formData);
+      const dataUri = await new Promise<string>((resolve, reject) => {
+        const lecteur = new FileReader();
+        lecteur.onload = () => resolve(lecteur.result as string);
+        lecteur.onerror = () => reject(lecteur.error);
+        lecteur.readAsDataURL(fichier);
+      });
+      const misAJour = await apiPatch<PublicUser>("users", user.id, { avatarUrl: dataUri });
       definirUtilisateur(misAJour);
       toast.success("Photo de profil mise à jour.");
     } catch {
@@ -157,11 +173,18 @@ export default function ParametresPage() {
   };
 
   // RGPD - droit à la portabilité (art. 20) : télécharge un export JSON complet de toutes les
-  // données personnelles rattachées au compte (voir GET /api/users/me/export côté backend).
+  // données personnelles rattachées au compte.
   const handleExporterDonnees = async () => {
     setExportEnCours(true);
     try {
-      const donnees = await apiGet<unknown>("users", "me/export");
+      const filtreDocuments =
+        user.role === "encadrant" ? { encadrantId: user.id } : { etudiantId: user.id };
+      const [profil, documents, notifications] = await Promise.all([
+        apiGet<PublicUser>("users", user.id),
+        apiList<DocumentSubmission>("documents", { filtres: filtreDocuments, limite: 500 }),
+        apiList<Notification>("notifications", { filtres: { userId: user.id }, limite: 500 }),
+      ]);
+      const donnees = { profil, documents: documents.data, notifications: notifications.data };
       const blob = new Blob([JSON.stringify(donnees, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const lien = document.createElement("a");
@@ -177,13 +200,19 @@ export default function ParametresPage() {
     }
   };
 
-  // RGPD - droit à l'effacement (art. 17), mis en œuvre par anonymisation (voir
-  // POST /api/users/me/anonymiser côté backend pour le détail de ce choix). Confirmation
+  // RGPD - droit à l'effacement (art. 17), mis en œuvre par anonymisation. Confirmation
   // explicite requise (saisie du mot "SUPPRIMER") avant toute action irréversible.
   const handleSupprimerCompte = async () => {
     setSuppressionEnCours(true);
     try {
-      await apiPost("users/me/anonymiser", {});
+      await apiPatch("users", user.id, {
+        actif: false,
+        nom: "Compte supprimé",
+        prenom: "",
+        email: `anonymise-${user.id}@memoai.fr`,
+        telephone: null,
+        avatarUrl: null,
+      });
       toast.success("Votre compte a été supprimé.");
       await logout(); // redirige déjà vers /login (voir auth-context.tsx)
     } catch {
@@ -192,15 +221,18 @@ export default function ParametresPage() {
     }
   };
 
-  // Spec écran H8-H9 : révoque les sessions des autres appareils (voir
-  // POST /api/users/me/revoquer-sessions côté backend) et retire leurs lignes SessionConnexion.
-  // La session courante (identifiée par sessionIdCourante) est explicitement préservée.
+  // Spec écran H8-H9 : révoque les sessions des autres appareils. La session courante
+  // (identifiée par sessionIdCourante) est explicitement préservée.
   const handleRevoquerSessions = async () => {
     setRevocationEnCours(true);
     try {
-      await apiPost("users/me/revoquer-sessions", { sessionIdCourante });
+      await Promise.all(
+        sessions
+          .filter((session) => session.id !== sessionIdCourante)
+          .map((session) => apiDelete("sessions", session.id))
+      );
       toast.success("Les autres sessions ont été déconnectées.");
-      await queryClient.invalidateQueries({ queryKey: ["sessions-actives", user!.id] });
+      await queryClient.invalidateQueries({ queryKey: ["sessions-actives", user.id] });
     } catch {
       toast.error("Impossible de déconnecter les autres sessions.");
     } finally {

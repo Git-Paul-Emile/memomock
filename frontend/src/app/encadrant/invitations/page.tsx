@@ -76,15 +76,18 @@ export default function InvitationsPage() {
   };
 
   const envoyerInvitations = async () => {
-    if (emails.length === 0) return;
+    if (emails.length === 0 || !user) return;
     setEnvoiEnCours(true);
     try {
+      const maintenant = new Date().toISOString();
       await Promise.all(
         emails.map((email) =>
           apiPost("invitations", {
             email,
             code: codeInvitation,
             statut: "en_attente",
+            encadrantId: user.id,
+            date: maintenant,
           })
         )
       );

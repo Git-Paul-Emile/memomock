@@ -25,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiGet, apiList, apiPatch, apiPost } from "@/lib/api";
 import { NIVEAU_ALERTE_VARIANT, SEUIL_SCORE_CONFORMITE } from "@/lib/constants";
+import { lancerAnalyseSimulee } from "@/lib/mock-ai";
 import { formatDateTime } from "@/lib/utils";
 import type { Analyse, DocumentSubmission, TypeAnalyse } from "@/types";
 
@@ -73,13 +74,16 @@ export default function AnalyseDocumentPage() {
   const document = data?.document ?? null;
   const analyses = data?.analyses ?? [];
 
-  // Filet de sécurité si le traitement automatique a échoué ou est resté bloqué (voir
-  // POST /api/documents/:id/relancer-analyse côté backend).
+  // Filet de sécurité si l'analyse automatique n'a jamais démarré ou est restée bloquée.
   const relancerAnalyse = async () => {
     if (!document) return;
     setAnalyseEnCours(true);
     try {
-      await apiPost(`documents/${document.id}/relancer-analyse`, {});
+      await apiPatch("documents", document.id, {
+        statut: "analyse_en_cours",
+        dateMaj: new Date().toISOString(),
+      });
+      void lancerAnalyseSimulee(document.id);
       toast.success("Analyse relancée.");
       await refetch();
     } catch {

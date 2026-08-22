@@ -48,13 +48,23 @@ export default function OnboardingEtudiantPage() {
     }
     setEnCours(true);
     try {
-      const document = await apiPost<DocumentSubmission>("documents/brouillon", {
-        titre: sujet.trim() || `Mémoire de ${user.prenom}`,
+      const maintenant = new Date().toISOString();
+      const document = await apiPost<DocumentSubmission>("documents", {
+        etudiantId: user.id,
         encadrantId: user.encadrantId,
+        titre: sujet.trim() || `Mémoire de ${user.prenom}`,
         typeDocument,
         discipline: discipline.trim(),
         ...(sujet.trim() ? { sujet: sujet.trim() } : {}),
         ...(problematique.trim() ? { problematique: problematique.trim() } : {}),
+        statut: "brouillon",
+        scoreConformite: 0,
+        scoreForme: 0,
+        scoreFond: 0,
+        scoreCoherence: 0,
+        dateSoumission: maintenant,
+        dateMaj: maintenant,
+        version: 1,
       });
       router.push(`/etudiant/soumission?documentId=${document.id}`);
     } catch {

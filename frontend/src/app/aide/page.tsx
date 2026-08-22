@@ -70,14 +70,14 @@ export default function AidePage() {
   const [message, setMessage] = React.useState("");
   const [envoiEnCours, setEnvoiEnCours] = React.useState(false);
 
-  // Historique des demandes de l'utilisateur connecté (spec écran H20) - le backend restreint
-  // déjà la liste à ses propres demandes (voir demandes-support.service#authorize.list). Cet
-  // écran est toujours atteint authentifié (voir layout.tsx, SharedPageShell + RouteGuard).
+  // Historique des demandes de l'utilisateur connecté (spec écran H20). Cet écran est toujours
+  // atteint authentifié (voir layout.tsx, SharedPageShell + RouteGuard).
   const {
     data: demandes,
     isLoading: demandesChargement,
     refetch: refetchDemandes,
   } = useApiList<DemandeSupport>("demandes-support", {
+    filtres: { userId: user?.id },
     tri: "createdAt",
     ordre: "desc",
     limite: 10,
@@ -97,10 +97,16 @@ export default function AidePage() {
     }
     setEnvoiEnCours(true);
     try {
-      await apiPost("public/contact", {
+      const maintenant = new Date().toISOString();
+      await apiPost<DemandeSupport>("demandes-support", {
+        userId: user?.id ?? null,
         email: email.trim(),
         sujet: sujet.trim(),
         message: message.trim(),
+        statut: "nouvelle",
+        reponse: null,
+        createdAt: maintenant,
+        updatedAt: maintenant,
       });
       toast.success("Votre demande a été envoyée. Nous vous répondrons sous 24 h ouvrées.");
       setSujet("");

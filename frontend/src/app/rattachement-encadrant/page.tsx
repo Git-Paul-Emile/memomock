@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { apiList, apiPatch, apiPost, apiPublic } from "@/lib/api";
 import { cn, getInitials } from "@/lib/utils";
 import { APP_NAME } from "@/lib/constants";
-import type { Classe, DemandeEncadrement, EncadrantPublic, PublicUser } from "@/types";
+import type { Classe, DemandeEncadrement, EncadrantPublic, Invitation, PublicUser } from "@/types";
 
 /**
  * Écran « Rattachement à un encadrant » côté étudiant.
@@ -52,15 +52,21 @@ export default function RattachementEncadrantPage() {
   );
 
   const rejoindreParCode = async () => {
-    await apiPost(
-      "users/me/rattacher-encadrant",
-      { code: code.trim().toUpperCase() }
-    );
+    const res = await apiList<Invitation>("invitations", {
+      filtres: { code: code.trim().toUpperCase() },
+      limite: 1,
+    });
+    const invitation = res.data[0];
+    if (!invitation || invitation.statut === "expiree") throw new Error("Code invalide");
+    const misAJour = await apiPatch<PublicUser>("users", user!.id, {
+      encadrantId: invitation.encadrantId,
+    });
+    await apiPatch<Invitation>("invitations", invitation.id, { statut: "acceptee" });
+    definirUtilisateur(misAJour);
   };
 
-  // CRUD standard (contrairement à l'action `users/me/rattacher-encadrant` ci-dessus, qui ne
-  // fonctionne pas contre le json-server réel utilisé en local) : on résout la classe par son
-  // code, puis on met à jour le profil de l'utilisateur connecté.
+  // CRUD standard : on résout la classe par son code, puis on met à jour le profil de
+  // l'utilisateur connecté.
   const rejoindreParCodeClasse = async () => {
     const res = await apiList<Classe>("classes", {
       filtres: { code: codeClasse.trim().toUpperCase() },

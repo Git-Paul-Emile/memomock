@@ -219,6 +219,24 @@ export function apiPut<T>(resource: string, id: string, body: unknown): Promise<
   return request<T>(`/${resource}/${id}`, { method: "PUT", body: JSON.stringify(body) });
 }
 
-export function apiDelete(resource: string, id: string): Promise<void> {
-  return request<void>(`/${resource}/${id}`, { method: "DELETE" });
+/**
+ * json-server supprime toujours la ressource demandée en premier, puis fait un balayage complet
+ * de la base pour purger les enfants orphelins (clé étrangère `xxxId` pointant vers un id absent)
+ * - ce balayage plante avec une 500 dès qu'une clé `xxxId` vaut `null` quelque part dans la base
+ * (cas légitime et courant ici, ex. `RegleApprise.documentId: null` pour une règle à portée
+ * générale) : voir node_modules/json-server/lib/server/router/plural.js `destroy()` et
+ * mixins.js `getRemovable`. La suppression elle-même a donc déjà réussi quand cette 500 survient ;
+ * on ne doit pas la remonter comme une erreur.
+ */
+export async function apiDelete(resource: string, id: string): Promise<void> {
+  const token = await getToken();
+  const sessionId = obtenirSessionId();
+  await fetch(`${API_BASE_URL}/${resource}/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(sessionId ? { "X-Session-Id": sessionId } : {}),
+    },
+  });
 }
