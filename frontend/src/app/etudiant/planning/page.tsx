@@ -44,13 +44,15 @@ export default function PlanningEtudiantPage() {
     ["planning-echeances", document?.id],
     async () => {
       if (!document?.profilEncadrantId) return [];
-      const profil = await apiGet<ProfilEncadrant>("profils-encadrant", document.profilEncadrantId).catch(
-        () => null
-      );
+      const profil = await apiGet<ProfilEncadrant>(
+        "profils-encadrant",
+        document.profilEncadrantId
+      ).catch(() => null);
       if (!profil) return [];
       const resultat: Echeance[] = [];
       for (const l of profil.livrablesAttendus) {
-        if (l.dateEcheance) resultat.push({ libelle: l.nom, dateEcheance: l.dateEcheance, type: "livrable" });
+        if (l.dateEcheance)
+          resultat.push({ libelle: l.nom, dateEcheance: l.dateEcheance, type: "livrable" });
       }
       if (profil.canevasId) {
         const chapitresRes = await apiList<ChapitreCanevas>("chapitres-canevas", {
@@ -58,7 +60,8 @@ export default function PlanningEtudiantPage() {
           limite: 100,
         });
         for (const c of chapitresRes.data) {
-          if (c.dateEcheance) resultat.push({ libelle: c.titre, dateEcheance: c.dateEcheance, type: "chapitre" });
+          if (c.dateEcheance)
+            resultat.push({ libelle: c.titre, dateEcheance: c.dateEcheance, type: "chapitre" });
         }
       }
       return resultat.sort((a, b) => a.dateEcheance.localeCompare(b.dateEcheance));
@@ -100,13 +103,20 @@ export default function PlanningEtudiantPage() {
                   </div>
                 ))}
                 {seancesPassees.map((s) => (
-                  <div key={s.id} className="flex items-center justify-between rounded-lg border p-3 opacity-70">
+                  <div
+                    key={s.id}
+                    className="flex items-center justify-between rounded-lg border p-3 opacity-70"
+                  >
                     <div>
                       <p className="text-sm font-medium">{s.titre}</p>
                       <p className="text-xs text-muted-foreground">{formatDateTime(s.dateHeure)}</p>
                     </div>
                     <Badge variant={s.statut === "effectuee" ? "success" : "outline"}>
-                      {s.statut === "effectuee" ? "Effectuée" : s.statut === "annulee" ? "Annulée" : "Non effectuée"}
+                      {s.statut === "effectuee"
+                        ? "Effectuée"
+                        : s.statut === "annulee"
+                          ? "Annulée"
+                          : "Non effectuée"}
                     </Badge>
                   </div>
                 ))}
@@ -124,12 +134,17 @@ export default function PlanningEtudiantPage() {
             {chargementEcheances ? (
               <Skeleton className="h-16 w-full" />
             ) : !echeances || echeances.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Aucune échéance définie pour l&apos;instant.</p>
+              <p className="text-sm text-muted-foreground">
+                Aucune échéance définie pour l&apos;instant.
+              </p>
             ) : (
               echeances.map((e) => {
                 const jours = joursRestants(e.dateEcheance);
                 return (
-                  <div key={`${e.type}-${e.libelle}`} className="flex items-center justify-between rounded-lg border p-3">
+                  <div
+                    key={`${e.type}-${e.libelle}`}
+                    className="flex items-center justify-between rounded-lg border p-3"
+                  >
                     <div>
                       <p className="text-sm font-medium">{e.libelle}</p>
                       <p className="text-xs text-muted-foreground">{formatDate(e.dateEcheance)}</p>

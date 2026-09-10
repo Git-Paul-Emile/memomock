@@ -53,7 +53,9 @@ export function FilCommentaire({
         <div key={r.id} className="flex items-start gap-1.5 text-xs">
           <CornerDownRight className="mt-0.5 size-3 shrink-0 text-muted-foreground" />
           <div>
-            <span className="font-medium">{r.auteur === "etudiant" ? "Étudiant" : "Encadrant"}</span>{" "}
+            <span className="font-medium">
+              {r.auteur === "etudiant" ? "Étudiant" : "Encadrant"}
+            </span>{" "}
             <span className="text-muted-foreground">· {formatDateTime(r.date)}</span>
             <p>{r.texte}</p>
           </div>
@@ -72,7 +74,13 @@ export function FilCommentaire({
           placeholder="Répondre…"
           className="h-7 text-xs"
         />
-        <Button size="sm" variant="ghost" className="h-7" onClick={envoyer} disabled={!texte.trim() || enCours}>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-7"
+          onClick={envoyer}
+          disabled={!texte.trim() || enCours}
+        >
           Envoyer
         </Button>
       </div>

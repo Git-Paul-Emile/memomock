@@ -115,11 +115,7 @@ export function PanneauChapitres({
             {role === "encadrant" && (
               <div className="ml-7 flex gap-2">
                 {item.verrouille ? (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onDeverrouiller?.(item)}
-                  >
+                  <Button size="sm" variant="outline" onClick={() => onDeverrouiller?.(item)}>
                     <Unlock className="size-4" />
                     Déverrouiller
                   </Button>
@@ -141,7 +137,11 @@ export function PanneauChapitres({
         ))}
       </CardContent>
 
-      <DialogueRefus item={refusOuvert} onClose={() => setRefusOuvert(null)} onRefuser={onRefuser} />
+      <DialogueRefus
+        item={refusOuvert}
+        onClose={() => setRefusOuvert(null)}
+        onRefuser={onRefuser}
+      />
     </Card>
   );
 }
@@ -198,7 +198,11 @@ function DialogueRefus({
           <Button variant="outline" onClick={onClose}>
             Annuler
           </Button>
-          <Button variant="destructive" onClick={confirmer} disabled={!commentaire.trim() || enCours}>
+          <Button
+            variant="destructive"
+            onClick={confirmer}
+            disabled={!commentaire.trim() || enCours}
+          >
             Confirmer le refus
           </Button>
         </DialogFooter>

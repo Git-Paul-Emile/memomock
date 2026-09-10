@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -53,12 +53,14 @@ export default function NouveauDocumentPage() {
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { typeDocument: "master" },
   });
+
+  const typeDocument = useWatch({ control, name: "typeDocument" });
 
   const onSubmit = async (values: FormValues) => {
     if (!user?.encadrantId) {
@@ -125,7 +127,7 @@ export default function NouveauDocumentPage() {
               <div className="space-y-1.5">
                 <Label>Type de document</Label>
                 <Select
-                  value={watch("typeDocument")}
+                  value={typeDocument}
                   onValueChange={(v) => setValue("typeDocument", v as TypeDocument)}
                 >
                   <SelectTrigger className="w-full">

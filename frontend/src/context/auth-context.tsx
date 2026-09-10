@@ -15,15 +15,10 @@ import {
   updateProfile,
 } from "@/lib/firebase";
 
-import { auth } from "@/lib/firebase";
+import { auth, type MockUser } from "@/lib/firebase";
 import { API_BASE_URL, ApiError } from "@/lib/api";
-import { obtenirSessionId, oublierSessionId } from "@/lib/session-id";
+import { oublierSessionId } from "@/lib/session-id";
 import type { PublicUser, RoleInscription } from "@/types";
-
-// Code applicatif renvoyé par le backend (POST /auth/sync, HTTP 428) quand un utilisateur
-// n'a pas encore de profil applicatif. Le frontend l'utilise pour rediriger vers l'écran de
-// complétion de profil (/completer-profil).
-export const CODE_PROFIL_INCOMPLET = "PROFIL_INCOMPLET";
 
 export interface InscriptionPayload {
   role: RoleInscription;
@@ -31,7 +26,7 @@ export interface InscriptionPayload {
   prenom: string;
   email: string;
   motDePasse: string;
-  telephone: string; // Obligatoire à l'inscription (non vérifié - plus d'OTP WhatsApp).
+  telephone: string; // Obligatoire à l'inscription, non vérifié (pas de code OTP).
   encadrantId?: string;
   filiere?: string;
   // Renseigné uniquement pour role === "admin_etablissement" : sert à créer l'établissement juste
@@ -53,9 +48,8 @@ interface AuthContextValue {
   isLoading: boolean;
   login: (email: string, motDePasse: string) => Promise<PublicUser>;
   register: (payload: InscriptionPayload) => Promise<PublicUser>;
-  // roleSouhaite/telephone fournis uniquement depuis la page d'inscription. Sans eux (bouton
-  // Google de la page de connexion), une inscription entièrement nouvelle lèvera une ApiError
-  // de code CODE_PROFIL_INCOMPLET, que l'appelant traduit en redirection vers /completer-profil.
+  // Écran /completer-profil : renseigne les informations obligatoires manquantes (rôle,
+  // téléphone, encadrant...) d'un compte déjà authentifié mais au profil incomplet.
   completerProfil: (payload: CompletionPayload) => Promise<PublicUser>;
   forgotPassword: (email: string) => Promise<void>;
   // Écran H6 : ré-authentifie avec le mot de passe actuel puis applique le nouveau.
@@ -69,50 +63,24 @@ interface AuthContextValue {
 const AuthContext = React.createContext<AuthContextValue | undefined>(undefined);
 
 /**
- * Sépare, dans le formulaire d'inscription, ce qui relève de l'IDENTITÉ (traité par l'API mock)
- * de ce qui relève du PROFIL MÉTIER (envoyé à notre API : rôle, nom, encadrant, établissement...).
- *
- * Deux raisons de ne jamais laisser fuiter les identifiants vers `POST /auth/sync` :
- *  1. Sécurité - un mot de passe en clair n'a aucune raison de transiter vers notre backend.
- *  2. Contrat d'API - le schéma de la route est `.strict()` côté backend : toute clé inconnue déclenche un 400.
+ * Récupère le profil utilisateur depuis l'API mock (recherche par e-mail dans `users`).
  */
-function extraireProfilMetier(
-  payload: Partial<InscriptionPayload> = {}
-): Omit<Partial<InscriptionPayload>, "email" | "motDePasse"> {
-  const { email, motDePasse, ...profilMetier } = payload;
-  return profilMetier;
-}
-
-/**
- * Récupère le profil utilisateur depuis json-server.
- * Cherche l'utilisateur par email dans la collection `users`.
- * Mode mock : aucune création/synchronisation backend.
- */
-async function synchroniserProfil(
-  firebaseUser: any,
-  payload?: Partial<InscriptionPayload>
-): Promise<PublicUser> {
+async function synchroniserProfil(firebaseUser: MockUser): Promise<PublicUser> {
   // Récupérer l'utilisateur depuis json-server par email
   const email = firebaseUser.email;
   const res = await fetch(`${API_BASE_URL}/users?email=${encodeURIComponent(email)}`, {
     headers: { "Content-Type": "application/json" },
   });
-  
+
   if (!res.ok) {
-    throw new ApiError(
-      "Utilisateur non trouvé.",
-      res.status
-    );
+    throw new ApiError("Utilisateur non trouvé.", res.status);
   }
-  
-  const users = (await res.json()) as any[];
+
+  const users = (await res.json()) as PublicUser[];
   if (users.length === 0) {
-    throw new ApiError(
-      "Utilisateur non trouvé.",
-      404
-    );
+    throw new ApiError("Utilisateur non trouvé.", 404);
   }
-  
+
   const user = users[0];
   return {
     id: user.id,
@@ -173,8 +141,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const register = React.useCallback(async (payload: InscriptionPayload) => {
-    const { email, motDePasse, etablissementNom: _etablissementNom, ...donneesSupplementaires } =
-      payload;
+    const {
+      email,
+      motDePasse,
+      etablissementNom: _etablissementNom,
+      ...donneesSupplementaires
+    } = payload;
     const identifiants = await createUserWithEmailAndPassword(
       auth,
       email,
@@ -182,23 +154,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       donneesSupplementaires
     );
     await updateProfile(identifiants.user, { displayName: `${payload.prenom} ${payload.nom}` });
-    const profil = await synchroniserProfil(identifiants.user, payload);
+    const profil = await synchroniserProfil(identifiants.user);
     setUser(profil);
     return profil;
   }, []);
 
-  
-
   /**
    * Complète le profil d'un utilisateur déjà authentifié avec les informations obligatoires
-   * manquantes (rôle, téléphone, encadrant...), puis crée le profil applicatif via /auth/sync.
+   * manquantes (rôle, téléphone, encadrant...). En mode mock, se contente de recharger le
+   * profil : `_payload` serait envoyé à l'API dans une implémentation réelle.
    */
-  const completerProfil = React.useCallback(async (payload: CompletionPayload) => {
+  const completerProfil = React.useCallback(async (_payload: CompletionPayload) => {
     const firebaseUser = auth.currentUser;
     if (!firebaseUser) {
       throw new ApiError("Session expirée. Merci de vous reconnecter.", 401);
     }
-    const profil = await synchroniserProfil(firebaseUser, payload);
+    const profil = await synchroniserProfil(firebaseUser);
     setUser(profil);
     return profil;
   }, []);

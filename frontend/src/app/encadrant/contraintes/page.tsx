@@ -33,8 +33,8 @@ import type { ContraintesProfil, ProfilEncadrant } from "@/types";
  *
  * Complément du profil méthodologique : choix de la norme de citation, du ton académique
  * attendu, de la structure type du document et des règles de mise en forme (police, interligne,
- * nombre de pages, sections obligatoires). Persisté dans `ProfilEncadrant.contraintes` (voir
- * PATCH /api/v1/profils-encadrant/:id, backend/prisma/schema.prisma).
+ * nombre de pages, sections obligatoires). Persisté dans `ProfilEncadrant.contraintes` via
+ * PATCH `/profils-encadrant/:id`.
  */
 const NORMES = [
   { valeur: "apa", label: "APA (7e édition)" },

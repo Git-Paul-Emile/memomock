@@ -1,179 +1,212 @@
 # MemoAI Assistant
 
 Plateforme d'aide à la rédaction et à l'encadrement de mémoires académiques décrite dans le
-mémo de cadrage. Le dépôt contient deux projets :
+mémo de cadrage (`feature.md`).
 
-- **Frontend** (`frontend/`) - Next.js / React, tous les écrans étudiant/encadrant/admin.
-- **Backend** (`backend/`) - API REST Node.js/Express + Prisma/PostgreSQL.
+Ce dépôt contient **une seule application** : le frontend Next.js. Il n'y a pas de backend
+séparé — les données sont servies par un mock (`json-server` sur `frontend/data.json`), et
+l'authentification est simulée côté client (voir plus bas).
+
+- **Frontend** (`frontend/`) — Next.js / React, tous les écrans étudiant / encadrant /
+  administrateur d'établissement / super-admin.
+- **Données de démonstration** (`frontend/data.json`) — jeu de données cohérent exposé en API
+  REST par `json-server`.
 
 ## Stack technique
 
 - **Next.js 16** (App Router, React 19, TypeScript strict)
-- **Tailwind CSS v4** + composants **shadcn/ui** faits main (Radix UI + class-variance-authority)
+- **Tailwind CSS v4** + composants façon **shadcn/ui** faits main (Radix UI +
+  class-variance-authority)
 - **react-hook-form + zod** pour la validation de formulaires
-- **recharts** pour les graphiques du tableau de bord de supervision
+- **@tanstack/react-query** pour le cache des requêtes
+- **recharts** pour les graphiques des tableaux de bord
 - **sonner** pour les notifications toast
-- **Backend** : Node.js/Express, **Prisma** + **PostgreSQL** (données académiques).
+- **vitest** + Testing Library pour les tests unitaires
+- **json-server** pour le mock d'API REST (dépendance de développement)
 
 ## Démarrage rapide
 
-### 1. Backend (API + base de données)
-
-```bash
-cd backend
-npm install
-```
-
-Éditez `backend/.env` et renseignez `DATABASE_URL` avec votre chaîne de connexion
-PostgreSQL, puis :
-
-```bash
-npm run prisma:generate
-npm run prisma:migrate
-npm run seed
-```
-
-### 2. Frontend
+Un seul projet, deux processus à lancer (l'API mock et le serveur de développement Next.js).
 
 ```bash
 cd frontend
 npm install
 ```
 
-### 3. Lancer les deux ensemble
-
-Il n'y a pas de commande unique à la racine : ouvrez deux terminaux, un par projet.
-
 ```bash
-# Terminal 1
-cd backend
-npm run dev      # API sur :4000
+# Terminal 1 — API mock (json-server) sur http://localhost:4000
+npm run mock:server
 
-# Terminal 2
-cd frontend
-npm run dev      # Frontend sur :3000
+# Terminal 2 — application Next.js sur http://localhost:3000
+npm run dev
 ```
+
+Comptes de démonstration (mot de passe identique pour tous : voir `data.json`, champ
+`password`) :
+
+| Rôle | E-mail |
+| --- | --- |
+| Étudiant | `amina.diallo@etu.memoai.fr` |
+| Encadrant | `a.traore@memoai.fr` |
+| Administrateur d'établissement | `direction@paris-saclay.memoai.fr` |
+| Super-admin plateforme | voir `data.json` (`role: "admin"`) |
+
+### Déploiement distant
+
+En déploiement (Vercel, voir `vercel.json`), `json-server` n'est pas disponible. Une route
+Next.js de secours, `src/app/api/mock/[[...path]]/route.ts`, réimplémente les mêmes verbes
+REST à partir de `data.json` (en mémoire, réinitialisée à chaque démarrage). Le client HTTP
+(`src/lib/api.ts`) bascule automatiquement vers `/api/mock` quand l'application tourne sur un
+hôte distant configuré pour une API locale.
+
+## Scripts
+
+| Commande | Effet |
+| --- | --- |
+| `npm run dev` | Serveur de développement Next.js (:3000) |
+| `npm run mock:server` | API mock json-server (:4000) |
+| `npm run build` | Build de production |
+| `npm run start` | Sert le build de production |
+| `npm run lint` | ESLint (config `eslint-config-next`) |
+| `npm run format` / `npm run format:check` | Prettier (écriture / vérification) |
+| `npm run test` / `npm run test:watch` | Tests vitest |
 
 ## Authentification (mock)
 
-- **E-mail / mot de passe** : inscription et connexion via l'API json-server mock
-  (`POST /users`, `GET /users?email=...`), voir `frontend/src/context/auth-context.tsx`.
-- **Afficher/masquer le mot de passe** sur tous les champs de saisie (`components/ui/password-input.tsx`).
-- **Mot de passe oublié** : en mode mock, met à jour directement le mot de passe dans `data.json`
-  et renvoie un succès.
-- **Téléphone obligatoire, non vérifié** : le numéro est collecté à l'inscription (champ requis)
-  mais il n'y a pas de vérification par code OTP.
-- **Sessions actives** : chaque connexion génère un identifiant de session stocké en localStorage,
-  visible dans `/parametres` avec possibilité de révoquer les autres sessions.
+Toute l'authentification est simulée : `src/lib/firebase.ts` est un module de substitution
+qui expose la même API que le SDK Firebase mais lit et écrit dans `data.json` via l'API mock,
+et `src/context/auth-context.tsx` est la seule source de vérité sur « qui est connecté ».
 
-## Stockage des fichiers et notifications
-
-- **Documents et avatars sur Cloudinary** : la soumission d'un mémoire (`POST
-  /api/documents/upload`) et le changement de photo de profil (`POST /api/users/avatar`)
-  envoient directement le fichier vers Cloudinary (dossiers `documents/{etudiantId}/...` et
-  `avatars/{userId}`), plutôt que de le stocker sur le disque du serveur - voir
-  `backend/src/lib/cloudinary.js`.
-- **Canal de notification préféré** : chaque utilisateur choisit dans `/parametres` s'il
-  reçoit ses notifications par e-mail (par défaut, via Resend) ou uniquement dans l'application.
-  Le canal WhatsApp a été retiré. Chaque notification créée est automatiquement relayée vers ce
-  canal (voir `backend/src/lib/notifications/canaux`, appelé à la fois par la route HTTP et par
-  le worker d'analyse asynchrone).
-- **Pipeline d'analyse asynchrone** : la soumission d'un document (`POST
-  /api/documents/upload`) publie un job sur une file BullMQ (Redis) plutôt que de générer les
-  analyses de forme/fond de façon bloquante - un worker les traite en arrière-plan et
-  notifie l'étudiant une fois terminé (voir `backend/src/lib/queue.js` et
-  `backend/src/workers/analyse.worker.js`). Si Redis n'est pas disponible, le traitement bascule
-  automatiquement en mode synchrone (même code, exécuté immédiatement) : l'application reste
-  utilisable sans aucune infrastructure supplémentaire à provisionner en développement.
+- **E-mail / mot de passe** : inscription et connexion via l'API mock (`POST /users`,
+  `GET /users?email=...`). Les mots de passe sont stockés en clair dans `data.json` — c'est un
+  jeu de données de démonstration, pas une base de production.
+- **Jeton d'identité** au format `mock-token-{userId}`, envoyé dans l'en-tête `Authorization`
+  de chaque requête.
+- **Afficher / masquer le mot de passe** sur tous les champs (`components/ui/password-input.tsx`).
+- **Mot de passe oublié** : en mode mock, le mot de passe est directement réinitialisé dans
+  `data.json` et un succès est renvoyé.
+- **Téléphone obligatoire, non vérifié** : le numéro est collecté à l'inscription (champ
+  requis) sans vérification par code.
+- **Sessions actives** : chaque connexion génère un identifiant de session stocké en
+  `localStorage`, visible dans `/parametres` avec possibilité de révoquer les autres sessions.
 
 ## RGPD
 
-- **Droit d'accès et de portabilité** (art. 15 et 20) : `GET /api/users/me/export` renvoie un
-  export JSON complet des données personnelles de l'utilisateur courant (profil, documents,
-  analyses, notifications, messages) - accessible depuis `/parametres`.
-- **Droit à l'effacement** (art. 17) : `POST /api/users/me/anonymiser` anonymise
-  irréversiblement les données identifiantes (nom, e-mail, téléphone, avatar) et supprime le
-  compte (connexion définitivement impossible). Les enregistrements
-  académiques (documents, analyses) sont conservés mais détachés de l'identité - voir le
-  commentaire de la route pour la justification (contraintes de clé étrangère + traçabilité
-  académique légitime), une pratique reconnue par la CNIL lorsqu'une suppression totale n'est
-  pas possible.
+Les fonctionnalités RGPD sont implémentées côté client contre l'API mock :
+
+- **Droit d'accès et de portabilité** (art. 15 et 20) : `/parametres` assemble et télécharge un
+  export JSON complet des données de l'utilisateur courant (profil, documents, analyses,
+  notifications).
+- **Droit à l'effacement** (art. 17) : `/parametres` anonymise les données identifiantes (nom,
+  e-mail, téléphone, avatar) et neutralise le compte. Les enregistrements académiques
+  (documents, analyses) sont conservés mais détachés de l'identité — le détail est affiché
+  avant confirmation.
+- **Droit de rectification** : modification du profil depuis la même page.
 - **Information des personnes concernées** (art. 12-14) : page `/confidentialite`, liée depuis
   l'inscription et les paramètres du compte.
 
+## Contenu IA (simulé)
+
+Il n'y a aucun appel à un LLM réel. Les analyses de forme / fond, le score de conformité et
+les échanges avec le tuteur IA sont générés localement à partir de gabarits
+(`src/lib/mock-ai.ts`) et de données pré-calculées dans `data.json`.
+
 ## Structure du projet
 
-```
-frontend/                     Frontend Next.js (voir frontend/package.json)
+```text
+frontend/
+  data.json                     Jeu de données mock (servi par json-server)
   src/
     app/                          Routes (App Router)
       login/, register/             Authentification
+      completer-profil/             Complétion de profil (inscription Google simulée)
       reinitialiser-mot-de-passe/   Réinitialisation de mot de passe
       etudiant/                     Espace étudiant (dashboard, soumission, analyse, correction)
-      encadrant/                    Espace encadrant (dashboard, profil, relecture, jumeau numérique)
-      admin/                        Espace admin (supervision technique)
+      encadrant/                    Espace encadrant (dashboard, profil, relecture, canevas, jumeau)
+      etablissement/                Espace administrateur d'établissement (voir ci-dessous)
+      admin/                        Espace super-admin (supervision technique)
+      api/mock/[[...path]]/         Route REST de secours pour le déploiement distant
       notifications/, parametres/   Écrans transverses (tous rôles)
+      (pages marketing publiques : a-propos, faq, tarification, contact...)
     components/
-      ui/                          Primitives UI façon shadcn/ui (Button, Card, Table, Dialog...)
+      ui/                          Primitives façon shadcn/ui (Button, Card, Table, Dialog...)
+      etablissement/               Composants propres à l'espace établissement (invitation, pilule)
       layout/                      Sidebar, header, garde de route par rôle
       shared/                      Toolbar, pagination, empty state, badges, jauge de score
+      classes/, documents/, canevas/, livrables/, profil/, onboarding/, marketing/, admin/
       auth/                        Sélecteur de compte Google simulé
-      profil/, documents/          Composants métier spécifiques
-    context/auth-context.tsx      Authentification (mock json-server)
-    hooks/use-api-list.ts         Hook générique de consommation REST paginée/triée/filtrée
-    lib/api.ts                     Client HTTP (pagination _page/_limit, tri _sort/_order, recherche q=)
-    lib/mock-ai.ts                 Petits utilitaires pour l'écran de correction interactive
-    types/                         Types partagés (contrat de données frontend ↔ json-server)
+    context/auth-context.tsx      Authentification (mock)
+    hooks/
+      use-api-list.ts               Liste REST paginée / triée / filtrée / cherchable
+      use-api-resource.ts           Ressource REST unitaire
+      use-etablissement.ts          Accès mutualisé aux données de l'espace établissement
+    lib/
+      api.ts                        Client HTTP (_page/_limit, _sort/_order, q=)
+      firebase.ts                   Module de substitution de l'auth (mock)
+      etablissement.ts              Règles métier pures de l'espace établissement
+      mock-ai.ts                    Génération locale des analyses / scores
+    types/                          Types partagés (contrat frontend ↔ json-server)
 ```
+
+## Rôles
+
+Quatre rôles : `etudiant`, `encadrant`, `admin_etablissement` (une école administre son propre
+espace) et `admin` (super-admin de l'équipe MemoAI). La garde de route
+(`components/layout/route-guard.tsx`) vérifie le rôle de l'utilisateur connecté à l'entrée de
+chaque espace et redirige si nécessaire.
+
+## Espace administrateur d'établissement
+
+Accessible depuis `/etablissement` pour le rôle `admin_etablissement`.
+
+| Écran | Route | Contenu |
+| --- | --- | --- |
+| Tableau de bord | `/etablissement/dashboard` | Indicateurs de la promotion active, alerte d'inactivité, activité récente |
+| Structure | `/etablissement/filieres` | Arborescence filières → niveaux → classes, avec taux de dépôt |
+| Promotions | `/etablissement/promotions` | Années académiques, bascule de l'année courante |
+| Créer une promotion | `/etablissement/promotions/nouvelle` | Années, filières incluses, niveaux ouverts |
+| Classes | `/etablissement/classes` | Liste filtrable, création, code de rattachement |
+| Professeurs | `/etablissement/professeurs` | Recherche, invitation, affectation filière / classe / groupe, activation |
+| Apprenants | `/etablissement/apprenants` | Tableau filtrable, score IA, statut, fiche détaillée |
+| Normes par défaut | `/etablissement/normes` | Référentiel académique appliqué à tous les encadreurs |
+| Abonnement | `/etablissement/abonnement` | Forfait souscrit par l'établissement |
+
+Points d'architecture propres à ce module :
+
+- **Couche domaine isolée** : `lib/etablissement.ts` ne contient que des fonctions pures
+  (projection du statut d'un document vers le statut lisible par l'administration, détection
+  d'inactivité, période d'une promotion). Testable sans monter de composant, et partagée par
+  tous les écrans — deux écrans ne peuvent pas afficher deux chiffres différents.
+- **Accès aux données mutualisé** : `hooks/use-etablissement.ts` expose `useMonEtablissement`,
+  `usePromotions`, `useReferentielEtablissement` et `useDocumentsEtablissement`. Les clés
+  TanStack Query étant partagées, la navigation entre écrans ne relance pas les mêmes requêtes.
+- **Pagination et recherche côté serveur** pour les listes volumineuses (apprenants,
+  professeurs) via `useApiList` (`_page`, `_limit`, `_sort`, `q`) ; filtrage côté client
+  uniquement pour les collections de petite taille déjà en cache (classes, filières).
+- **Une seule promotion active** par établissement : la bascule archive l'ancienne avant
+  d'activer la nouvelle, pour ne jamais laisser deux années courantes concurrentes.
+- **Affectations** : `AffectationEncadrant` porte le détail organisationnel
+  (filière / niveau / classe / groupe) tandis que `Classe.encadrantIds` reste la source de
+  vérité pour l'accès aux documents ; les deux sont tenues synchronisées à l'affectation.
 
 ## Choix d'architecture
 
 - **Séparation des responsabilités** : toute la logique réseau (pagination, tri, filtre,
-  recherche) est centralisée côté frontend dans `lib/api.ts` et le hook `useApiList`, et côté
-  backend dans `utils/crudFactory.js` + `middleware/queryParser.js`. Les écrans et les routes
-  ne contiennent que de la logique de présentation/métier, jamais de logique réseau bas niveau.
+  recherche) est centralisée dans `lib/api.ts` et le hook `useApiList`. Les écrans ne
+  contiennent que de la logique de présentation / métier, jamais de logique réseau bas niveau.
 - **Composants UI réutilisables** (`components/ui`) construits sur Radix UI, dans l'esprit
   shadcn/ui : chaque composant a une seule responsabilité et se personnalise par composition,
-  pas par duplication (principes DRY / SOLID appliqués à l'UI).
-- **Garde de route par rôle** (`components/layout/route-guard.tsx`) : chaque espace
-  (`/etudiant`, `/encadrant`, `/admin`) vérifie le rôle de l'utilisateur connecté et redirige
-  si nécessaire.
-- **API REST conforme aux 6 contraintes REST** : client-serveur, sans état (le jeton d'identité
-  est envoyé à chaque requête via le header `Authorization`), cache (GET non forcés en
-  `no-store`), interface uniforme (ressources nommées au pluriel, verbes HTTP standards),
-  système en couches (routes → controllers/services → Prisma), et pagination/tri/filtre/
-  recherche disponibles sur toutes les listes.
-- **Base de données normalisée** : les listes imbriquées de l'ancien `db.json` (guides,
-  normes... d'un profil encadrant ; points d'une analyse) sont désormais des tables à part
-  entière (`ElementReference`, `PointAnalyse`) reliées par clé étrangère, tout en conservant
-  exactement la même forme de réponse JSON côté frontend (voir `backend/src/modules/analyses`
-  et `backend/src/modules/profils-encadrant`).
-- **Sécurité** : authentification mockée (mots de passe stockés en clair dans `data.json` pour le
-  développement) ; jetons d'identité vérifiés côté serveur ; autorisations fines par rôle et par
-  propriété des données (`utils/rbac.js`) ; validation stricte des entrées (Zod) ; limitation de
-  débit et en-têtes de sécurité HTTP (`helmet`) - voir `backend/README.md` pour le détail complet.
-- **Contenu IA réel (OpenAI), avec repli simulé** : les analyses forme/fond
-  (`backend/src/workers/analyse.worker.js`) et les embeddings du profil méthodologique
-  (`backend/src/lib/embeddings`) utilisent un vrai LLM (OpenAI `gpt-4o-mini` +
-  `text-embedding-3-small`) dès que `OPENAI_API_KEY` est renseignée côté backend - sans elle,
-  tout reste en mode simulé (gabarits pédagogiques, embeddings placeholder). Voir
-  `backend/README.md`, section « Contenu IA réel ».
-- **RAG (pgvector)** : le profil méthodologique de chaque encadrant est découpé en fragments et
-  indexé dans pgvector à chaque mise à jour (`backend/src/lib/vector-store`), recherche par
-  similarité fonctionnelle de bout en bout (`GET /api/profils-encadrant/recherche`) et utilisée
-  comme contexte des analyses de fond dès que le LLM est actif.
+  pas par duplication.
+- **API REST mock** : ressources nommées au pluriel, verbes HTTP standards
+  (GET / POST / PATCH / DELETE), pagination / tri / filtre / recherche par query params. Le
+  jeton d'identité est envoyé à chaque requête (sans état).
+- **Contrat de données typé** : `types/index.ts` décrit la forme exacte des réponses de l'API
+  mock ; c'est le contrat partagé entre les écrans et `data.json`.
 
-## Déploiement et intégration continue
+## Données de démonstration
 
-- **CI** : le pipeline GitHub Actions (`.github/workflows/ci.yml`) : lint → format (Prettier) →
-  tests → build applicatif, sur chaque push/PR vers `main` - voir `rules/cicd.md`.
-- **Architecture locale** : frontend (Next.js 3000) + json-server mock DB (4000). Pas de
-  dépendances externes - tout s'exécute localement. Aucun Docker, aucun PostgreSQL, aucune
-  authentification externe requise.
-- **Données mockées locales** : `frontend/data.json` contient 12 utilisateurs, 8 documents, 3 encadrants,
-  et 10+ autres collections. json-server expose ces données sous forme d'API REST sur `http://localhost:4000`.
-  Aucune dépendance externe - tout est local et auto-contenu.
-- **Authentification** : complètement mockée via `frontend/src/context/auth-context.tsx` qui utilise json-server
-  comme backend d'authentification. Les tokens sont au format `mock-token-{userId}`. 
-- **Vérifié localement** : lint, tests et build du frontend - voir le workflow CI.
-  UptimeRobot, intervalle 5 min) qui l'appelle régulièrement empêche la mise en veille.
+`frontend/data.json` contient un jeu cohérent : 27 utilisateurs (étudiants, encadrants,
+administrateurs), 1 établissement, 2 filières, 4 classes, 3 promotions, 17 documents à des
+statuts variés, plus les analyses, notifications, canevas, grilles d'évaluation, séances et
+forfaits associés. `json-server` expose ces collections en API REST sur
+`http://localhost:4000`. Aucune dépendance externe — tout est local et auto-contenu.

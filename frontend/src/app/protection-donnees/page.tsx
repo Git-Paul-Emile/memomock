@@ -50,19 +50,18 @@ export default function ProtectionDonneesPage() {
             <section>
               <h2 className="mb-1 font-medium text-foreground">Traitement par l&apos;IA</h2>
               <p>
-                L&apos;analyse IA lit le texte de votre document pour produire un score de
-                conformité et des suggestions. Ce texte n&apos;est jamais utilisé pour entraîner un
-                modèle tiers, ni conservé par le fournisseur du modèle au-delà du traitement de la
-                requête (voir la politique du fournisseur concerné pour le détail contractuel).
+                L&apos;analyse lit le texte de votre document pour produire un score de conformité
+                et des suggestions. Dans cette version de démonstration, cette analyse est simulée
+                localement : aucun texte n&apos;est envoyé à un modèle tiers.
               </p>
             </section>
 
             <section>
-              <h2 className="mb-1 font-medium text-foreground">Stockage et chiffrement</h2>
+              <h2 className="mb-1 font-medium text-foreground">Stockage</h2>
               <p>
-                Les fichiers sont hébergés chez Cloudinary (chiffrement en transit et au repos), les
-                métadonnées et le texte extrait dans une base PostgreSQL managée (Neon), accessible
-                uniquement depuis nos serveurs applicatifs.
+                Dans cette version de démonstration, les documents et leurs métadonnées sont
+                conservés dans un jeu de données local (servi par json-server) et ne sont transmis à
+                aucun hébergeur externe.
               </p>
             </section>
 

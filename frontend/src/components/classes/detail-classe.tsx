@@ -160,7 +160,11 @@ function SectionDiffusion({ classeId }: { classeId: string }) {
 }
 
 function SectionGroupes({ classe }: { classe: Classe }) {
-  const { data: groupes, isLoading, refetch } = useApiList<Groupe>("groupes", {
+  const {
+    data: groupes,
+    isLoading,
+    refetch,
+  } = useApiList<Groupe>("groupes", {
     filtres: { classeId: classe.id },
     limite: 50,
   });
@@ -255,9 +259,7 @@ function SectionEncadrants({
 
   React.useEffect(() => {
     let annule = false;
-    Promise.all(
-      classe.encadrantIds.map((id) => apiGet<PublicUser>("users", id).catch(() => null))
-    )
+    Promise.all(classe.encadrantIds.map((id) => apiGet<PublicUser>("users", id).catch(() => null)))
       .then((res) => {
         if (!annule) setEncadrants(res.filter((e): e is PublicUser => !!e));
       })
@@ -272,7 +274,11 @@ function SectionEncadrants({
   React.useEffect(() => {
     if (!ouvert || !recherche.trim()) return;
     let annule = false;
-    apiList<PublicUser>("users", { filtres: { role: "encadrant" }, recherche: recherche.trim(), limite: 10 })
+    apiList<PublicUser>("users", {
+      filtres: { role: "encadrant" },
+      recherche: recherche.trim(),
+      limite: 10,
+    })
       .then((res) => {
         if (!annule) setResultats(res.data.filter((e) => !classe.encadrantIds.includes(e.id)));
       })
@@ -454,7 +460,9 @@ function SectionEtudiants({ classe }: { classe: Classe }) {
       <CardHeader className="flex-row items-start justify-between">
         <div>
           <CardTitle className="text-base">Étudiants</CardTitle>
-          <CardDescription>{etudiants.length} étudiant(s) rattaché(s) à cette classe.</CardDescription>
+          <CardDescription>
+            {etudiants.length} étudiant(s) rattaché(s) à cette classe.
+          </CardDescription>
         </div>
         <Dialog open={ouvert} onOpenChange={setOuvert}>
           <DialogTrigger asChild>
@@ -467,8 +475,8 @@ function SectionEtudiants({ classe }: { classe: Classe }) {
             <DialogHeader>
               <DialogTitle>Rattacher des étudiants</DialogTitle>
               <DialogDescription>
-                Ils doivent déjà posséder un compte MemoAI (sinon, partagez plutôt le code de
-                classe ci-dessus).
+                Ils doivent déjà posséder un compte MemoAI (sinon, partagez plutôt le code de classe
+                ci-dessus).
               </DialogDescription>
             </DialogHeader>
             <div className="flex gap-2">

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { GraduationCap, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -48,20 +48,20 @@ export default function CompleterProfilPage() {
   const [role, setRole] = React.useState<RoleInscription>("etudiant");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const { data: encadrants } = useApiList<PublicUser>("public/encadrants", { limite: 100 });
+  const { data: encadrants } = useApiList<PublicUser>("encadrants", { limite: 100 });
 
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { role: "etudiant" },
   });
 
-  const encadrantId = watch("encadrantId");
+  const encadrantId = useWatch({ control, name: "encadrantId" });
 
   // Garde-fous : si l'utilisateur n'est pas connecté, retour à la connexion. Si
   // un profil complet existe déjà (rechargement), on renvoie l'utilisateur vers son espace.

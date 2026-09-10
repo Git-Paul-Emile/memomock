@@ -8,17 +8,15 @@ import { PublicFooter } from "@/components/marketing/public-footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { API_HEALTH_URL } from "@/lib/api";
 
-// Interroge directement `GET /api/health` (hors /v1, hors enveloppe {success,data} standard) :
-// un vrai statut, jamais une page statique "tout va bien" qui mentirait en cas d'incident réel.
 // Spec écran A13 : 3 indicateurs distincts (IA disponible / analyse documentaire disponible /
-// plateforme disponible), pas un seul statut global - voir backend/src/app.js.
+// plateforme disponible), pas un seul statut global. Interroge la racine de l'API mock pour
+// vérifier qu'elle répond.
 interface SanteApi {
   statut: string;
   plateforme: boolean;
   analyseDocumentaire: boolean;
-  // "degrade" : une clé de modèle est bien configurée, mais le dernier appel au fournisseur a
-  // échoué (quota, panne, réseau) - l'application sert alors du contenu de repli. Voir
-  // backend/src/lib/llm/sante-llm.js.
+  // "degrade" : le modèle est configuré mais le dernier appel a échoué (quota, panne, réseau)
+  // - l'application sert alors du contenu de repli.
   ia: { disponible: boolean; mode: "reel" | "simule" | "degrade"; detail?: string };
 }
 

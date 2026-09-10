@@ -61,13 +61,11 @@ export default function PlanningEncadrantPage() {
     limite: 200,
   });
 
-  const {
-    data: disponibilites,
-    refetch: refetchDisponibilites,
-  } = useApiList<DisponibiliteEncadrant>("disponibilites-encadrant", {
-    filtres: { encadrantId: user?.id },
-    limite: 50,
-  });
+  const { data: disponibilites, refetch: refetchDisponibilites } =
+    useApiList<DisponibiliteEncadrant>("disponibilites-encadrant", {
+      filtres: { encadrantId: user?.id },
+      limite: 50,
+    });
 
   const [filtreEtudiant, setFiltreEtudiant] = React.useState<string>("tous");
   const seancesFiltrees =
@@ -92,10 +90,7 @@ export default function PlanningEncadrantPage() {
       />
 
       <div className="space-y-6">
-        <CarteDisponibilites
-          disponibilites={disponibilites}
-          onChange={refetchDisponibilites}
-        />
+        <CarteDisponibilites disponibilites={disponibilites} onChange={refetchDisponibilites} />
 
         <CarteGenererPlanning
           etudiants={etudiants}
@@ -192,7 +187,8 @@ function LigneSeance({
           {enRetard && <Badge variant="destructive">Non effectuée</Badge>}
         </div>
         <p className="text-xs text-muted-foreground">
-          {etudiant ? `${etudiant.prenom} ${etudiant.nom}` : "-"} · {formatDateTime(seance.dateHeure)}
+          {etudiant ? `${etudiant.prenom} ${etudiant.nom}` : "-"} ·{" "}
+          {formatDateTime(seance.dateHeure)}
         </p>
         {seance.tache && <p className="text-xs text-muted-foreground">Tâche : {seance.tache}</p>}
       </div>
@@ -350,13 +346,7 @@ function CarteDisponibilites({
   );
 }
 
-function NouvelleSeance({
-  etudiants,
-  onCree,
-}: {
-  etudiants: PublicUser[];
-  onCree: () => void;
-}) {
+function NouvelleSeance({ etudiants, onCree }: { etudiants: PublicUser[]; onCree: () => void }) {
   const { user } = useAuth();
   const [ouvert, setOuvert] = React.useState(false);
   const [etudiantId, setEtudiantId] = React.useState<string | undefined>(undefined);
@@ -603,10 +593,7 @@ function CarteGenererPlanning({
               <Button variant="outline" onClick={() => setOuvert(false)}>
                 Annuler
               </Button>
-              <Button
-                onClick={generer}
-                disabled={!etudiantId || !dateSoutenance || enCours}
-              >
+              <Button onClick={generer} disabled={!etudiantId || !dateSoutenance || enCours}>
                 Générer le planning
               </Button>
             </DialogFooter>

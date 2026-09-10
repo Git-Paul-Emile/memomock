@@ -15,7 +15,10 @@ export default function DetailClasseEncadrantPage() {
   const { data, isLoading } = useApiResource<Classe>(["classe", id], () =>
     apiGet<Classe>("classes", id)
   );
-  const [classe, setClasse] = useSyncedState<Classe | undefined>(data, undefined as unknown as Classe);
+  const [classe, setClasse] = useSyncedState<Classe | undefined>(
+    data,
+    undefined as unknown as Classe
+  );
 
   if (isLoading || !classe) {
     return (

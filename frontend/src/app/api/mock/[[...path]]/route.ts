@@ -1,7 +1,8 @@
 import data from "../../../../../data.json";
 import { NextResponse, type NextRequest } from "next/server";
 
-type ResourceStore = Record<string, Array<Record<string, any>>>;
+type Row = Record<string, unknown>;
+type ResourceStore = Record<string, Row[]>;
 
 const globalStore = globalThis as typeof globalThis & { __memoAiMockStore?: ResourceStore };
 
@@ -27,7 +28,7 @@ function getCollection(resource: string) {
   return Array.isArray(collection) ? collection : null;
 }
 
-function matchesQuery(item: Record<string, any>, searchParams: URLSearchParams) {
+function matchesQuery(item: Row, searchParams: URLSearchParams) {
   for (const [key, value] of searchParams.entries()) {
     if (key.startsWith("_") || key === "q") continue;
     if (String(item[key]) !== value) return false;
@@ -35,7 +36,7 @@ function matchesQuery(item: Record<string, any>, searchParams: URLSearchParams) 
   return true;
 }
 
-function applyQuery(collection: Array<Record<string, any>>, searchParams: URLSearchParams) {
+function applyQuery(collection: Row[], searchParams: URLSearchParams) {
   let rows = collection.filter((item) => matchesQuery(item, searchParams));
   const search = searchParams.get("q")?.trim().toLowerCase();
   if (search) {
@@ -46,8 +47,8 @@ function applyQuery(collection: Array<Record<string, any>>, searchParams: URLSea
   if (sortKey) {
     const order = searchParams.get("_order") === "desc" ? -1 : 1;
     rows = [...rows].sort((a, b) => {
-      const left = a[sortKey];
-      const right = b[sortKey];
+      const left = a[sortKey] as string | number;
+      const right = b[sortKey] as string | number;
       if (left === right) return 0;
       return left > right ? order : -order;
     });
@@ -69,10 +70,7 @@ function nextId(resource: string) {
   return `${resource}-${Date.now()}-${collection.length + 1}`;
 }
 
-export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ path?: string[] }> }
-) {
+export async function GET(request: NextRequest, context: { params: Promise<{ path?: string[] }> }) {
   const { path } = await context.params;
   const [resource, id, action] = getPathParts(path);
   if (!resource) return json(getStore());
@@ -111,8 +109,8 @@ export async function POST(
   const collection = resource ? getCollection(resource) : null;
   if (!resource || !collection) return json({ message: "Ressource introuvable." }, 404);
 
-  const body = await request.json().catch(() => ({}));
-  const created = {
+  const body = (await request.json().catch(() => ({}))) as Row;
+  const created: Row = {
     id: body.id ?? nextId(resource),
     createdAt: body.createdAt ?? new Date().toISOString(),
     ...body,
@@ -133,15 +131,12 @@ export async function PATCH(
   const index = collection.findIndex((entry) => String(entry.id) === id);
   if (index === -1) return json({ message: "Element introuvable." }, 404);
 
-  const body = await request.json().catch(() => ({}));
+  const body = (await request.json().catch(() => ({}))) as Row;
   collection[index] = { ...collection[index], ...body };
   return json(collection[index]);
 }
 
-export async function PUT(
-  request: NextRequest,
-  context: { params: Promise<{ path?: string[] }> }
-) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ path?: string[] }> }) {
   return PATCH(request, context);
 }
 

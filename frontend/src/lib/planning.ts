@@ -47,7 +47,8 @@ export function genererPlanning(
 
   while (compte < nombreSeances && garde < totalJours + 366) {
     garde += 1;
-    const jourConvient = joursDisponibles.length === 0 || joursDisponibles.includes(curseur.getDay());
+    const jourConvient =
+      joursDisponibles.length === 0 || joursDisponibles.includes(curseur.getDay());
     if (jourConvient) {
       const dispo = disponibilites.find((d) => d.jourSemaine === curseur.getDay());
       const [heure, minute] = (dispo?.heureDebut ?? "18:00").split(":").map(Number);

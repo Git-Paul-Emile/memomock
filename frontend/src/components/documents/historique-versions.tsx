@@ -38,7 +38,7 @@ import type { VersionDocument } from "@/types";
  * Historique des versions d'un document (spec section 29, écrans D69-D72) : un instantané par
  * transition clé (transmission à l'encadrant, décision de l'encadrant). Réutilisé par les
  * écrans étudiant et encadrant - `retourHref` change, `peutRestaurer` (réservé à l'étudiant
- * propriétaire, voir versions.service#restaurer côté backend) aussi.
+ * propriétaire) aussi.
  */
 export function HistoriqueVersions({
   documentId,

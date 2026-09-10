@@ -7,7 +7,6 @@ import { GraduationCap, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/context/auth-context";
-import { espaceParDefaut } from "@/components/layout/route-guard";
 import { ApiError } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,19 +40,29 @@ export default function ReinitialiserMotDePassePage() {
     }
     setIsSubmitting(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"}/users/${user!.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: motDePasse }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"}/users/${user!.id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: motDePasse }),
+        }
+      );
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new ApiError(body?.message ?? "Impossible de mettre à jour le mot de passe.", res.status);
+        throw new ApiError(
+          body?.message ?? "Impossible de mettre à jour le mot de passe.",
+          res.status
+        );
       }
       setReussi(true);
       toast.success("Mot de passe mis à jour.");
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : "Ce lien de réinitialisation est invalide ou a expiré.");
+      toast.error(
+        err instanceof ApiError
+          ? err.message
+          : "Ce lien de réinitialisation est invalide ou a expiré."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -72,9 +81,7 @@ export default function ReinitialiserMotDePassePage() {
         <Card>
           <CardHeader>
             <CardTitle>Réinitialiser le mot de passe</CardTitle>
-            <CardDescription>
-              Choisissez un nouveau mot de passe pour {user.email}.
-            </CardDescription>
+            <CardDescription>Choisissez un nouveau mot de passe pour {user.email}.</CardDescription>
           </CardHeader>
           <CardContent>
             {reussi ? (

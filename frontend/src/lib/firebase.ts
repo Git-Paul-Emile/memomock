@@ -9,6 +9,15 @@ export interface MockUser {
   displayName?: string;
 }
 
+/** Forme minimale d'un enregistrement `users` de json-server exploité par ce module mock. */
+interface CompteJsonServer {
+  id: string;
+  email: string;
+  password?: string;
+  prenom?: string;
+  nom?: string;
+}
+
 function getMockUser(): MockUser | null {
   if (typeof window === "undefined") return null;
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -55,14 +64,10 @@ export class FirebaseError extends Error {
 }
 
 export const EmailAuthProvider = {
-  credential: (_email: string, _password: string) => ({})
+  credential: (_email: string, _password: string) => ({}),
 };
 
-export async function signInWithEmailAndPassword(
-  _auth: unknown,
-  email: string,
-  password: string
-) {
+export async function signInWithEmailAndPassword(_auth: unknown, email: string, password: string) {
   const sessionId = obtenirSessionId();
   const res = await fetch(`${API_BASE_URL}/users?email=${encodeURIComponent(email)}`, {
     headers: {
@@ -79,13 +84,17 @@ export async function signInWithEmailAndPassword(
     );
   }
 
-  const users = (await res.json()) as any[];
+  const users = (await res.json()) as CompteJsonServer[];
   const user = users.find((u) => u.password === password);
   if (!user) {
     throw new FirebaseError("auth/invalid-credential", "Adresse e-mail ou mot de passe incorrect.");
   }
 
-  const mockUser: MockUser = { id: user.id, email: user.email, displayName: `${user.prenom} ${user.nom}` };
+  const mockUser: MockUser = {
+    id: user.id,
+    email: user.email,
+    displayName: `${user.prenom} ${user.nom}`,
+  };
   setMockUser(mockUser);
   return { user: mockUser };
 }
@@ -129,10 +138,13 @@ export async function createUserWithEmailAndPassword(
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new FirebaseError("auth/internal-error", body?.message ?? "Impossible de créer le compte.");
+    throw new FirebaseError(
+      "auth/internal-error",
+      body?.message ?? "Impossible de créer le compte."
+    );
   }
 
-  const created = (await res.json()) as any;
+  const created = (await res.json()) as CompteJsonServer;
   const mockUser: MockUser = { id: created.id, email: created.email };
   setMockUser(mockUser);
   return { user: mockUser };
@@ -164,7 +176,7 @@ export async function sendPasswordResetEmail(
     throw new FirebaseError("auth/invalid-email", "Impossible d'envoyer l'e-mail pour le moment.");
   }
 
-  const users = (await res.json()) as any[];
+  const users = (await res.json()) as CompteJsonServer[];
   if (users.length === 0) {
     return;
   }
@@ -178,10 +190,7 @@ export async function sendPasswordResetEmail(
   });
 }
 
-export async function reauthenticateWithCredential(
-  _auth: unknown,
-  _credential: unknown
-) {
+export async function reauthenticateWithCredential(_auth: unknown, _credential: unknown) {
   return;
 }
 
@@ -203,7 +212,10 @@ export async function updatePassword(_auth: unknown, nouveauMotDePasse: string) 
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new FirebaseError("auth/internal-error", body?.message ?? "Impossible de mettre à jour le mot de passe.");
+    throw new FirebaseError(
+      "auth/internal-error",
+      body?.message ?? "Impossible de mettre à jour le mot de passe."
+    );
   }
 }
 
@@ -211,10 +223,7 @@ export async function sendEmailVerification(_auth: unknown) {
   return;
 }
 
-export function onAuthStateChanged(
-  _auth: unknown,
-  callback: (user: MockUser | null) => void
-) {
+export function onAuthStateChanged(_auth: unknown, callback: (user: MockUser | null) => void) {
   callback(getMockUser());
   return () => {};
 }

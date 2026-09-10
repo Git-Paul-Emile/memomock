@@ -19,7 +19,11 @@ import {
   FolderKanban,
   GitBranch,
   CalendarClock,
+  CalendarRange,
   CreditCard,
+  GraduationCap,
+  ScrollText,
+  UserCog,
   type LucideIcon,
 } from "lucide-react";
 
@@ -44,7 +48,11 @@ const ICONS: Record<string, LucideIcon> = {
   FolderKanban,
   GitBranch,
   CalendarClock,
+  CalendarRange,
   CreditCard,
+  GraduationCap,
+  ScrollText,
+  UserCog,
 };
 
 export function NavIcon({ name, className }: { name: string; className?: string }) {

@@ -47,11 +47,7 @@ const NIVEAUX: TypeDocument[] = ["licence", "master", "doctorat"];
  */
 export default function ClassesEncadrantPage() {
   const { user } = useAuth();
-  const {
-    data: classes,
-    isLoading,
-    refetch,
-  } = useApiList<Classe>("classes", { limite: 200 });
+  const { data: classes, isLoading, refetch } = useApiList<Classe>("classes", { limite: 200 });
 
   const mesClasses = classes.filter((c) => user && c.encadrantIds.includes(user.id));
 
@@ -110,8 +106,8 @@ export default function ClassesEncadrantPage() {
               <DialogHeader>
                 <DialogTitle>Nouvelle classe</DialogTitle>
                 <DialogDescription>
-                  Ex : « Master Informatique — Promotion 2026 ». Vous obtiendrez un code à
-                  partager avec vos étudiants.
+                  Ex : « Master Informatique — Promotion 2026 ». Vous obtiendrez un code à partager
+                  avec vos étudiants.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-3">

@@ -133,13 +133,14 @@ export function PanneauLivrables({
               </div>
             )}
 
-            {role === "etudiant" && (item.statut === "a_faire" || item.statut === "en_correction") && (
-              <div className="ml-7">
-                <Button size="sm" variant="outline" onClick={() => setDepotOuvert(item)}>
-                  {item.statut === "en_correction" ? "Redéposer" : "Déposer"}
-                </Button>
-              </div>
-            )}
+            {role === "etudiant" &&
+              (item.statut === "a_faire" || item.statut === "en_correction") && (
+                <div className="ml-7">
+                  <Button size="sm" variant="outline" onClick={() => setDepotOuvert(item)}>
+                    {item.statut === "en_correction" ? "Redéposer" : "Déposer"}
+                  </Button>
+                </div>
+              )}
 
             {role === "encadrant" && item.statut === "soumis" && (
               <div className="ml-7 flex gap-2">
@@ -152,8 +153,7 @@ export function PanneauLivrables({
                   Conforme
                 </Button>
                 <Button size="sm" variant="ghost" onClick={() => setVerifOuverte(item)}>
-                  <XCircle className="size-4" />
-                  À corriger
+                  <XCircle className="size-4" />À corriger
                 </Button>
               </div>
             )}
@@ -161,7 +161,11 @@ export function PanneauLivrables({
         ))}
       </CardContent>
 
-      <DialogueDepot item={depotOuvert} onClose={() => setDepotOuvert(null)} onDeposer={onDeposer} />
+      <DialogueDepot
+        item={depotOuvert}
+        onClose={() => setDepotOuvert(null)}
+        onDeposer={onDeposer}
+      />
       <DialogueVerification
         item={verifOuverte}
         onClose={() => setVerifOuverte(null)}

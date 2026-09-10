@@ -22,9 +22,8 @@ import type { JournalAudit } from "@/types";
 
 /**
  * Écran « Journal d'audit » (spec F33, distinct de F34 « Journal système » = /admin/supervision,
- * technique). Trace uniquement les actions sensibles (voir backend/src/utils/audit.js) : décision
- * finale sur un document, changement de rôle/désactivation de compte, publication/archivage d'un
- * référentiel.
+ * technique). Trace uniquement les actions sensibles : décision finale sur un document,
+ * changement de rôle/désactivation de compte, publication/archivage d'un référentiel.
  */
 export default function AdminJournalAuditPage() {
   const [page, setPage] = React.useState(1);

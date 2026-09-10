@@ -67,8 +67,7 @@ export default function GrilleEvaluationPage() {
     refetch: refetchGrille,
   } = useApiResource<GrilleEvaluation | null>(
     ["grille-evaluation", profilSelectionne?.id],
-    () =>
-      apiGet<GrilleEvaluation>("grilles-evaluation", profilSelectionne!.id).catch(() => null),
+    () => apiGet<GrilleEvaluation>("grilles-evaluation", profilSelectionne!.id).catch(() => null),
     { enabled: !!profilSelectionne }
   );
 

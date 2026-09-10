@@ -1,7 +1,6 @@
 /**
- * Simulation locale de l'IA (aucun backend/LLM réel dans ce projet - voir frontend/data.json et
- * lib/api.ts) : génération d'analyses forme/fond/cohérence/structure et de réponses du tuteur de
- * correction, à partir de gabarits.
+ * Simulation locale de l'IA (aucun LLM réel dans ce projet) : génération d'analyses
+ * forme/fond/cohérence/structure et de réponses du tuteur de correction, à partir de gabarits.
  */
 
 import { apiPatch, apiPost } from "./api";
@@ -16,31 +15,111 @@ interface PointGabarit {
 
 const BANQUE_POINTS: Record<TypeAnalyse, PointGabarit[]> = {
   forme: [
-    { libelle: "Pagination conforme", detail: "Numérotation continue et correcte détectée sur l'ensemble du document.", niveau: "succes" },
-    { libelle: "Police et interligne homogènes", detail: "La mise en forme respecte le gabarit attendu du début à la fin.", niveau: "succes" },
-    { libelle: "Titres de niveau incohérents", detail: "Plusieurs titres de section utilisent une casse ou une numérotation différente du reste du document.", niveau: "attention" },
-    { libelle: "Espacements irréguliers", detail: "Certains paragraphes présentent un interligne différent du reste du document.", niveau: "attention" },
-    { libelle: "Bibliographie incomplète", detail: "Des références citées dans le texte n'apparaissent pas dans la bibliographie finale.", niveau: "erreur" },
-    { libelle: "Sommaire absent", detail: "Aucune table des matières n'a été détectée en début de document.", niveau: "erreur" },
+    {
+      libelle: "Pagination conforme",
+      detail: "Numérotation continue et correcte détectée sur l'ensemble du document.",
+      niveau: "succes",
+    },
+    {
+      libelle: "Police et interligne homogènes",
+      detail: "La mise en forme respecte le gabarit attendu du début à la fin.",
+      niveau: "succes",
+    },
+    {
+      libelle: "Titres de niveau incohérents",
+      detail:
+        "Plusieurs titres de section utilisent une casse ou une numérotation différente du reste du document.",
+      niveau: "attention",
+    },
+    {
+      libelle: "Espacements irréguliers",
+      detail: "Certains paragraphes présentent un interligne différent du reste du document.",
+      niveau: "attention",
+    },
+    {
+      libelle: "Bibliographie incomplète",
+      detail:
+        "Des références citées dans le texte n'apparaissent pas dans la bibliographie finale.",
+      niveau: "erreur",
+    },
+    {
+      libelle: "Sommaire absent",
+      detail: "Aucune table des matières n'a été détectée en début de document.",
+      niveau: "erreur",
+    },
   ],
   fond: [
-    { libelle: "Problématique clairement posée", detail: "La question de recherche est explicite et reformulée en conclusion.", niveau: "succes" },
-    { libelle: "Argumentation structurée", detail: "Chaque partie s'appuie sur des sources identifiées.", niveau: "succes" },
-    { libelle: "Transitions à renforcer", detail: "Le lien logique entre certaines sous-parties gagnerait à être explicité.", niveau: "attention" },
-    { libelle: "Sources à diversifier", detail: "Une part importante des références provient d'un nombre restreint d'auteurs.", niveau: "attention" },
-    { libelle: "Analyse critique insuffisante", detail: "Certains résultats sont présentés sans mise en perspective ni discussion.", niveau: "erreur" },
+    {
+      libelle: "Problématique clairement posée",
+      detail: "La question de recherche est explicite et reformulée en conclusion.",
+      niveau: "succes",
+    },
+    {
+      libelle: "Argumentation structurée",
+      detail: "Chaque partie s'appuie sur des sources identifiées.",
+      niveau: "succes",
+    },
+    {
+      libelle: "Transitions à renforcer",
+      detail: "Le lien logique entre certaines sous-parties gagnerait à être explicité.",
+      niveau: "attention",
+    },
+    {
+      libelle: "Sources à diversifier",
+      detail: "Une part importante des références provient d'un nombre restreint d'auteurs.",
+      niveau: "attention",
+    },
+    {
+      libelle: "Analyse critique insuffisante",
+      detail: "Certains résultats sont présentés sans mise en perspective ni discussion.",
+      niveau: "erreur",
+    },
   ],
   coherence: [
-    { libelle: "Fil conducteur cohérent", detail: "Les grandes parties du document s'enchaînent logiquement autour de la problématique.", niveau: "succes" },
-    { libelle: "Vocabulaire homogène", detail: "La terminologie employée reste cohérente d'une partie à l'autre.", niveau: "succes" },
-    { libelle: "Redondances entre parties", detail: "Certains points sont développés à l'identique dans deux sections distinctes.", niveau: "attention" },
-    { libelle: "Contradiction entre l'introduction et la conclusion", detail: "L'annonce de plan ne correspond pas exactement au déroulé final.", niveau: "erreur" },
+    {
+      libelle: "Fil conducteur cohérent",
+      detail:
+        "Les grandes parties du document s'enchaînent logiquement autour de la problématique.",
+      niveau: "succes",
+    },
+    {
+      libelle: "Vocabulaire homogène",
+      detail: "La terminologie employée reste cohérente d'une partie à l'autre.",
+      niveau: "succes",
+    },
+    {
+      libelle: "Redondances entre parties",
+      detail: "Certains points sont développés à l'identique dans deux sections distinctes.",
+      niveau: "attention",
+    },
+    {
+      libelle: "Contradiction entre l'introduction et la conclusion",
+      detail: "L'annonce de plan ne correspond pas exactement au déroulé final.",
+      niveau: "erreur",
+    },
   ],
   structure: [
-    { libelle: "Chapitres attendus présents", detail: "Toutes les parties du canevas de l'encadrant ont été identifiées dans le document.", niveau: "succes" },
-    { libelle: "Découpage équilibré", detail: "La longueur des chapitres reste cohérente avec le plan attendu.", niveau: "succes" },
-    { libelle: "Chapitre trop court", detail: "Une partie du document est nettement plus courte que ce qu'attend le canevas.", niveau: "attention" },
-    { libelle: "Chapitre manquant", detail: "Une partie attendue par le canevas de l'encadrant n'a pas été retrouvée dans le document.", niveau: "erreur" },
+    {
+      libelle: "Chapitres attendus présents",
+      detail: "Toutes les parties du canevas de l'encadrant ont été identifiées dans le document.",
+      niveau: "succes",
+    },
+    {
+      libelle: "Découpage équilibré",
+      detail: "La longueur des chapitres reste cohérente avec le plan attendu.",
+      niveau: "succes",
+    },
+    {
+      libelle: "Chapitre trop court",
+      detail: "Une partie du document est nettement plus courte que ce qu'attend le canevas.",
+      niveau: "attention",
+    },
+    {
+      libelle: "Chapitre manquant",
+      detail:
+        "Une partie attendue par le canevas de l'encadrant n'a pas été retrouvée dans le document.",
+      niveau: "erreur",
+    },
   ],
 };
 

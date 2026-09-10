@@ -9,7 +9,7 @@ import { z } from "zod";
 import { GraduationCap, Loader2, Mail, UserRound, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 
-import { useAuth, CODE_PROFIL_INCOMPLET } from "@/context/auth-context";
+import { useAuth } from "@/context/auth-context";
 import { espaceParDefaut } from "@/components/layout/route-guard";
 import { ApiError } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -44,7 +44,7 @@ export default function LoginPage() {
   const { login, forgotPassword } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  
+
   const [oubliOuvert, setOubliOuvert] = React.useState(false);
   const [oubliEmail, setOubliEmail] = React.useState("");
   const [oubliEnCours, setOubliEnCours] = React.useState(false);
@@ -70,7 +70,9 @@ export default function LoginPage() {
       toast.success(`Bienvenue, ${user.prenom} !`);
       router.push(espaceParDefaut(user.role));
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : "Adresse e-mail ou mot de passe incorrect.");
+      toast.error(
+        err instanceof ApiError ? err.message : "Adresse e-mail ou mot de passe incorrect."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -83,7 +85,9 @@ export default function LoginPage() {
       await forgotPassword(oubliEmail.trim());
       setOubliEnvoye(true);
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : "Impossible d'envoyer l'e-mail pour le moment.");
+      toast.error(
+        err instanceof ApiError ? err.message : "Impossible d'envoyer l'e-mail pour le moment."
+      );
     } finally {
       setOubliEnCours(false);
     }
@@ -103,13 +107,8 @@ export default function LoginPage() {
             <CardDescription>Accédez à votre espace étudiant ou encadrant.</CardDescription>
           </CardHeader>
           <CardContent>
-
             <div className="grid grid-cols-2 gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => remplirCompteDemo("etudiant")}
-              >
+              <Button type="button" variant="outline" onClick={() => remplirCompteDemo("etudiant")}>
                 <UserRound className="size-4" />
                 Étudiant·e
               </Button>

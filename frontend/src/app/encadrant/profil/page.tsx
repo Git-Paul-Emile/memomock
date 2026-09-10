@@ -24,7 +24,13 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiList, apiPatch } from "@/lib/api";
-import type { Canevas, ElementReference, LivrableDefinition, ProfilEncadrant, TypeLivrable } from "@/types";
+import type {
+  Canevas,
+  ElementReference,
+  LivrableDefinition,
+  ProfilEncadrant,
+  TypeLivrable,
+} from "@/types";
 
 type Categorie = "guidesRedaction" | "memoiresModeles" | "normes" | "exigences";
 
@@ -209,34 +215,34 @@ export default function ProfilEncadrantPage() {
             </CardContent>
           </Card>
 
-        <Tabs defaultValue="guidesRedaction">
-          <TabsList className="mb-4 flex-wrap">
+          <Tabs defaultValue="guidesRedaction">
+            <TabsList className="mb-4 flex-wrap">
+              {CATEGORIES.map((c) => (
+                <TabsTrigger key={c.cle} value={c.cle}>
+                  {c.titre}
+                </TabsTrigger>
+              ))}
+              <TabsTrigger value="livrablesAttendus">Livrables attendus</TabsTrigger>
+            </TabsList>
             {CATEGORIES.map((c) => (
-              <TabsTrigger key={c.cle} value={c.cle}>
-                {c.titre}
-              </TabsTrigger>
+              <TabsContent key={c.cle} value={c.cle}>
+                <ListeReferences
+                  titre={c.titre}
+                  description={c.description}
+                  elements={profilSelectionne[c.cle]}
+                  onAjouter={(item) => ajouterElement(c.cle, item)}
+                  onSupprimer={(id) => supprimerElement(c.cle, id)}
+                />
+              </TabsContent>
             ))}
-            <TabsTrigger value="livrablesAttendus">Livrables attendus</TabsTrigger>
-          </TabsList>
-          {CATEGORIES.map((c) => (
-            <TabsContent key={c.cle} value={c.cle}>
-              <ListeReferences
-                titre={c.titre}
-                description={c.description}
-                elements={profilSelectionne[c.cle]}
-                onAjouter={(item) => ajouterElement(c.cle, item)}
-                onSupprimer={(id) => supprimerElement(c.cle, id)}
+            <TabsContent value="livrablesAttendus">
+              <ListeLivrablesAttendus
+                elements={profilSelectionne.livrablesAttendus}
+                onAjouter={ajouterLivrable}
+                onSupprimer={supprimerLivrable}
               />
             </TabsContent>
-          ))}
-          <TabsContent value="livrablesAttendus">
-            <ListeLivrablesAttendus
-              elements={profilSelectionne.livrablesAttendus}
-              onAjouter={ajouterLivrable}
-              onSupprimer={supprimerLivrable}
-            />
-          </TabsContent>
-        </Tabs>
+          </Tabs>
         </>
       )}
     </div>

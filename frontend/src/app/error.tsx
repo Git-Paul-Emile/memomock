@@ -18,9 +18,7 @@ export default function ErrorBoundary({
   reset: () => void;
 }) {
   React.useEffect(() => {
-    // En production, cette ligne est le point d'accroche naturel pour un futur envoi vers
-    // Sentry côté frontend (symétrique de lib/sentry.js côté backend) - non fait ici pour
-    // rester dans le périmètre "observabilité backend" demandé, mais l'emplacement est prêt.
+    // Point d'accroche naturel pour un futur envoi vers un service de suivi d'erreurs.
     console.error("Erreur non gérée côté frontend :", error);
   }, [error]);
 

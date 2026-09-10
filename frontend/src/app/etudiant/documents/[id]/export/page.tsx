@@ -51,10 +51,9 @@ export default function ExportPage() {
   const [enCours, setEnCours] = React.useState(false);
   const [pret, setPret] = React.useState(false);
 
-  // Aucune conversion de format n'est effectuée côté serveur (pas de génération Word/PDF à la
-  // volée) : le fichier téléchargé est le fichier original réellement soumis par l'étudiant
-  // (stocké sur Cloudinary à l'upload, voir `document.urlFichier`), ce qui préserve sa mise en
-  // forme d'origine à l'identique - l'objectif énoncé dans le cahier des charges.
+  // Aucune conversion de format (pas de génération Word/PDF à la volée) : le fichier téléchargé
+  // est le fichier d'origine (`document.urlFichier`), ce qui préserve sa mise en forme à
+  // l'identique - l'objectif énoncé dans le cahier des charges.
   const telecharger = async () => {
     if (!document?.urlFichier) {
       toast.error("Aucun fichier disponible pour ce document.");

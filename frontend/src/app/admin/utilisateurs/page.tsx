@@ -37,8 +37,7 @@ const ROLES_FILTRABLES: (Role | "tous")[] = ["tous", "etudiant", "encadrant", "a
 
 /**
  * Écran « Gestion des utilisateurs » (spec écrans F8-F11) : liste, recherche, changement de
- * rôle et activation/désactivation - réservé aux administrateurs (voir users.service#update,
- * ces trois champs sont explicitement refusés à tout appelant non-admin).
+ * rôle et activation/désactivation - réservé aux administrateurs.
  */
 export default function AdminUtilisateursPage() {
   const [recherche, setRecherche] = React.useState("");

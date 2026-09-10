@@ -56,9 +56,8 @@ function InfoCarte({ label }: { label: string }) {
 /**
  * Écran « Statistiques d'encadrement » (spec écrans E73-E77, consolidés) : temps moyen de
  * correction, cycles de révision, score moyen, répartition par type de document, par étudiant.
- * Calculé côté client à partir des listes déjà exposées et scopées par
- * `documents.service#authorize.list` (un encadrant ne voit que ses propres documents/étudiants)
- * - même approche que /admin/statistiques, pas d'endpoint d'agrégation dédié.
+ * Calculé côté client à partir des listes de documents filtrées par `encadrantId` - même
+ * approche que /admin/statistiques, pas d'endpoint d'agrégation dédié.
  */
 export default function EncadrantStatistiquesPage() {
   const { user } = useAuth();
@@ -169,11 +168,17 @@ export default function EncadrantStatistiquesPage() {
             limite: 100,
           }),
         ]);
-        const chapitres = resoudreChapitres(chapitresRes.data, criteresRes.data, validationsRes.data);
+        const chapitres = resoudreChapitres(
+          chapitresRes.data,
+          criteresRes.data,
+          validationsRes.data
+        );
         resultat[etu.id] =
           chapitres.length === 0
             ? null
-            : Math.round((chapitres.filter((c) => c.statut === "valide").length / chapitres.length) * 100);
+            : Math.round(
+                (chapitres.filter((c) => c.statut === "valide").length / chapitres.length) * 100
+              );
       }
       return resultat;
     },

@@ -154,6 +154,186 @@
       "typeDocument": "master",
       "discipline": "Informatique",
       "profilEncadrantId": "pe1"
+    },
+    {
+      "id": "doc101",
+      "etudiantId": "u16",
+      "encadrantId": "u2",
+      "titre": "Détection d'anomalies dans les journaux applicatifs",
+      "nomFichier": "memoire-u16.pdf",
+      "tailleOctets": 1240000,
+      "statut": "valide",
+      "scoreConformite": 88,
+      "scoreForme": 88,
+      "scoreFond": 90,
+      "scoreCoherence": 86,
+      "dateSoumission": "2026-09-02T09:00:00.000Z",
+      "dateMaj": "2026-09-02T11:30:00.000Z",
+      "version": 1,
+      "typeDocument": "master",
+      "discipline": "Informatique",
+      "profilEncadrantId": null,
+      "dateSoutenancePrevue": "2027-06-15T09:00:00.000Z"
+    },
+    {
+      "id": "doc102",
+      "etudiantId": "u17",
+      "encadrantId": "u14",
+      "titre": "Architecture hexagonale et testabilité",
+      "nomFichier": "memoire-u17.pdf",
+      "tailleOctets": 1240000,
+      "statut": "en_relecture",
+      "scoreConformite": 80,
+      "scoreForme": 81,
+      "scoreFond": 78,
+      "scoreCoherence": 80,
+      "dateSoumission": "2026-09-03T09:00:00.000Z",
+      "dateMaj": "2026-09-03T11:30:00.000Z",
+      "version": 1,
+      "typeDocument": "master",
+      "discipline": "Informatique",
+      "profilEncadrantId": null,
+      "dateSoutenancePrevue": "2027-06-15T09:00:00.000Z"
+    },
+    {
+      "id": "doc103",
+      "etudiantId": "u18",
+      "encadrantId": "u3",
+      "titre": "Pilotage de la performance RSE en PME",
+      "nomFichier": "memoire-u18.pdf",
+      "tailleOctets": 1240000,
+      "statut": "rejete",
+      "scoreConformite": 58,
+      "scoreForme": 62,
+      "scoreFond": 54,
+      "scoreCoherence": 58,
+      "dateSoumission": "2026-09-04T09:00:00.000Z",
+      "dateMaj": "2026-09-04T11:30:00.000Z",
+      "version": 1,
+      "typeDocument": "master",
+      "discipline": "Sciences de gestion",
+      "profilEncadrantId": null,
+      "dateSoutenancePrevue": "2027-06-15T09:00:00.000Z"
+    },
+    {
+      "id": "doc104",
+      "etudiantId": "u19",
+      "encadrantId": "u15",
+      "titre": "Attribution marketing multicanal",
+      "nomFichier": "memoire-u19.pdf",
+      "tailleOctets": 1240000,
+      "statut": "en_correction",
+      "scoreConformite": 68,
+      "scoreForme": 70,
+      "scoreFond": 65,
+      "scoreCoherence": 68,
+      "dateSoumission": "2026-09-05T09:00:00.000Z",
+      "dateMaj": "2026-09-05T11:30:00.000Z",
+      "version": 1,
+      "typeDocument": "master",
+      "discipline": "Sciences de gestion",
+      "profilEncadrantId": null,
+      "dateSoutenancePrevue": "2027-06-15T09:00:00.000Z"
+    },
+    {
+      "id": "doc105",
+      "etudiantId": "u20",
+      "encadrantId": "u14",
+      "titre": "Conception d'une API REST de gestion de stock",
+      "nomFichier": "memoire-u20.pdf",
+      "tailleOctets": 1240000,
+      "statut": "analyse_terminee",
+      "scoreConformite": 71,
+      "scoreForme": 74,
+      "scoreFond": 71,
+      "scoreCoherence": 69,
+      "dateSoumission": "2026-09-06T09:00:00.000Z",
+      "dateMaj": "2026-09-06T11:30:00.000Z",
+      "version": 1,
+      "typeDocument": "licence",
+      "discipline": "Informatique",
+      "profilEncadrantId": null,
+      "dateSoutenancePrevue": "2027-06-15T09:00:00.000Z"
+    },
+    {
+      "id": "doc106",
+      "etudiantId": "u21",
+      "encadrantId": "u14",
+      "titre": "Automatisation des tests d'intégration",
+      "nomFichier": "memoire-u21.pdf",
+      "tailleOctets": 1240000,
+      "statut": "soumis",
+      "scoreConformite": 0,
+      "scoreForme": 0,
+      "scoreFond": 0,
+      "scoreCoherence": 0,
+      "dateSoumission": "2026-09-08T09:00:00.000Z",
+      "dateMaj": "2026-09-08T11:30:00.000Z",
+      "version": 1,
+      "typeDocument": "licence",
+      "discipline": "Informatique",
+      "profilEncadrantId": null,
+      "dateSoutenancePrevue": "2027-06-15T09:00:00.000Z"
+    },
+    {
+      "id": "doc107",
+      "etudiantId": "u22",
+      "encadrantId": "u2",
+      "titre": "Observabilité des microservices",
+      "nomFichier": "memoire-u22.pdf",
+      "tailleOctets": 1240000,
+      "statut": "valide",
+      "scoreConformite": 91,
+      "scoreForme": 92,
+      "scoreFond": 89,
+      "scoreCoherence": 91,
+      "dateSoumission": "2026-09-07T09:00:00.000Z",
+      "dateMaj": "2026-09-07T11:30:00.000Z",
+      "version": 1,
+      "typeDocument": "master",
+      "discipline": "Informatique",
+      "profilEncadrantId": null,
+      "dateSoutenancePrevue": "2027-06-15T09:00:00.000Z"
+    },
+    {
+      "id": "doc108",
+      "etudiantId": "u23",
+      "encadrantId": "u14",
+      "titre": "Refonte d'un intranet documentaire",
+      "nomFichier": "memoire-u23.pdf",
+      "tailleOctets": 1240000,
+      "statut": "analyse_en_cours",
+      "scoreConformite": 0,
+      "scoreForme": 0,
+      "scoreFond": 0,
+      "scoreCoherence": 0,
+      "dateSoumission": "2026-09-09T09:00:00.000Z",
+      "dateMaj": "2026-09-09T11:30:00.000Z",
+      "version": 1,
+      "typeDocument": "master",
+      "discipline": "Informatique",
+      "profilEncadrantId": null,
+      "dateSoutenancePrevue": "2027-06-15T09:00:00.000Z"
+    },
+    {
+      "id": "doc109",
+      "etudiantId": "u24",
+      "encadrantId": "u3",
+      "titre": "Contrôle de gestion et tableaux de bord",
+      "nomFichier": "memoire-u24.pdf",
+      "tailleOctets": 1240000,
+      "statut": "refuse",
+      "scoreConformite": 45,
+      "scoreForme": 48,
+      "scoreFond": 42,
+      "scoreCoherence": 45,
+      "dateSoumission": "2026-09-01T09:00:00.000Z",
+      "dateMaj": "2026-09-01T11:30:00.000Z",
+      "version": 1,
+      "typeDocument": "master",
+      "discipline": "Sciences de gestion",
+      "profilEncadrantId": null,
+      "dateSoutenancePrevue": "2027-06-15T09:00:00.000Z"
     }
   ],
   "notifications": [
@@ -273,11 +453,9 @@
       "createdAt": "2026-01-06T09:00:00.000Z",
       "password": "encadrant123",
       "telephoneVerifie": false,
-      "domainesExpertise": [
-        "Intelligence artificielle",
-        "Génie logiciel"
-      ],
-      "disponible": true
+      "domainesExpertise": ["Intelligence artificielle", "Génie logiciel"],
+      "disponible": true,
+      "etablissementId": "etab1"
     },
     {
       "id": "u3",
@@ -288,11 +466,9 @@
       "createdAt": "2026-01-06T09:05:00.000Z",
       "password": "encadrant123",
       "telephoneVerifie": false,
-      "domainesExpertise": [
-        "Stratégie d'entreprise",
-        "Transformation digitale"
-      ],
-      "disponible": true
+      "domainesExpertise": ["Stratégie d'entreprise", "Transformation digitale"],
+      "disponible": true,
+      "etablissementId": "etab1"
     },
     {
       "id": "u4",
@@ -303,10 +479,7 @@
       "createdAt": "2026-01-06T09:10:00.000Z",
       "password": "encadrant123",
       "telephoneVerifie": false,
-      "domainesExpertise": [
-        "Droit du numérique",
-        "RGPD"
-      ],
+      "domainesExpertise": ["Droit du numérique", "RGPD"],
       "disponible": false
     },
     {
@@ -422,6 +595,258 @@
       "createdAt": "2026-01-06T08:00:00.000Z",
       "password": "etablissement123",
       "telephoneVerifie": false
+    },
+    {
+      "id": "u14",
+      "role": "encadrant",
+      "nom": "Traoré",
+      "prenom": "Awa",
+      "email": "a.traore@memoai.fr",
+      "createdAt": "2026-06-18T08:00:00.000Z",
+      "password": "Test1234!",
+      "telephoneVerifie": false,
+      "domainesExpertise": ["Génie logiciel", "Bases de données"],
+      "disponible": true,
+      "etablissementId": "etab1",
+      "classeId": null,
+      "groupeId": null,
+      "actif": true,
+      "telephone": "+221770000000",
+      "canalNotificationPrefere": "email"
+    },
+    {
+      "id": "u15",
+      "role": "encadrant",
+      "nom": "Martin",
+      "prenom": "Paul",
+      "email": "p.martin@memoai.fr",
+      "createdAt": "2026-06-18T08:00:00.000Z",
+      "password": "Test1234!",
+      "telephoneVerifie": false,
+      "domainesExpertise": ["Marketing digital", "Stratégie"],
+      "disponible": true,
+      "etablissementId": "etab1",
+      "classeId": null,
+      "groupeId": null,
+      "actif": true,
+      "telephone": "+221770000000",
+      "canalNotificationPrefere": "email"
+    },
+    {
+      "id": "u16",
+      "role": "etudiant",
+      "nom": "Sow",
+      "prenom": "Ibrahima",
+      "email": "ibrahima.sow@etu.memoai.fr",
+      "etablissementId": "etab1",
+      "classeId": "classe1",
+      "groupeId": "groupe1",
+      "encadrantId": "u2",
+      "filiere": "Master 2 Informatique",
+      "actif": true,
+      "telephone": "+221770000000",
+      "canalNotificationPrefere": "email",
+      "password": "Test1234!",
+      "telephoneVerifie": false,
+      "createdAt": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "u17",
+      "role": "etudiant",
+      "nom": "Ba",
+      "prenom": "Khadija",
+      "email": "khadija.ba@etu.memoai.fr",
+      "etablissementId": "etab1",
+      "classeId": "classe1",
+      "groupeId": null,
+      "encadrantId": "u14",
+      "filiere": "Master 2 Informatique",
+      "actif": true,
+      "telephone": "+221770000000",
+      "canalNotificationPrefere": "email",
+      "password": "Test1234!",
+      "telephoneVerifie": false,
+      "createdAt": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "u18",
+      "role": "etudiant",
+      "nom": "Sarr",
+      "prenom": "Cheikh",
+      "email": "cheikh.sarr@etu.memoai.fr",
+      "etablissementId": "etab1",
+      "classeId": "classe2",
+      "groupeId": "groupe2",
+      "encadrantId": "u3",
+      "filiere": "Master 2 Sciences de gestion",
+      "actif": true,
+      "telephone": "+221770000000",
+      "canalNotificationPrefere": "email",
+      "password": "Test1234!",
+      "telephoneVerifie": false,
+      "createdAt": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "u19",
+      "role": "etudiant",
+      "nom": "Diallo",
+      "prenom": "Mariama",
+      "email": "mariama.diallo@etu.memoai.fr",
+      "etablissementId": "etab1",
+      "classeId": "classe2",
+      "groupeId": null,
+      "encadrantId": "u15",
+      "filiere": "Master 2 Sciences de gestion",
+      "actif": true,
+      "telephone": "+221770000000",
+      "canalNotificationPrefere": "email",
+      "password": "Test1234!",
+      "telephoneVerifie": false,
+      "createdAt": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "u20",
+      "role": "etudiant",
+      "nom": "Mbaye",
+      "prenom": "Ousmane",
+      "email": "ousmane.mbaye@etu.memoai.fr",
+      "etablissementId": "etab1",
+      "classeId": "classe4",
+      "groupeId": "groupe3",
+      "encadrantId": "u14",
+      "filiere": "Licence 3 Informatique",
+      "actif": true,
+      "telephone": "+221770000000",
+      "canalNotificationPrefere": "email",
+      "password": "Test1234!",
+      "telephoneVerifie": false,
+      "createdAt": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "u21",
+      "role": "etudiant",
+      "nom": "Gueye",
+      "prenom": "Aminata",
+      "email": "aminata.gueye@etu.memoai.fr",
+      "etablissementId": "etab1",
+      "classeId": "classe4",
+      "groupeId": "groupe4",
+      "encadrantId": "u14",
+      "filiere": "Licence 3 Informatique",
+      "actif": true,
+      "telephone": "+221770000000",
+      "canalNotificationPrefere": "email",
+      "password": "Test1234!",
+      "telephoneVerifie": false,
+      "createdAt": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "u22",
+      "role": "etudiant",
+      "nom": "Faye",
+      "prenom": "Moussa",
+      "email": "moussa.faye@etu.memoai.fr",
+      "etablissementId": "etab1",
+      "classeId": "classe1",
+      "groupeId": "groupe1",
+      "encadrantId": "u2",
+      "filiere": "Master 2 Informatique",
+      "actif": true,
+      "telephone": "+221770000000",
+      "canalNotificationPrefere": "email",
+      "password": "Test1234!",
+      "telephoneVerifie": false,
+      "createdAt": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "u23",
+      "role": "etudiant",
+      "nom": "Sy",
+      "prenom": "Aïssatou",
+      "email": "aissatou.sy@etu.memoai.fr",
+      "etablissementId": "etab1",
+      "classeId": "classe1",
+      "groupeId": null,
+      "encadrantId": "u14",
+      "filiere": "Master 2 Informatique",
+      "actif": true,
+      "telephone": "+221770000000",
+      "canalNotificationPrefere": "email",
+      "password": "Test1234!",
+      "telephoneVerifie": false,
+      "createdAt": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "u24",
+      "role": "etudiant",
+      "nom": "Thiam",
+      "prenom": "Pape",
+      "email": "pape.thiam@etu.memoai.fr",
+      "etablissementId": "etab1",
+      "classeId": "classe2",
+      "groupeId": "groupe2",
+      "encadrantId": "u3",
+      "filiere": "Master 2 Sciences de gestion",
+      "actif": true,
+      "telephone": "+221770000000",
+      "canalNotificationPrefere": "email",
+      "password": "Test1234!",
+      "telephoneVerifie": false,
+      "createdAt": "2026-09-01T08:00:00.000Z"
+    },
+    {
+      "id": "u25",
+      "role": "etudiant",
+      "nom": "Cissé",
+      "prenom": "Rama",
+      "email": "rama.cisse@etu.memoai.fr",
+      "etablissementId": "etab1",
+      "classeId": "classe2",
+      "groupeId": null,
+      "encadrantId": "u15",
+      "filiere": "Master 2 Sciences de gestion",
+      "actif": true,
+      "telephone": "+221770000000",
+      "canalNotificationPrefere": "email",
+      "password": "Test1234!",
+      "telephoneVerifie": false,
+      "createdAt": "2026-07-05T08:00:00.000Z"
+    },
+    {
+      "id": "u26",
+      "role": "etudiant",
+      "nom": "Seck",
+      "prenom": "Abdou",
+      "email": "abdou.seck@etu.memoai.fr",
+      "etablissementId": "etab1",
+      "classeId": "classe4",
+      "groupeId": "groupe3",
+      "encadrantId": "u14",
+      "filiere": "Licence 3 Informatique",
+      "actif": true,
+      "telephone": "+221770000000",
+      "canalNotificationPrefere": "email",
+      "password": "Test1234!",
+      "telephoneVerifie": false,
+      "createdAt": "2026-07-05T08:00:00.000Z"
+    },
+    {
+      "id": "u27",
+      "role": "etudiant",
+      "nom": "Camara",
+      "prenom": "Bineta",
+      "email": "bineta.camara@etu.memoai.fr",
+      "etablissementId": "etab1",
+      "classeId": "classe4",
+      "groupeId": "groupe4",
+      "encadrantId": "u14",
+      "filiere": "Licence 3 Informatique",
+      "actif": true,
+      "telephone": "+221770000000",
+      "canalNotificationPrefere": "email",
+      "password": "Test1234!",
+      "telephoneVerifie": false,
+      "createdAt": "2026-07-05T08:00:00.000Z"
     }
   ],
   "etablissements": [
@@ -454,10 +879,9 @@
       "nom": "Master Informatique — Promotion 2026",
       "niveau": "master",
       "code": "CLASSE-INFO26",
-      "encadrantIds": [
-        "u2"
-      ],
-      "createdAt": "2026-01-06T08:10:00.000Z"
+      "encadrantIds": ["u14", "u2"],
+      "createdAt": "2026-01-06T08:10:00.000Z",
+      "promotionId": "promo1"
     },
     {
       "id": "classe2",
@@ -466,10 +890,9 @@
       "nom": "Master Sciences de gestion — Promotion 2026",
       "niveau": "master",
       "code": "CLASSE-GEST26",
-      "encadrantIds": [
-        "u3"
-      ],
-      "createdAt": "2026-01-06T08:11:00.000Z"
+      "encadrantIds": ["u15", "u3"],
+      "createdAt": "2026-01-06T08:11:00.000Z",
+      "promotionId": "promo1"
     },
     {
       "id": "classe3",
@@ -478,10 +901,20 @@
       "nom": "Master Droit du numérique — Cohorte 2026",
       "niveau": "master",
       "code": "CLASSE-DROIT26",
-      "encadrantIds": [
-        "u4"
-      ],
-      "createdAt": "2026-01-16T09:00:00.000Z"
+      "encadrantIds": ["u4"],
+      "createdAt": "2026-01-16T09:00:00.000Z",
+      "promotionId": null
+    },
+    {
+      "id": "classe4",
+      "etablissementId": "etab1",
+      "promotionId": "promo1",
+      "filiereId": "fil1",
+      "nom": "Licence 3 Informatique — Promotion 2027",
+      "niveau": "licence",
+      "code": "CLASSE-INFOL3",
+      "encadrantIds": ["u14"],
+      "createdAt": "2026-06-20T08:00:00.000Z"
     }
   ],
   "groupes": [
@@ -490,6 +923,24 @@
       "classeId": "classe1",
       "nom": "Groupe A",
       "createdAt": "2026-01-06T08:15:00.000Z"
+    },
+    {
+      "id": "groupe2",
+      "classeId": "classe2",
+      "nom": "Groupe A",
+      "createdAt": "2026-06-20T08:05:00.000Z"
+    },
+    {
+      "id": "groupe3",
+      "classeId": "classe4",
+      "nom": "Groupe A",
+      "createdAt": "2026-06-20T08:06:00.000Z"
+    },
+    {
+      "id": "groupe4",
+      "classeId": "classe4",
+      "nom": "Groupe B",
+      "createdAt": "2026-06-20T08:07:00.000Z"
     }
   ],
   "temoignages": [
@@ -685,36 +1136,6 @@
     }
   ],
   "messages": [],
-  "commentairesMarges": [
-    {
-      "id": "cm1",
-      "documentId": "doc7",
-      "numero": 1,
-      "texte": "Précisez la taille des cohortes ici, c'est important pour la validité méthodologique.",
-      "date": "2026-06-11T10:00:00.000Z"
-    },
-    {
-      "id": "cm2",
-      "documentId": "doc7",
-      "numero": 2,
-      "texte": "Bonne nuance. Pensez à citer une source récente pour appuyer cette affirmation.",
-      "date": "2026-06-11T10:05:00.000Z"
-    },
-    {
-      "id": "cm3",
-      "documentId": "doc6",
-      "numero": 1,
-      "texte": "Reformuler ce passage : trop proche du langage parlé.",
-      "date": "2026-07-22T14:00:00.000Z"
-    },
-    {
-      "id": "cm4",
-      "documentId": "doc6",
-      "numero": 2,
-      "texte": "Ajouter une référence à l'arrêt de la CJUE mentionné en cours.",
-      "date": "2026-07-22T14:10:00.000Z"
-    }
-  ],
   "faq": [
     {
       "id": "faq1",
@@ -748,122 +1169,6 @@
     }
   ],
   "passwordResets": [],
-  "filesAttente": [
-    {
-      "id": "f1",
-      "documentId": "doc2",
-      "type": "analyse_forme",
-      "statut": "en_cours",
-      "tentatives": 1,
-      "createdAt": "2026-07-10T08:00:00.000Z"
-    },
-    {
-      "id": "f2",
-      "documentId": "doc2",
-      "type": "analyse_fond",
-      "statut": "en_attente",
-      "tentatives": 0,
-      "createdAt": "2026-07-10T08:00:05.000Z"
-    },
-    {
-      "id": "f4",
-      "documentId": "doc1",
-      "type": "extraction_texte",
-      "statut": "termine",
-      "tentatives": 1,
-      "dureeMs": 3200,
-      "createdAt": "2026-07-08T09:12:05.000Z"
-    },
-    {
-      "id": "f6",
-      "documentId": "doc5",
-      "type": "notification_email",
-      "statut": "termine",
-      "tentatives": 1,
-      "dureeMs": 450,
-      "createdAt": "2026-07-09T09:01:00.000Z"
-    }
-  ],
-  "reglesApprises": [
-    {
-      "id": "r1",
-      "encadrantId": "u2",
-      "regle": "Exiger systématiquement un diagramme d'architecture en figure 1 pour les mémoires d'informatique.",
-      "source": "Comparaison document doc7 (version validée vs corrections manuelles)",
-      "confiance": 82,
-      "statut": "adoptee",
-      "dateApprentissage": "2026-07-01T09:00:00.000Z",
-      "niveau": "generale",
-      "documentId": null,
-      "typeDocument": null,
-      "discipline": null
-    },
-    {
-      "id": "r2",
-      "encadrantId": "u2",
-      "regle": "Préférer le format IEEE même quand l'étudiant utilise initialement APA.",
-      "source": "Comparaison document doc7",
-      "confiance": 74,
-      "statut": "adoptee",
-      "dateApprentissage": "2026-07-01T09:05:00.000Z",
-      "niveau": "generale",
-      "documentId": null,
-      "typeDocument": null,
-      "discipline": null
-    },
-    {
-      "id": "r3",
-      "encadrantId": "u2",
-      "regle": "Signaler tout chapitre de plus de 20 pages sans sous-partie.",
-      "source": "Historique de corrections sur 3 mémoires précédents",
-      "confiance": 58,
-      "statut": "proposee",
-      "dateApprentissage": "2026-07-09T09:00:00.000Z",
-      "niveau": "generale",
-      "documentId": null,
-      "typeDocument": null,
-      "discipline": null
-    },
-    {
-      "id": "r4",
-      "encadrantId": "u3",
-      "regle": "Exiger un tableau récapitulatif des entretiens en annexe (durée, fonction, date).",
-      "source": "Comparaison document doc3",
-      "confiance": 79,
-      "statut": "adoptee",
-      "dateApprentissage": "2026-07-07T16:30:00.000Z",
-      "niveau": "generale",
-      "documentId": null,
-      "typeDocument": null,
-      "discipline": null
-    },
-    {
-      "id": "r5",
-      "encadrantId": "u3",
-      "regle": "Réduire le poids donné aux fautes de style mineures dans le score de forme.",
-      "source": "Corrections manuelles répétées jugées trop sévères par l'IA",
-      "confiance": 45,
-      "statut": "proposee",
-      "dateApprentissage": "2026-07-10T11:00:00.000Z",
-      "niveau": "generale",
-      "documentId": null,
-      "typeDocument": null,
-      "discipline": null
-    },
-    {
-      "id": "r6",
-      "encadrantId": "u4",
-      "regle": "Vérifier systématiquement la date de consolidation des textes de loi cités.",
-      "source": "Comparaison document doc6",
-      "confiance": 88,
-      "statut": "adoptee",
-      "dateApprentissage": "2026-07-05T09:00:00.000Z",
-      "niveau": "generale",
-      "documentId": null,
-      "typeDocument": null,
-      "discipline": null
-    }
-  ],
   "analyses": [
     {
       "id": "an-struct-doc1",
@@ -1215,10 +1520,7 @@
       "prenom": "Jérôme",
       "email": "j.leroux@memoai.fr",
       "filiere": null,
-      "domainesExpertise": [
-        "Intelligence artificielle",
-        "Génie logiciel"
-      ],
+      "domainesExpertise": ["Intelligence artificielle", "Génie logiciel"],
       "disponible": true,
       "nbEtudiantsSuivis": 2
     },
@@ -1228,10 +1530,7 @@
       "prenom": "Fatou",
       "email": "f.sarr@memoai.fr",
       "filiere": null,
-      "domainesExpertise": [
-        "Stratégie d'entreprise",
-        "Transformation digitale"
-      ],
+      "domainesExpertise": ["Stratégie d'entreprise", "Transformation digitale"],
       "disponible": true,
       "nbEtudiantsSuivis": 2
     },
@@ -1241,10 +1540,7 @@
       "prenom": "Karim",
       "email": "k.belhadj@memoai.fr",
       "filiere": null,
-      "domainesExpertise": [
-        "Droit du numérique",
-        "RGPD"
-      ],
+      "domainesExpertise": ["Droit du numérique", "RGPD"],
       "disponible": false,
       "nbEtudiantsSuivis": 2
     }
@@ -2105,10 +2401,7 @@
       "prixMensuel": 0,
       "maxEtudiants": 20,
       "maxEncadrants": 3,
-      "fonctionnalites": [
-        "Analyse IA de base",
-        "1 canevas par encadrant"
-      ],
+      "fonctionnalites": ["Analyse IA de base", "1 canevas par encadrant"],
       "miseEnRelationPayante": false,
       "ordre": 0
     },
@@ -2244,5 +2537,122 @@
   },
   "sessions": [],
   "demandes-support": [],
-  "surlignages": []
+  "surlignages": [],
+  "promotions": [
+    {
+      "id": "promo1",
+      "etablissementId": "etab1",
+      "libelle": "2026-2027",
+      "anneeDebut": 2026,
+      "anneeFin": 2027,
+      "statut": "active",
+      "filiereIds": ["fil1", "fil2"],
+      "niveaux": ["licence", "master"],
+      "dateDebut": "2026-10-01T00:00:00.000Z",
+      "dateFin": "2027-06-30T00:00:00.000Z",
+      "createdAt": "2026-06-15T08:00:00.000Z"
+    },
+    {
+      "id": "promo2",
+      "etablissementId": "etab1",
+      "libelle": "2025-2026",
+      "anneeDebut": 2025,
+      "anneeFin": 2026,
+      "statut": "archivee",
+      "filiereIds": ["fil1", "fil2"],
+      "niveaux": ["licence", "master"],
+      "dateDebut": "2025-10-01T00:00:00.000Z",
+      "dateFin": "2026-06-30T00:00:00.000Z",
+      "createdAt": "2025-06-15T08:00:00.000Z"
+    },
+    {
+      "id": "promo3",
+      "etablissementId": "etab1",
+      "libelle": "2024-2025",
+      "anneeDebut": 2024,
+      "anneeFin": 2025,
+      "statut": "archivee",
+      "filiereIds": ["fil1"],
+      "niveaux": ["master"],
+      "dateDebut": "2024-10-01T00:00:00.000Z",
+      "dateFin": "2025-06-30T00:00:00.000Z",
+      "createdAt": "2024-06-15T08:00:00.000Z"
+    }
+  ],
+  "normes-etablissement": [
+    {
+      "id": "normes1",
+      "etablissementId": "etab1",
+      "formatCitation": "APA 7",
+      "sourcesMinimum": 20,
+      "typesSourcesAcceptees": ["Revues scientifiques", "Ouvrages", "Thèses"],
+      "partiesIntroduction": 5,
+      "positionPagination": "bas_de_page",
+      "styleRedactionnel": "academique_formel",
+      "voix": "impersonnelle",
+      "police": "Times New Roman",
+      "taillePolice": "12pt",
+      "interligne": "1.5",
+      "margesCm": "2.5",
+      "updatedAt": "2026-08-28T10:00:00.000Z"
+    }
+  ],
+  "affectations-encadrant": [
+    {
+      "id": "aff1",
+      "etablissementId": "etab1",
+      "encadrantId": "u2",
+      "promotionId": "promo1",
+      "filiereId": "fil1",
+      "niveau": "master",
+      "classeId": "classe1",
+      "groupeId": "groupe1",
+      "createdAt": "2026-06-21T08:00:00.000Z"
+    },
+    {
+      "id": "aff2",
+      "etablissementId": "etab1",
+      "encadrantId": "u14",
+      "promotionId": "promo1",
+      "filiereId": "fil1",
+      "niveau": "licence",
+      "classeId": "classe4",
+      "groupeId": "groupe3",
+      "createdAt": "2026-06-21T08:05:00.000Z"
+    },
+    {
+      "id": "aff3",
+      "etablissementId": "etab1",
+      "encadrantId": "u3",
+      "promotionId": "promo1",
+      "filiereId": "fil2",
+      "niveau": "master",
+      "classeId": "classe2",
+      "groupeId": "groupe2",
+      "createdAt": "2026-06-21T08:10:00.000Z"
+    },
+    {
+      "id": "aff4",
+      "etablissementId": "etab1",
+      "encadrantId": "u15",
+      "promotionId": "promo1",
+      "filiereId": "fil2",
+      "niveau": "master",
+      "classeId": "classe2",
+      "groupeId": null,
+      "createdAt": "2026-06-21T08:12:00.000Z"
+    },
+    {
+      "id": "aff5",
+      "etablissementId": "etab1",
+      "encadrantId": "u14",
+      "promotionId": "promo1",
+      "filiereId": "fil1",
+      "niveau": "master",
+      "classeId": "classe1",
+      "groupeId": null,
+      "createdAt": "2026-06-21T08:15:00.000Z"
+    }
+  ],
+  "invitations-etablissement": []
 }

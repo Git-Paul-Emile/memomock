@@ -44,10 +44,10 @@ export default function CanevasDetailPage() {
     limite: 100,
   });
 
-  const {
-    data: criteres,
-    refetch: refetchCriteres,
-  } = useApiList<CritereChapitre>("criteres-chapitre", { limite: 500 });
+  const { data: criteres, refetch: refetchCriteres } = useApiList<CritereChapitre>(
+    "criteres-chapitre",
+    { limite: 500 }
+  );
 
   const chapitresTries = [...chapitres].sort((a, b) => a.ordre - b.ordre);
 
@@ -165,7 +165,10 @@ function ChapitreCard({
       </CardHeader>
       <CardContent className="space-y-2">
         {criteres.map((c) => (
-          <div key={c.id} className="flex items-center justify-between rounded-md border px-3 py-1.5">
+          <div
+            key={c.id}
+            className="flex items-center justify-between rounded-md border px-3 py-1.5"
+          >
             <span className="text-sm">
               {c.libelle}
               {!c.obligatoire && <span className="text-muted-foreground"> (optionnel)</span>}

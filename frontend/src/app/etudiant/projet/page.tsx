@@ -60,8 +60,8 @@ const CHAMPS_VIDES: ChampsProjet = {
 
 /**
  * Écran « Mon projet » (spec D2) : vue de synthèse du mémoire en cours - sujet, problématique,
- * objectifs et date de soutenance, portés directement par `Document` (voir schema.prisma : pas
- * de modèle "Projet" séparé, simplification assumée). Un étudiant ayant plusieurs documents
+ * objectifs et date de soutenance, portés directement par `Document` (pas de modèle "Projet"
+ * séparé, simplification assumée). Un étudiant ayant plusieurs documents
  * (brouillons successifs, ex-projets) choisit celui à afficher/éditer via le sélecteur.
  */
 export default function MonProjetPage() {
@@ -320,7 +320,9 @@ export default function MonProjetPage() {
                 (() => {
                   const jours = joursRestants(champs.dateSoutenancePrevue);
                   return (
-                    <Badge variant={jours < 0 ? "destructive" : jours <= 14 ? "warning" : "outline"}>
+                    <Badge
+                      variant={jours < 0 ? "destructive" : jours <= 14 ? "warning" : "outline"}
+                    >
                       {jours < 0 ? "Dépassée" : jours === 0 ? "Aujourd'hui" : `J-${jours}`}
                     </Badge>
                   );

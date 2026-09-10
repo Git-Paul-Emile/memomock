@@ -54,9 +54,7 @@ export function ListeLivrablesAttendus({
   const [type, setType] = React.useState<TypeLivrable>("fichier");
   const [obligatoire, setObligatoire] = React.useState(true);
   const [enCours, setEnCours] = React.useState(false);
-  const [elementASupprimer, setElementASupprimer] = React.useState<LivrableDefinition | null>(
-    null
-  );
+  const [elementASupprimer, setElementASupprimer] = React.useState<LivrableDefinition | null>(null);
   const [suppressionEnCours, setSuppressionEnCours] = React.useState(false);
 
   const reinitialiser = () => {

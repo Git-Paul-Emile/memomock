@@ -118,8 +118,7 @@ export default function ParametresPage() {
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
     try {
-      // L'e-mail n'est pas modifiable ici : on ne l'envoie pas
-      // au backend, dont le validateur de mise à jour de profil (strict) ne l'accepte pas.
+      // L'e-mail n'est pas modifiable ici : on l'écarte du PATCH.
       const { email: _email, ...misAJourData } = values;
       const misAJour = await apiPatch<PublicUser>("users", user.id, misAJourData);
       definirUtilisateur(misAJour);
@@ -404,70 +403,70 @@ export default function ParametresPage() {
       </Card>
 
       <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Sécurité</CardTitle>
-            <CardDescription>
-              Mot de passe utilisé pour vous connecter à votre compte.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Dialog open={motDePasseOuvert} onOpenChange={setMotDePasseOuvert}>
-              <DialogTrigger asChild>
-                <Button variant="outline">
-                  <Lock className="size-4" />
-                  Changer le mot de passe
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Changer le mot de passe</DialogTitle>
-                  <DialogDescription>
-                    Votre mot de passe actuel est requis pour confirmer ce changement.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="mdp-actuel">Mot de passe actuel</Label>
-                    <Input
-                      id="mdp-actuel"
-                      type="password"
-                      value={motDePasseActuel}
-                      onChange={(e) => setMotDePasseActuel(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="mdp-nouveau">Nouveau mot de passe</Label>
-                    <Input
-                      id="mdp-nouveau"
-                      type="password"
-                      value={nouveauMotDePasse}
-                      onChange={(e) => setNouveauMotDePasse(e.target.value)}
-                      placeholder="8 caractères minimum"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="mdp-confirmation">Confirmer le nouveau mot de passe</Label>
-                    <Input
-                      id="mdp-confirmation"
-                      type="password"
-                      value={confirmationMotDePasse}
-                      onChange={(e) => setConfirmationMotDePasse(e.target.value)}
-                    />
-                  </div>
+        <CardHeader>
+          <CardTitle className="text-base">Sécurité</CardTitle>
+          <CardDescription>
+            Mot de passe utilisé pour vous connecter à votre compte.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Dialog open={motDePasseOuvert} onOpenChange={setMotDePasseOuvert}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Lock className="size-4" />
+                Changer le mot de passe
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Changer le mot de passe</DialogTitle>
+                <DialogDescription>
+                  Votre mot de passe actuel est requis pour confirmer ce changement.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="mdp-actuel">Mot de passe actuel</Label>
+                  <Input
+                    id="mdp-actuel"
+                    type="password"
+                    value={motDePasseActuel}
+                    onChange={(e) => setMotDePasseActuel(e.target.value)}
+                  />
                 </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setMotDePasseOuvert(false)}>
-                    Annuler
-                  </Button>
-                  <Button onClick={handleChangerMotDePasse} disabled={motDePasseEnCours}>
-                    {motDePasseEnCours && <Loader2 className="size-4 animate-spin" />}
-                    Confirmer
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </CardContent>
-        </Card>
+                <div className="space-y-1.5">
+                  <Label htmlFor="mdp-nouveau">Nouveau mot de passe</Label>
+                  <Input
+                    id="mdp-nouveau"
+                    type="password"
+                    value={nouveauMotDePasse}
+                    onChange={(e) => setNouveauMotDePasse(e.target.value)}
+                    placeholder="8 caractères minimum"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="mdp-confirmation">Confirmer le nouveau mot de passe</Label>
+                  <Input
+                    id="mdp-confirmation"
+                    type="password"
+                    value={confirmationMotDePasse}
+                    onChange={(e) => setConfirmationMotDePasse(e.target.value)}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setMotDePasseOuvert(false)}>
+                  Annuler
+                </Button>
+                <Button onClick={handleChangerMotDePasse} disabled={motDePasseEnCours}>
+                  {motDePasseEnCours && <Loader2 className="size-4 animate-spin" />}
+                  Confirmer
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

@@ -15,9 +15,9 @@ import type { Role } from "@/types";
  * un cookie httpOnly, pour empêcher tout accès même avant l'hydratation React. Ici,
  * l'auth gère la session côté client (localStorage, voir `src/context/auth-context.tsx`), non
  * lisible par un middleware serveur sans appel réseau supplémentaire - la garde est donc
- * volontairement posée au niveau du layout client de chaque espace. La sécurité réelle des
- * données, elle, ne dépend jamais de cette garde côté UI : chaque requête API est de toute
- * façon revérifiée côté serveur (jeton + RBAC, voir backend/src/middleware/auth.js).
+ * volontairement posée au niveau du layout client de chaque espace. Dans une implémentation
+ * réelle, la sécurité des données ne dépendrait jamais de cette garde côté UI : chaque requête
+ * API serait revérifiée côté serveur (jeton + contrôle de rôle).
  */
 export function RouteGuard({ allow, children }: { allow: Role[]; children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -71,9 +71,9 @@ export function lienOnboarding(role: Role): string | null {
       return "/onboarding/etudiant";
     case "encadrant":
       return "/onboarding/encadrant";
-    // Aucun onboarding pour un administrateur : ce rôle ne s'obtient plus par inscription depuis
-    // le retrait de la notion d'établissement (voir backend auth.service), il est attribué par
-    // un administrateur déjà en place ou par le seed. Il n'y a donc pas de « première fois ».
+    // Aucun onboarding pour un administrateur : ce rôle ne s'obtient pas par inscription, il est
+    // attribué par un administrateur déjà en place ou fourni dans data.json. Pas de « première
+    // fois ».
     case "admin":
       return null;
     // La création de l'établissement se fait directement dans le formulaire d'inscription (voir

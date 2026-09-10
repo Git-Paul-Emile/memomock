@@ -63,9 +63,8 @@ export default function ConfidentialitePage() {
             <h2 className="mb-1 font-medium text-foreground">4. Destinataires</h2>
             <p>
               Vos données ne sont jamais vendues ni transmises à des tiers à des fins commerciales.
-              Elles sont hébergées chez nos sous-traitants techniques : Neon (base de données),
-              services d'authentification (local ou externe), Cloudinary (stockage des fichiers)
-              et Resend (envoi des e-mails transactionnels et de notification).
+              Dans cette version de démonstration, elles sont stockées localement (jeu de données de
+              test servi par json-server) et ne sont transmises à aucun sous-traitant externe.
             </p>
           </section>
 
@@ -109,9 +108,10 @@ export default function ConfidentialitePage() {
           <section>
             <h2 className="mb-1 font-medium text-foreground">7. Sécurité</h2>
             <p>
-              L&apos;authentification est gérée localement (mots de passe stockés de manière mockée),
-              les échanges sont chiffrés (HTTPS), et l&apos;accès à vos données est strictement limité
-              à vous-même, votre encadrant assigné et les administrateurs de la plateforme.
+              L&apos;authentification est gérée localement (mots de passe stockés de manière
+              mockée), les échanges sont chiffrés (HTTPS), et l&apos;accès à vos données est
+              strictement limité à vous-même, votre encadrant assigné et les administrateurs de la
+              plateforme.
             </p>
           </section>
         </CardContent>

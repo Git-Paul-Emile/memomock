@@ -100,7 +100,9 @@ export default function EncadrantDashboardPage() {
         filtres: { encadrantId: user!.id },
         limite: 200,
       });
-      const documentsActifs = tousLesDocuments.filter((d) => d.statut !== "valide" && d.statut !== "refuse");
+      const documentsActifs = tousLesDocuments.filter(
+        (d) => d.statut !== "valide" && d.statut !== "refuse"
+      );
       const resultat: RetardEtudiant[] = [];
 
       for (const etudiant of etudiants) {
@@ -119,7 +121,10 @@ export default function EncadrantDashboardPage() {
               filtres: { documentId: documentEtudiant.id },
               limite: 50,
             });
-            const livrablesAffiches = resoudreLivrables(profil.livrablesAttendus, livrablesRes.data);
+            const livrablesAffiches = resoudreLivrables(
+              profil.livrablesAttendus,
+              livrablesRes.data
+            );
             let chapitresAffiches: ReturnType<typeof resoudreChapitres> = [];
             if (profil.canevasId) {
               const [chapitresRes, criteresRes, validationsRes] = await Promise.all([
@@ -191,7 +196,8 @@ export default function EncadrantDashboardPage() {
     await apiPost("notifications", {
       userId: etudiantId,
       titre: "Rappel : échéance dépassée",
-      message: "Votre encadrant vous rappelle qu'une ou plusieurs échéances de suivi sont dépassées.",
+      message:
+        "Votre encadrant vous rappelle qu'une ou plusieurs échéances de suivi sont dépassées.",
       type: "retard",
       lu: false,
       date: new Date().toISOString(),
@@ -228,17 +234,19 @@ export default function EncadrantDashboardPage() {
       .filter((d) => !rechercheBasse || d.titre.toLowerCase().includes(rechercheBasse));
   }, [classeActive, documentsPourFiltreClasse, idsEtudiantsClasse, recherche]);
 
-  const { data: dataPagineeServeur, total, totalPages, isLoading } = useApiList<DocumentSubmission>(
-    "documents",
-    {
-      page,
-      limite: LIMITE_PAGE,
-      tri: "dateMaj",
-      ordre: "desc",
-      recherche,
-      filtres: { encadrantId: user?.id, statut: statut === "tous" ? undefined : statut },
-    }
-  );
+  const {
+    data: dataPagineeServeur,
+    total,
+    totalPages,
+    isLoading,
+  } = useApiList<DocumentSubmission>("documents", {
+    page,
+    limite: LIMITE_PAGE,
+    tri: "dateMaj",
+    ordre: "desc",
+    recherche,
+    filtres: { encadrantId: user?.id, statut: statut === "tous" ? undefined : statut },
+  });
 
   const data = classeActive
     ? documentsFiltresParClasse.slice((page - 1) * LIMITE_PAGE, page * LIMITE_PAGE)
@@ -339,7 +347,10 @@ export default function EncadrantDashboardPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             {retardsParEtudiant.map(({ etudiant, retards }) => (
-              <div key={etudiant.id} className="flex items-center justify-between rounded-lg border p-3">
+              <div
+                key={etudiant.id}
+                className="flex items-center justify-between rounded-lg border p-3"
+              >
                 <div>
                   <p className="text-sm font-medium">
                     {etudiant.prenom} {etudiant.nom}

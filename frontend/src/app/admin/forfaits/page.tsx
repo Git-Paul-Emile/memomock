@@ -214,7 +214,10 @@ export default function ForfaitsAdminPage() {
                       Spec section 97 - informatif, aucune facturation réelle.
                     </p>
                   </div>
-                  <Switch checked={miseEnRelationPayante} onCheckedChange={setMiseEnRelationPayante} />
+                  <Switch
+                    checked={miseEnRelationPayante}
+                    onCheckedChange={setMiseEnRelationPayante}
+                  />
                 </div>
               </div>
               <DialogFooter>
@@ -281,8 +284,8 @@ export default function ForfaitsAdminPage() {
             <DialogTitle>Supprimer ce forfait ?</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            « {aSupprimer?.nom} » sera retiré du catalogue. Les abonnements existants sur ce
-            forfait ne sont pas supprimés.
+            « {aSupprimer?.nom} » sera retiré du catalogue. Les abonnements existants sur ce forfait
+            ne sont pas supprimés.
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setASupprimer(null)}>

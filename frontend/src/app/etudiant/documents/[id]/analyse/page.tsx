@@ -48,12 +48,9 @@ export default function AnalyseDocumentPage() {
   const [analyseEnCours, setAnalyseEnCours] = React.useState(false);
 
   // Utilise directement useQuery (plutôt que useApiResource) pour son option `refetchInterval` :
-  // l'analyse démarre désormais automatiquement côté backend dès la soumission du document (job
-  // publié sur une file BullMQ, ou exécuté immédiatement si Redis n'est pas disponible - voir
-  // backend/src/lib/queue.js). Cet écran se contente donc de RECHARGER périodiquement, via le
-  // polling natif de TanStack Query, tant que le document est "analyse_en_cours" sans résultat
-  // encore visible, plutôt que de générer lui-même les analyses (ancien comportement simulé côté
-  // client) ou de gérer un setInterval manuel.
+  // l'analyse simulée est lancée à la soumission du document (voir /etudiant/soumission,
+  // `lancerAnalyseSimulee`). Cet écran se contente de RECHARGER périodiquement, via le polling
+  // natif de TanStack Query, tant que le document est "analyse_en_cours" sans résultat visible.
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["document-analyse-etudiant", id],
     queryFn: async (): Promise<DonneesAnalyse> => {
@@ -122,8 +119,8 @@ export default function AnalyseDocumentPage() {
   }
 
   const analyseDisponible = analyses.length > 0;
-  // Calculé côté backend (voir utils/conformite.js) : tient compte du seuil de soumission et du
-  // seuil minimal par catégorie configurés sur le profil méthodologique du document.
+  // `pretPourSoumission` peut être fourni par l'API ; à défaut, on retombe sur une comparaison
+  // au seuil de conformité générique.
   const scoreSuffisant =
     document.pretPourSoumission ?? document.scoreConformite >= SEUIL_SCORE_CONFORMITE;
 

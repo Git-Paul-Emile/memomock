@@ -13,9 +13,8 @@ export type Role = "etudiant" | "encadrant" | "admin" | "admin_etablissement";
 /**
  * Rôles qu'un visiteur peut demander lui-même à l'inscription. `admin` en est volontairement
  * exclu : le rôle transite par le navigateur, l'accepter reviendrait à laisser n'importe qui
- * s'attribuer des privilèges d'administration. Le backend applique la même restriction (voir
- * `ROLES_INSCRIPTION` dans backend/src/modules/auth/auth.service.js) ; ce type n'est que le
- * garde-fou de compilation qui empêche l'interface de proposer un choix que l'API refusera.
+ * s'attribuer des privilèges d'administration. Ce type est le garde-fou de compilation qui
+ * empêche l'interface de proposer un choix que l'API mock refusera.
  * `admin_etablissement` reste inclus : une école crée elle-même son espace (spec section 6).
  */
 export type RoleInscription = Exclude<Role, "admin">;
@@ -26,7 +25,7 @@ export interface User {
   nom: string;
   prenom: string;
   email: string;
-  motDePasse?: string; // DÉPRÉCIÉ (ancien système JWT/bcrypt) : jamais renvoyé par l'API.
+  motDePasse?: string; // Présent en clair dans data.json (démo) ; omis de PublicUser.
   avatarUrl?: string;
   encadrantId?: string; // Renseigné si role === "etudiant"
   // Programme d'études (ex. « Master 2 Informatique »), libellé libre - reste disponible même
@@ -39,10 +38,10 @@ export interface User {
   classeId?: string | null;
   groupeId?: string | null;
   telephone?: string; // Format international, ex : +221772995851. Obligatoire à l'inscription,
-  // mais non vérifié (l'OTP WhatsApp a été retiré).
+  // mais non vérifié (pas de code OTP).
   canalNotificationPrefere?: CanalNotification;
   // Compte désactivé par un administrateur (spec écrans F8-F11) : un compte inactif ne peut
-  // plus s'authentifier (voir backend middleware/auth.js). Absent = actif (valeur par défaut).
+  // plus se connecter. Absent = actif (valeur par défaut).
   actif?: boolean;
   // Libellé affiché à côté du rôle technique (spec écran F14, ex. "Coordinateur pédagogique") :
   // purement cosmétique, sans effet sur les permissions RBAC - réservé à un administrateur.
@@ -54,7 +53,7 @@ export interface User {
 }
 
 // Canal de relais des notifications. "in_app" est toujours présent (visible sur /notifications) ;
-// "email" y ajoute un envoi par e-mail (Resend). Le canal WhatsApp a été retiré.
+// "email" y ajouterait un envoi par e-mail (simulé). Le canal WhatsApp a été retiré.
 export type CanalNotification = "email" | "in_app";
 
 export type PublicUser = Omit<User, "motDePasse">;
@@ -94,6 +93,10 @@ export interface Classe {
   id: string;
   etablissementId: string | null;
   filiereId: string | null;
+  // Promotion (année académique) à laquelle la classe appartient - voir `Promotion` en fin de
+  // fichier. Nullable : les classes créées avant l'introduction des promotions, et celles d'un
+  // encadrant indépendant (spec section 95), n'en ont pas.
+  promotionId?: string | null;
   nom: string;
   niveau: TypeDocument;
   code: string;
@@ -169,7 +172,7 @@ export interface ProfilEncadrant {
   contraintes: ContraintesProfil | null;
   // Seuil de conformité (%) exigé pour transmettre un document, et seuil minimal par catégorie
   // (forme/fond/cohérence) en dessous duquel la soumission reste bloquée même si le score global
-  // est atteint - voir écran /encadrant/grille (Phase 3) et utils/conformite.js côté backend.
+  // est atteint - voir écran /encadrant/grille.
   seuilSoumission: number;
   seuilCategorieMinimum: number;
   updatedAt: string;
@@ -263,8 +266,7 @@ export interface VersionDocument {
   createdAt: string;
 }
 
-// Session de connexion active (spec écran H8-H9, "Sessions actives"). Alimentée à chaque
-// POST /auth/sync - voir lib/session-id.ts (obtenirSessionId).
+// Session de connexion active (spec écran H8-H9, "Sessions actives") - voir lib/session-id.ts.
 export interface SessionConnexion {
   id: string;
   userId: string;
@@ -275,8 +277,8 @@ export interface SessionConnexion {
 }
 
 export type StatutDocument =
-  // Créé sans fichier (métadonnées seules - sujet, type, discipline...), voir
-  // POST /documents/brouillon. Transitionne vers analyse_en_cours dès l'import du fichier.
+  // Créé sans fichier (métadonnées seules - sujet, type, discipline...).
+  // Transitionne vers analyse_en_cours dès l'import du fichier.
   | "brouillon"
   | "soumis"
   | "analyse_en_cours"
@@ -285,7 +287,7 @@ export type StatutDocument =
   | "pret_pour_encadrant"
   | "en_relecture"
   | "valide"
-  // "Demander une révision" (le libellé écran) - conservé tel quel, voir schema.prisma backend.
+  // "Demander une révision" (le libellé écran) - clé technique conservée telle quelle.
   | "rejete"
   // Décision "Refuser" de l'encadrant, distincte d'une simple demande de révision.
   | "refuse";
@@ -298,7 +300,7 @@ export interface DocumentSubmission {
   // Absents tant que le document est en statut `brouillon` (créé sans fichier).
   nomFichier?: string | null;
   tailleOctets?: number | null;
-  // Fichier réel hébergé sur Cloudinary (voir backend POST /documents/upload).
+  // URL du fichier téléversé (dans cette démo, valeur factice issue de data.json).
   urlFichier?: string;
   cloudinaryId?: string;
   statut: StatutDocument;
@@ -307,11 +309,11 @@ export interface DocumentSubmission {
   scoreFond: number;
   scoreCoherence?: number;
   // Type de mémoire, discipline, et profil méthodologique effectivement résolu à la création
-  // (spec sections 7-8) - voir backend documents.service#resoudreProfilEncadrant.
+  // (spec sections 7-8).
   typeDocument?: TypeDocument | null;
   discipline?: string | null;
   profilEncadrantId?: string | null;
-  // Métadonnées du "projet" (écran D2 "Mon projet") - voir schema.prisma, Document.
+  // Métadonnées du "projet" (écran D2 "Mon projet"), portées directement par le document.
   sujet?: string | null;
   problematique?: string | null;
   objectifs?: string | null;
@@ -322,8 +324,8 @@ export interface DocumentSubmission {
   dateSoumission: string;
   dateMaj: string;
   version: number;
-  // Calculés côté backend (voir utils/conformite.js), uniquement sur GET /documents/:id - pas
-  // sur les listes. Absents tant que le document n'a pas été chargé via cette route.
+  // Dérivés du document, exposés uniquement sur GET /documents/:id - pas sur les listes.
+  // Absents tant que le document n'a pas été chargé via cette route.
   pretPourSoumission?: boolean;
   pointsBloquants?: string[];
 }
@@ -357,7 +359,7 @@ export interface Livrable {
 }
 
 // "coherence" : cohérence croisée entre les grandes parties du document (spec section 13),
-// distincte du fond - voir workers/analyse.worker.js côté backend.
+// distincte du fond.
 // "structure" : présence des chapitres attendus par le canevas associé (spec sections 29-30).
 export type TypeAnalyse = "forme" | "fond" | "coherence" | "structure";
 export type NiveauAlerte = "info" | "succes" | "attention" | "erreur";
@@ -391,12 +393,7 @@ export interface MessageCorrection {
 // "retard" : alerte de délai dépassé (spec sections 78-79) - créée explicitement (bouton
 // "Relancer"), pas par une tâche de fond (aucun scheduler serveur dans ce projet).
 export type TypeNotification =
-  | "soumission"
-  | "analyse"
-  | "correction"
-  | "validation"
-  | "systeme"
-  | "retard";
+  "soumission" | "analyse" | "correction" | "validation" | "systeme" | "retard";
 
 export interface Notification {
   id: string;
@@ -648,7 +645,7 @@ export interface ReponsePaginee<T> {
   totalPages: number;
 }
 
-// Audit des actions sensibles (spec écran F33) - voir backend/src/utils/audit.js.
+// Audit des actions sensibles (spec écran F33), affiché sur /admin/journal-audit.
 export interface JournalAudit {
   id: string;
   acteurId: string;
@@ -656,5 +653,136 @@ export interface JournalAudit {
   action: string;
   cible: string;
   details: string | null;
+  createdAt: string;
+}
+
+// ---------------------------------------------------------------------------
+// Espace « administrateur d'établissement » (spec sections 6, 9-12, 100)
+//
+// Ces entités complètent la hiérarchie Etablissement > Filiere > Classe > Groupe déjà définie
+// plus haut. Elles ne sont manipulées que par le rôle `admin_etablissement` ; les encadreurs
+// et les étudiants les consomment indirectement (normes appliquées par défaut, rattachement
+// automatique à une classe via un code d'invitation...).
+// ---------------------------------------------------------------------------
+
+/**
+ * Une seule promotion est « active » à la fois par établissement : c'est l'année académique
+ * courante, celle sur laquelle portent les tableaux de bord. Les autres sont archivées et
+ * restent consultables (historique).
+ */
+export type StatutPromotion = "active" | "archivee";
+
+export const LIBELLES_STATUT_PROMOTION: Record<StatutPromotion, string> = {
+  active: "Active",
+  archivee: "Archivée",
+};
+
+/**
+ * Année académique d'un établissement (spec section 10).
+ *
+ * Choix de modélisation : les filières et les niveaux sont des entités PERMANENTES de
+ * l'établissement (elles survivent aux promotions) ; la promotion ne fait que référencer
+ * celles qu'elle ouvre (`filiereIds`, `niveaux`). Seules les classes et les groupes sont
+ * réellement rattachés à une promotion - d'où `Classe.promotionId`.
+ */
+export interface Promotion {
+  id: string;
+  etablissementId: string;
+  // Ex. « 2025-2026 » : dérivé de anneeDebut/anneeFin, stocké pour l'affichage.
+  libelle: string;
+  anneeDebut: number;
+  anneeFin: number;
+  statut: StatutPromotion;
+  filiereIds: string[];
+  niveaux: TypeDocument[];
+  dateDebut: string; // ISO - rentrée académique
+  dateFin: string; // ISO - fin de l'année académique
+  createdAt: string;
+}
+
+/**
+ * Affectation d'un encadreur à un périmètre pédagogique (spec section 11 : « affecter les
+ * enseignants »). Table de liaison à part entière plutôt qu'un tableau imbriqué dans `User` :
+ * un encadreur a N affectations, chacune adressable individuellement (création/suppression
+ * unitaire via l'API REST), et la relation reste interrogeable dans les deux sens.
+ *
+ * `Classe.encadrantIds` reste la source de vérité pour l'accès aux documents d'une classe ;
+ * l'affectation porte le détail organisationnel (filière, niveau, groupe) affiché à
+ * l'administrateur.
+ */
+export interface AffectationEncadrant {
+  id: string;
+  etablissementId: string;
+  encadrantId: string;
+  promotionId: string | null;
+  filiereId: string | null;
+  niveau: TypeDocument | null;
+  classeId: string | null;
+  groupeId: string | null;
+  createdAt: string;
+}
+
+export type FormatCitation = "APA 7" | "APA 6" | "ISO 690" | "Chicago" | "MLA";
+export type StyleRedactionnel = "academique_formel" | "semi_formel";
+export type VoixRedaction = "impersonnelle" | "personnelle_autorisee";
+export type PositionPagination = "bas_de_page" | "haut_de_page";
+
+export const LIBELLES_STYLE_REDACTIONNEL: Record<StyleRedactionnel, string> = {
+  academique_formel: "Académique formel",
+  semi_formel: "Semi-formel",
+};
+
+export const LIBELLES_VOIX_REDACTION: Record<VoixRedaction, string> = {
+  impersonnelle: "Impersonnelle",
+  personnelle_autorisee: "Personnelle autorisée",
+};
+
+export const LIBELLES_POSITION_PAGINATION: Record<PositionPagination, string> = {
+  bas_de_page: "En bas de page",
+  haut_de_page: "En haut de page",
+};
+
+/**
+ * Référentiel académique par défaut d'un établissement (spec section 100) : un seul
+ * enregistrement par établissement.
+ *
+ * Ces valeurs alimentent `ContraintesProfil` lorsqu'un encadreur crée un profil pédagogique
+ * sans les redéfinir - l'encadreur garde la main pour ses propres classes (héritage avec
+ * surcharge, même principe que /admin/hierarchie-regles).
+ */
+export interface NormesEtablissement {
+  id: string;
+  etablissementId: string;
+  formatCitation: FormatCitation;
+  sourcesMinimum: number;
+  typesSourcesAcceptees: string[];
+  partiesIntroduction: number;
+  positionPagination: PositionPagination;
+  styleRedactionnel: StyleRedactionnel;
+  voix: VoixRedaction;
+  police: string;
+  taillePolice: string;
+  interligne: string;
+  margesCm: string;
+  updatedAt: string;
+}
+
+/** Rôles qu'un établissement peut inviter par e-mail (jamais un rôle d'administration). */
+export type RoleInvitable = Extract<Role, "encadrant" | "etudiant">;
+
+/**
+ * Invitation émise par l'établissement (spec section 1 : « un étudiant invité via un code est
+ * automatiquement rattaché à la bonne classe »). Distincte de `Invitation`, émise par un
+ * encadreur pour ses propres étudiants : ici l'émetteur est l'établissement, et le code porte
+ * le rattachement à une classe.
+ */
+export interface InvitationEtablissement {
+  id: string;
+  etablissementId: string;
+  email: string;
+  role: RoleInvitable;
+  classeId: string | null;
+  code: string;
+  statut: StatutInvitation;
   createdAt: string;
 }

@@ -4,12 +4,12 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { GraduationCap, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { useAuth, CODE_PROFIL_INCOMPLET } from "@/context/auth-context";
+import { useAuth } from "@/context/auth-context";
 import { espaceParDefaut, lienOnboarding } from "@/components/layout/route-guard";
 import { useApiList } from "@/hooks/use-api-list";
 import { apiPatch, apiPost, ApiError } from "@/lib/api";
@@ -25,13 +25,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { APP_NAME } from "@/lib/constants";
 import type { EncadrantPublic, Etablissement, RoleInscription } from "@/types";
 
-// Format international strict (ex : +221771234567) : "+" et indicatif pays obligatoires. Même
-// règle que côté backend (voir backend/src/validators/auth/schemaTelephone.js).
+// Format international strict (ex : +221771234567) : "+" et indicatif pays obligatoires.
 const TELEPHONE_REGEX = /^\+[1-9]\d{7,14}$/;
 
 // Trois rôles auto-inscriptibles : étudiant, encadrant, et administrateur d'établissement (une
@@ -56,26 +54,23 @@ export default function RegisterPage() {
   const router = useRouter();
   const [role, setRole] = React.useState<RoleInscription>("etudiant");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  
-  // Endpoint public dédié (voir backend/src/modules/public) : accessible avant même la création
-  // du compte, contrairement à /users qui est protégé. Corrigé pour pointer vers la ressource
-  // top-level réellement exposée par le mock (`/encadrants`) - `/public/encadrants` (imbriquée)
-  // renvoyait un 404 systématique, y compris via `/api/mock` en déploiement distant.
+
+  // Liste des encadrants exposée par le mock json-server sur la ressource top-level `/encadrants`,
+  // accessible avant la création du compte.
   const { data: encadrants } = useApiList<EncadrantPublic>("encadrants", { limite: 100 });
 
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schemaBase),
     defaultValues: { role: "etudiant" },
   });
 
-  const encadrantId = watch("encadrantId");
-  const telephone = watch("telephone");
+  const encadrantId = useWatch({ control, name: "encadrantId" });
 
   const onSubmit = async (values: FormValues) => {
     if (role === "etudiant" && !values.encadrantId) {
@@ -136,7 +131,11 @@ export default function RegisterPage() {
                       : "text-muted-foreground hover:bg-accent"
                   )}
                 >
-                  {r === "etudiant" ? "Étudiant·e" : r === "encadrant" ? "Encadrant·e" : "Établissement"}
+                  {r === "etudiant"
+                    ? "Étudiant·e"
+                    : r === "encadrant"
+                      ? "Encadrant·e"
+                      : "Établissement"}
                 </button>
               ))}
             </div>
@@ -223,7 +222,7 @@ export default function RegisterPage() {
                     </p>
                   </div>
                 </>
-               )}
+              )}
 
               {role === "admin_etablissement" && (
                 <div className="space-y-1.5">

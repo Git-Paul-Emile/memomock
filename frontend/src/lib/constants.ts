@@ -151,8 +151,12 @@ export const NAV_ENCADRANT = [
 
 export const NAV_ETABLISSEMENT = [
   { href: "/etablissement/dashboard", label: "Tableau de bord", icon: "LayoutDashboard" },
-  { href: "/etablissement/filieres", label: "Filières", icon: "GitBranch" },
+  { href: "/etablissement/filieres", label: "Structure", icon: "GitBranch" },
+  { href: "/etablissement/promotions", label: "Promotions", icon: "CalendarRange" },
   { href: "/etablissement/classes", label: "Classes", icon: "Users" },
+  { href: "/etablissement/professeurs", label: "Professeurs", icon: "UserCog" },
+  { href: "/etablissement/apprenants", label: "Apprenants", icon: "GraduationCap" },
+  { href: "/etablissement/normes", label: "Normes par défaut", icon: "ScrollText" },
   { href: "/etablissement/abonnement", label: "Abonnement", icon: "CreditCard" },
   { href: "/notifications", label: "Notifications", icon: "Bell" },
   { href: "/parametres", label: "Paramètres", icon: "Settings" },

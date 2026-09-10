@@ -24,7 +24,8 @@ function resolveApiRootUrl() {
   if (typeof window === "undefined") return configuredUrl;
 
   const isRemoteApp = !["localhost", "127.0.0.1"].includes(window.location.hostname);
-  const targetsLocalApi = configuredUrl.includes("localhost") || configuredUrl.includes("127.0.0.1");
+  const targetsLocalApi =
+    configuredUrl.includes("localhost") || configuredUrl.includes("127.0.0.1");
   if (isRemoteApp && targetsLocalApi) return "/api/mock";
 
   return configuredUrl;
@@ -53,7 +54,7 @@ export class ApiError extends Error {
 async function erreurDepuisReponse(res: Response): Promise<ApiError> {
   let message = res.statusText;
   try {
-    const body = (await res.json()) as any;
+    const body = (await res.json()) as { message?: string } | null;
     // json-server retourne parfois un message d'erreur en JSON
     if (body?.message) message = body.message;
   } catch {

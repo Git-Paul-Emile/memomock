@@ -133,9 +133,8 @@ export default function CorrectionDocumentPage() {
     );
   }
 
-  // Calculé côté backend (voir utils/conformite.js) : tient compte du seuil de soumission et du
-  // seuil minimal par catégorie configurés sur le profil méthodologique du document, pas d'un
-  // seuil unique codé en dur.
+  // `pretPourSoumission` peut être fourni par l'API ; à défaut, on retombe sur une comparaison
+  // au seuil de conformité générique.
   const scoreSuffisant =
     document.pretPourSoumission ?? document.scoreConformite >= SEUIL_SCORE_CONFORMITE;
 
