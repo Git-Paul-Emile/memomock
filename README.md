@@ -41,15 +41,19 @@ npm run mock:server
 npm run dev
 ```
 
-Comptes de démonstration (mot de passe identique pour tous : voir `data.json`, champ
-`password`) :
+Comptes de démonstration (identifiants stockés en clair dans `data.json`, champ `password`).
+Les trois premiers sont accessibles en un clic depuis la page `/login` :
 
-| Rôle | E-mail |
-| --- | --- |
-| Étudiant | `amina.diallo@etu.memoai.fr` |
-| Encadrant | `a.traore@memoai.fr` |
-| Administrateur d'établissement | `direction@paris-saclay.memoai.fr` |
-| Super-admin plateforme | voir `data.json` (`role: "admin"`) |
+| Rôle | E-mail | Mot de passe |
+| --- | --- | --- |
+| Étudiant | `amina.diallo@etu.memoai.fr` | `etudiant123` |
+| Encadrant | `j.leroux@memoai.fr` | `encadrant123` |
+| Administrateur d'établissement | `direction@paris-saclay.memoai.fr` | `etablissement123` |
+| Super-admin plateforme | `admin@memoai.fr` | `admin123` |
+
+Ces comptes sont liés entre eux : l'étudiante Amina Diallo est encadrée par Jérôme Leroux, et
+tous deux sont rattachés à l'établissement _Université Paris-Saclay_ administré par le
+troisième compte.
 
 ### Déploiement distant
 

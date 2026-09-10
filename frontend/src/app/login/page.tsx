@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { GraduationCap, Loader2, Mail, UserRound, UsersRound } from "lucide-react";
+import { Building2, GraduationCap, Loader2, Mail, UserRound, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/context/auth-context";
@@ -35,9 +35,15 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
+// Comptes de démonstration : un par rôle. Les identifiants correspondent exactement aux
+// enregistrements de `data.json` (champs `email` / `password`) - voir README.
+// - étudiant      : u5  (Amina Diallo), rattachée à l'encadrant u2 et à l'établissement etab1
+// - encadrant     : u2  (Jérôme Leroux), encadre l'étudiante u5, rattaché à etab1
+// - établissement : u13 (direction Paris-Saclay), administre etab1
 const COMPTES_DEMO = {
   etudiant: { email: "amina.diallo@etu.memoai.fr", motDePasse: "etudiant123" },
   encadrant: { email: "j.leroux@memoai.fr", motDePasse: "encadrant123" },
+  etablissement: { email: "direction@paris-saclay.memoai.fr", motDePasse: "etablissement123" },
 } as const;
 
 export default function LoginPage() {
@@ -104,21 +110,38 @@ export default function LoginPage() {
         <Card>
           <CardHeader>
             <CardTitle>Connexion</CardTitle>
-            <CardDescription>Accédez à votre espace étudiant ou encadrant.</CardDescription>
+            <CardDescription>
+              Choisissez un compte de démonstration ou saisissez vos identifiants.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-3">
-              <Button type="button" variant="outline" onClick={() => remplirCompteDemo("etudiant")}>
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-auto flex-col gap-1 px-2 py-2.5 text-xs"
+                onClick={() => remplirCompteDemo("etudiant")}
+              >
                 <UserRound className="size-4" />
                 Étudiant·e
               </Button>
               <Button
                 type="button"
                 variant="outline"
+                className="h-auto flex-col gap-1 px-2 py-2.5 text-xs"
                 onClick={() => remplirCompteDemo("encadrant")}
               >
                 <UsersRound className="size-4" />
                 Encadrant·e
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-auto flex-col gap-1 px-2 py-2.5 text-xs"
+                onClick={() => remplirCompteDemo("etablissement")}
+              >
+                <Building2 className="size-4" />
+                Établissement
               </Button>
             </div>
 
