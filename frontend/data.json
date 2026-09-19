@@ -453,7 +453,10 @@
       "createdAt": "2026-01-06T09:00:00.000Z",
       "password": "encadrant123",
       "telephoneVerifie": false,
-      "domainesExpertise": ["Intelligence artificielle", "Génie logiciel"],
+      "domainesExpertise": [
+        "Intelligence artificielle",
+        "Génie logiciel"
+      ],
       "disponible": true,
       "etablissementId": "etab1"
     },
@@ -466,7 +469,10 @@
       "createdAt": "2026-01-06T09:05:00.000Z",
       "password": "encadrant123",
       "telephoneVerifie": false,
-      "domainesExpertise": ["Stratégie d'entreprise", "Transformation digitale"],
+      "domainesExpertise": [
+        "Stratégie d'entreprise",
+        "Transformation digitale"
+      ],
       "disponible": true,
       "etablissementId": "etab1"
     },
@@ -479,7 +485,10 @@
       "createdAt": "2026-01-06T09:10:00.000Z",
       "password": "encadrant123",
       "telephoneVerifie": false,
-      "domainesExpertise": ["Droit du numérique", "RGPD"],
+      "domainesExpertise": [
+        "Droit du numérique",
+        "RGPD"
+      ],
       "disponible": false
     },
     {
@@ -605,7 +614,10 @@
       "createdAt": "2026-06-18T08:00:00.000Z",
       "password": "Test1234!",
       "telephoneVerifie": false,
-      "domainesExpertise": ["Génie logiciel", "Bases de données"],
+      "domainesExpertise": [
+        "Génie logiciel",
+        "Bases de données"
+      ],
       "disponible": true,
       "etablissementId": "etab1",
       "classeId": null,
@@ -623,7 +635,10 @@
       "createdAt": "2026-06-18T08:00:00.000Z",
       "password": "Test1234!",
       "telephoneVerifie": false,
-      "domainesExpertise": ["Marketing digital", "Stratégie"],
+      "domainesExpertise": [
+        "Marketing digital",
+        "Stratégie"
+      ],
       "disponible": true,
       "etablissementId": "etab1",
       "classeId": null,
@@ -879,7 +894,10 @@
       "nom": "Master Informatique — Promotion 2026",
       "niveau": "master",
       "code": "CLASSE-INFO26",
-      "encadrantIds": ["u14", "u2"],
+      "encadrantIds": [
+        "u14",
+        "u2"
+      ],
       "createdAt": "2026-01-06T08:10:00.000Z",
       "promotionId": "promo1"
     },
@@ -890,7 +908,10 @@
       "nom": "Master Sciences de gestion — Promotion 2026",
       "niveau": "master",
       "code": "CLASSE-GEST26",
-      "encadrantIds": ["u15", "u3"],
+      "encadrantIds": [
+        "u15",
+        "u3"
+      ],
       "createdAt": "2026-01-06T08:11:00.000Z",
       "promotionId": "promo1"
     },
@@ -901,7 +922,9 @@
       "nom": "Master Droit du numérique — Cohorte 2026",
       "niveau": "master",
       "code": "CLASSE-DROIT26",
-      "encadrantIds": ["u4"],
+      "encadrantIds": [
+        "u4"
+      ],
       "createdAt": "2026-01-16T09:00:00.000Z",
       "promotionId": null
     },
@@ -913,7 +936,9 @@
       "nom": "Licence 3 Informatique — Promotion 2027",
       "niveau": "licence",
       "code": "CLASSE-INFOL3",
-      "encadrantIds": ["u14"],
+      "encadrantIds": [
+        "u14"
+      ],
       "createdAt": "2026-06-20T08:00:00.000Z"
     }
   ],
@@ -1520,7 +1545,10 @@
       "prenom": "Jérôme",
       "email": "j.leroux@memoai.fr",
       "filiere": null,
-      "domainesExpertise": ["Intelligence artificielle", "Génie logiciel"],
+      "domainesExpertise": [
+        "Intelligence artificielle",
+        "Génie logiciel"
+      ],
       "disponible": true,
       "nbEtudiantsSuivis": 2
     },
@@ -1530,7 +1558,10 @@
       "prenom": "Fatou",
       "email": "f.sarr@memoai.fr",
       "filiere": null,
-      "domainesExpertise": ["Stratégie d'entreprise", "Transformation digitale"],
+      "domainesExpertise": [
+        "Stratégie d'entreprise",
+        "Transformation digitale"
+      ],
       "disponible": true,
       "nbEtudiantsSuivis": 2
     },
@@ -1540,7 +1571,10 @@
       "prenom": "Karim",
       "email": "k.belhadj@memoai.fr",
       "filiere": null,
-      "domainesExpertise": ["Droit du numérique", "RGPD"],
+      "domainesExpertise": [
+        "Droit du numérique",
+        "RGPD"
+      ],
       "disponible": false,
       "nbEtudiantsSuivis": 2
     }
@@ -1851,10 +1885,11 @@
           "ajouteLe": "2026-01-14T09:00:00.000Z"
         }
       ],
+      "canevasId": "canevas3",
       "contraintes": null,
       "seuilSoumission": 75,
       "seuilCategorieMinimum": 50,
-      "updatedAt": "2026-01-14T09:00:00.000Z"
+      "updatedAt": "2026-09-19T00:00:00.000Z"
     },
     {
       "id": "pe3",
@@ -1965,6 +2000,30 @@
       "description": "Structure standard attendue pour un mémoire de Master Informatique.",
       "createdAt": "2026-01-12T08:30:00.000Z",
       "updatedAt": "2026-01-12T08:30:00.000Z"
+    },
+    {
+      "id": "canevas2",
+      "encadrantId": "u2",
+      "nom": "Canevas Ingénierie Informatique (Guide de rédaction)",
+      "description": "Plan type projet technique : cadrage théorique, étude de l'existant, conception et implémentation de la solution.",
+      "createdAt": "2026-09-19T00:00:00.000Z",
+      "updatedAt": "2026-09-19T00:00:00.000Z"
+    },
+    {
+      "id": "canevas3",
+      "encadrantId": "u3",
+      "nom": "Canevas Sciences de Gestion (Guide de rédaction)",
+      "description": "Plan type mémoire de gestion : cadre théorique, cadre méthodologique, résultats et recommandations.",
+      "createdAt": "2026-09-19T00:00:00.000Z",
+      "updatedAt": "2026-09-19T00:00:00.000Z"
+    },
+    {
+      "encadrantId": "u2",
+      "nom": "Canvas test",
+      "description": null,
+      "createdAt": "2026-09-19T19:41:55.513Z",
+      "updatedAt": "2026-09-19T19:41:55.513Z",
+      "id": "lZc8aih"
     }
   ],
   "chapitres-canevas": [
@@ -2009,6 +2068,102 @@
       "obligatoire": true,
       "ordre": 4,
       "dateEcheance": "2026-09-15"
+    },
+    {
+      "id": "chap6",
+      "canevasId": "canevas2",
+      "titre": "Introduction",
+      "description": "Cadre le travail et annonce le plan (1 page maximum).",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "chap7",
+      "canevasId": "canevas2",
+      "titre": "Chapitre 1 - Concepts généraux liés au domaine étudié",
+      "description": "Définitions, terminologie et meilleures pratiques du domaine.",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "chap8",
+      "canevasId": "canevas2",
+      "titre": "Chapitre 2 - Étude de l'existant",
+      "description": "Présentation de la structure d'accueil, analyse de l'existant et problématique.",
+      "obligatoire": true,
+      "ordre": 2
+    },
+    {
+      "id": "chap9",
+      "canevasId": "canevas2",
+      "titre": "Chapitre 3 - Proposition et conception de la solution",
+      "description": "Comparaison des solutions existantes et conception de la solution retenue.",
+      "obligatoire": true,
+      "ordre": 3
+    },
+    {
+      "id": "chap10",
+      "canevasId": "canevas2",
+      "titre": "Chapitre 4 - Implémentation et mise en œuvre",
+      "description": "Installation, configuration et tests de la solution.",
+      "obligatoire": true,
+      "ordre": 4
+    },
+    {
+      "id": "chap11",
+      "canevasId": "canevas2",
+      "titre": "Conclusion",
+      "description": "Synthèse de la démarche, des résultats et perspectives d'évolution.",
+      "obligatoire": true,
+      "ordre": 5
+    },
+    {
+      "id": "chap12",
+      "canevasId": "canevas3",
+      "titre": "Introduction générale",
+      "description": "Présente le sujet, la problématique et annonce le plan.",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "chap13",
+      "canevasId": "canevas3",
+      "titre": "Chapitre 1 - Le cadre théorique",
+      "description": "Problématique, objectifs, hypothèses, pertinence du sujet et revue de littérature.",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "chap14",
+      "canevasId": "canevas3",
+      "titre": "Chapitre 2 - Le cadre méthodologique",
+      "description": "Présentation de l'entreprise, délimitation du champ d'étude et techniques d'investigation.",
+      "obligatoire": true,
+      "ordre": 2
+    },
+    {
+      "id": "chap15",
+      "canevasId": "canevas3",
+      "titre": "Chapitre 3 - Présentation, analyse et interprétation des résultats",
+      "description": "Résultats du guide d'entretien et du questionnaire.",
+      "obligatoire": true,
+      "ordre": 3
+    },
+    {
+      "id": "chap16",
+      "canevasId": "canevas3",
+      "titre": "Chapitre 4 - Recommandations",
+      "description": "Recommandations formulées par axe d'amélioration identifié.",
+      "obligatoire": true,
+      "ordre": 4
+    },
+    {
+      "id": "chap17",
+      "canevasId": "canevas3",
+      "titre": "Conclusion générale",
+      "description": "Synthèse de la démarche et des résultats, limites et perspectives.",
+      "obligatoire": true,
+      "ordre": 5
     }
   ],
   "criteres-chapitre": [
@@ -2085,6 +2240,328 @@
     {
       "id": "crit11",
       "chapitreId": "chap5",
+      "libelle": "Limites et perspectives",
+      "obligatoire": false,
+      "ordre": 1
+    },
+    {
+      "id": "crit12",
+      "chapitreId": "chap6",
+      "libelle": "Définir le domaine d'étude",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit13",
+      "chapitreId": "chap6",
+      "libelle": "Présenter le contexte",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "crit14",
+      "chapitreId": "chap6",
+      "libelle": "Préciser la pertinence de la problématique",
+      "obligatoire": true,
+      "ordre": 2
+    },
+    {
+      "id": "crit15",
+      "chapitreId": "chap6",
+      "libelle": "Annoncer le plan du mémoire",
+      "obligatoire": false,
+      "ordre": 3
+    },
+    {
+      "id": "crit16",
+      "chapitreId": "chap7",
+      "libelle": "Identifier et décrire les concepts de base du domaine",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit17",
+      "chapitreId": "chap7",
+      "libelle": "Rappeler les définitions et la terminologie utilisées",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "crit18",
+      "chapitreId": "chap7",
+      "libelle": "Décrire les meilleures pratiques ou normes en vigueur",
+      "obligatoire": false,
+      "ordre": 2
+    },
+    {
+      "id": "crit19",
+      "chapitreId": "chap8",
+      "libelle": "Présentation administrative de la structure d'accueil",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit20",
+      "chapitreId": "chap8",
+      "libelle": "Description de l'existant (infrastructure, topologie)",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "crit21",
+      "chapitreId": "chap8",
+      "libelle": "Analyse de l'existant (points forts / points faibles)",
+      "obligatoire": true,
+      "ordre": 2
+    },
+    {
+      "id": "crit22",
+      "chapitreId": "chap8",
+      "libelle": "Problématique déduite des points faibles",
+      "obligatoire": true,
+      "ordre": 3
+    },
+    {
+      "id": "crit23",
+      "chapitreId": "chap8",
+      "libelle": "Objectifs et axes d'amélioration proposés",
+      "obligatoire": true,
+      "ordre": 4
+    },
+    {
+      "id": "crit24",
+      "chapitreId": "chap9",
+      "libelle": "Description des offres de solutions existantes",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit25",
+      "chapitreId": "chap9",
+      "libelle": "Étude comparative des solutions",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "crit26",
+      "chapitreId": "chap9",
+      "libelle": "Critères de choix justifiant la solution retenue",
+      "obligatoire": true,
+      "ordre": 2
+    },
+    {
+      "id": "crit27",
+      "chapitreId": "chap9",
+      "libelle": "Description détaillée de la solution choisie",
+      "obligatoire": true,
+      "ordre": 3
+    },
+    {
+      "id": "crit28",
+      "chapitreId": "chap9",
+      "libelle": "Maquette de test conçue",
+      "obligatoire": false,
+      "ordre": 4
+    },
+    {
+      "id": "crit29",
+      "chapitreId": "chap10",
+      "libelle": "Procédures d'installation décrites",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit30",
+      "chapitreId": "chap10",
+      "libelle": "Paramètres de configuration identifiés",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "crit31",
+      "chapitreId": "chap10",
+      "libelle": "Configurations réalisées",
+      "obligatoire": true,
+      "ordre": 2
+    },
+    {
+      "id": "crit32",
+      "chapitreId": "chap10",
+      "libelle": "Tests des configurations effectués",
+      "obligatoire": true,
+      "ordre": 3
+    },
+    {
+      "id": "crit33",
+      "chapitreId": "chap10",
+      "libelle": "Discussion des résultats et recommandations",
+      "obligatoire": false,
+      "ordre": 4
+    },
+    {
+      "id": "crit34",
+      "chapitreId": "chap11",
+      "libelle": "Rappel du contexte, de la problématique et des objectifs",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit35",
+      "chapitreId": "chap11",
+      "libelle": "Rappel de la démarche suivie et du résultat obtenu",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "crit36",
+      "chapitreId": "chap11",
+      "libelle": "Appréciation de la qualité et de la pertinence des tests",
+      "obligatoire": true,
+      "ordre": 2
+    },
+    {
+      "id": "crit37",
+      "chapitreId": "chap11",
+      "libelle": "Ouverture sur des perspectives d'évolution",
+      "obligatoire": false,
+      "ordre": 3
+    },
+    {
+      "id": "crit38",
+      "chapitreId": "chap12",
+      "libelle": "Présenter le contexte et le sujet",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit39",
+      "chapitreId": "chap12",
+      "libelle": "Justifier la pertinence de la problématique",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "crit40",
+      "chapitreId": "chap12",
+      "libelle": "Annoncer le plan du mémoire",
+      "obligatoire": false,
+      "ordre": 2
+    },
+    {
+      "id": "crit41",
+      "chapitreId": "chap13",
+      "libelle": "Problématique clairement posée",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit42",
+      "chapitreId": "chap13",
+      "libelle": "Objectifs de recherche définis",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "crit43",
+      "chapitreId": "chap13",
+      "libelle": "Hypothèses de recherche formulées",
+      "obligatoire": true,
+      "ordre": 2
+    },
+    {
+      "id": "crit44",
+      "chapitreId": "chap13",
+      "libelle": "Pertinence du sujet justifiée",
+      "obligatoire": true,
+      "ordre": 3
+    },
+    {
+      "id": "crit45",
+      "chapitreId": "chap13",
+      "libelle": "Définitions des mots clés et revue critique de la littérature",
+      "obligatoire": true,
+      "ordre": 4
+    },
+    {
+      "id": "crit46",
+      "chapitreId": "chap14",
+      "libelle": "Présentation de l'entreprise (historique, missions, organisation)",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit47",
+      "chapitreId": "chap14",
+      "libelle": "Délimitation du champ d'étude",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "crit48",
+      "chapitreId": "chap14",
+      "libelle": "Techniques d'investigation décrites",
+      "obligatoire": true,
+      "ordre": 2
+    },
+    {
+      "id": "crit49",
+      "chapitreId": "chap14",
+      "libelle": "Échantillonnage justifié",
+      "obligatoire": true,
+      "ordre": 3
+    },
+    {
+      "id": "crit50",
+      "chapitreId": "chap14",
+      "libelle": "Difficultés rencontrées mentionnées",
+      "obligatoire": false,
+      "ordre": 4
+    },
+    {
+      "id": "crit51",
+      "chapitreId": "chap15",
+      "libelle": "Présentation et analyse des résultats du guide d'entretien",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit52",
+      "chapitreId": "chap15",
+      "libelle": "Présentation et analyse des résultats du questionnaire",
+      "obligatoire": true,
+      "ordre": 1
+    },
+    {
+      "id": "crit53",
+      "chapitreId": "chap15",
+      "libelle": "Interprétation des résultats du guide d'entretien",
+      "obligatoire": true,
+      "ordre": 2
+    },
+    {
+      "id": "crit54",
+      "chapitreId": "chap15",
+      "libelle": "Interprétation des résultats du questionnaire",
+      "obligatoire": true,
+      "ordre": 3
+    },
+    {
+      "id": "crit55",
+      "chapitreId": "chap16",
+      "libelle": "Recommandations formulées pour chaque axe d'amélioration identifié",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit56",
+      "chapitreId": "chap17",
+      "libelle": "Synthèse de la démarche et des résultats",
+      "obligatoire": true,
+      "ordre": 0
+    },
+    {
+      "id": "crit57",
+      "chapitreId": "chap17",
       "libelle": "Limites et perspectives",
       "obligatoire": false,
       "ordre": 1
@@ -2401,7 +2878,10 @@
       "prixMensuel": 0,
       "maxEtudiants": 20,
       "maxEncadrants": 3,
-      "fonctionnalites": ["Analyse IA de base", "1 canevas par encadrant"],
+      "fonctionnalites": [
+        "Analyse IA de base",
+        "1 canevas par encadrant"
+      ],
       "miseEnRelationPayante": false,
       "ordre": 0
     },
@@ -2546,8 +3026,14 @@
       "anneeDebut": 2026,
       "anneeFin": 2027,
       "statut": "active",
-      "filiereIds": ["fil1", "fil2"],
-      "niveaux": ["licence", "master"],
+      "filiereIds": [
+        "fil1",
+        "fil2"
+      ],
+      "niveaux": [
+        "licence",
+        "master"
+      ],
       "dateDebut": "2026-10-01T00:00:00.000Z",
       "dateFin": "2027-06-30T00:00:00.000Z",
       "createdAt": "2026-06-15T08:00:00.000Z"
@@ -2559,8 +3045,14 @@
       "anneeDebut": 2025,
       "anneeFin": 2026,
       "statut": "archivee",
-      "filiereIds": ["fil1", "fil2"],
-      "niveaux": ["licence", "master"],
+      "filiereIds": [
+        "fil1",
+        "fil2"
+      ],
+      "niveaux": [
+        "licence",
+        "master"
+      ],
       "dateDebut": "2025-10-01T00:00:00.000Z",
       "dateFin": "2026-06-30T00:00:00.000Z",
       "createdAt": "2025-06-15T08:00:00.000Z"
@@ -2572,8 +3064,12 @@
       "anneeDebut": 2024,
       "anneeFin": 2025,
       "statut": "archivee",
-      "filiereIds": ["fil1"],
-      "niveaux": ["master"],
+      "filiereIds": [
+        "fil1"
+      ],
+      "niveaux": [
+        "master"
+      ],
       "dateDebut": "2024-10-01T00:00:00.000Z",
       "dateFin": "2025-06-30T00:00:00.000Z",
       "createdAt": "2024-06-15T08:00:00.000Z"
@@ -2585,7 +3081,11 @@
       "etablissementId": "etab1",
       "formatCitation": "APA 7",
       "sourcesMinimum": 20,
-      "typesSourcesAcceptees": ["Revues scientifiques", "Ouvrages", "Thèses"],
+      "typesSourcesAcceptees": [
+        "Revues scientifiques",
+        "Ouvrages",
+        "Thèses"
+      ],
       "partiesIntroduction": 5,
       "positionPagination": "bas_de_page",
       "styleRedactionnel": "academique_formel",
