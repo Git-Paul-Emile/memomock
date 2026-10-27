@@ -69,11 +69,16 @@ Les données d'exemple sont fictives (noms, numéros, universités).
 
 ### Déploiement distant
 
-En déploiement (Vercel, voir `vercel.json`), `json-server` n'est pas disponible. Une route
-Next.js de secours, `src/app/api/mock/[[...path]]/route.ts`, réimplémente les mêmes verbes
-REST à partir de `data.json` (en mémoire, réinitialisée à chaque démarrage). Le client HTTP
-(`src/lib/api.ts`) bascule automatiquement vers `/api/mock` quand l'application tourne sur un
-hôte distant configuré pour une API locale. Déclarez `GEMINI_API_KEY` dans les variables
+En déploiement (Vercel, voir `vercel.json`), `json-server` n'est pas disponible. Le client HTTP
+(`src/lib/api.ts`) bascule alors vers `/api/mock`, et **le mock s'exécute dans le navigateur**
+(`src/lib/mock-navigateur.ts`) : le jeu initial est téléchargé une fois depuis
+`GET /api/mock` (servi depuis `data.json`), puis toutes les lectures et écritures sont traitées
+localement par le même moteur que json-server (`src/lib/mock-db.ts`) et conservées dans le
+`localStorage`. La mémoire des fonctions serverless n'étant pas partagée entre requêtes, un mock
+côté serveur perdait les données créées (404). Conséquences : les données sont propres à chaque
+navigateur (un étudiant et son encadreur doivent utiliser le même navigateur pour voir leurs
+échanges), et elles repartent de `data.json` à chaque nouveau déploiement qui le modifie. Le bouton
+« Réinitialiser les données de démonstration » (Paramètres) restaure le jeu d'origine. Déclarez `GEMINI_API_KEY` dans les variables
 d'environnement du projet Vercel (jamais avec le préfixe `NEXT_PUBLIC_`).
 
 ## Scripts

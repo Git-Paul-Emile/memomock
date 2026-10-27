@@ -40,6 +40,7 @@ import { ROLE_LABELS } from "@/lib/constants";
 import { PAYS_PAR_DEFAUT, paysDepuisTelephone } from "@/lib/afrique";
 import { SelectPays } from "@/components/shared/select-pays";
 import { publierEncadrant } from "@/lib/annuaire";
+import { mockNavigateurActif, reinitialiserDonneesDemo } from "@/lib/mock-navigateur";
 import { CodeInvalideError, utiliserCode } from "@/lib/invitations";
 import type {
   CanalNotification,
@@ -81,6 +82,13 @@ export default function ParametresPage() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [avatarEnCours, setAvatarEnCours] = React.useState(false);
   const [canalEnCours, setCanalEnCours] = React.useState(false);
+  // Vrai seulement dans le navigateur d'un déploiement distant (faux au rendu serveur, sans
+  // décalage d'hydratation).
+  const mockLocal = React.useSyncExternalStore(
+    () => () => {},
+    mockNavigateurActif,
+    () => false
+  );
   const [codeSaisi, setCodeSaisi] = React.useState("");
   const [codeEnCours, setCodeEnCours] = React.useState(false);
   const [exportEnCours, setExportEnCours] = React.useState(false);
@@ -587,6 +595,30 @@ export default function ParametresPage() {
           </Button>
         </CardContent>
       </Card>
+
+      {mockLocal && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Données de démonstration</CardTitle>
+            <CardDescription>
+              Sur cette version en ligne, vos données de démonstration sont conservées dans ce
+              navigateur. Vous pouvez repartir du jeu de données d&apos;origine.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              variant="outline"
+              onClick={async () => {
+                await reinitialiserDonneesDemo();
+                await logout();
+                window.location.href = "/login";
+              }}
+            >
+              Réinitialiser les données de démonstration
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {user.role !== "admin" && (
         <Card>

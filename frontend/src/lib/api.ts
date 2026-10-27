@@ -16,6 +16,7 @@
  *  - json-server gère automatiquement la pagination et le filtrage via _page, _limit, _sort, _order.
  */
 
+import { installerMockNavigateur } from "./mock-navigateur";
 import { obtenirSessionId } from "./session-id";
 
 // API json-server : mock local, données dans frontend/data.json
@@ -32,6 +33,14 @@ function resolveApiRootUrl() {
 }
 
 const API_ROOT_URL = resolveApiRootUrl();
+
+// Déploiement distant : le mock s'exécute dans le navigateur (données persistées localement),
+// car la mémoire des fonctions serverless n'est pas partagée entre requêtes - voir
+// lib/mock-navigateur.ts. Installé ici, avant toute requête, puisque tous les appels à l'API
+// (y compris lib/firebase.ts et le contexte d'authentification) passent par ce module.
+if (typeof window !== "undefined" && API_ROOT_URL === "/api/mock") {
+  installerMockNavigateur();
+}
 export const API_BASE_URL = API_ROOT_URL;
 // Health check (json-server /db endpoint)
 export const API_HEALTH_URL = `${API_ROOT_URL}`;
