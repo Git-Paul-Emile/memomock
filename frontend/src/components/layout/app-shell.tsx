@@ -101,12 +101,12 @@ export function AppShell({
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar desktop */}
-      <aside className="hidden w-64 shrink-0 border-r bg-sidebar md:flex md:flex-col">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r bg-sidebar md:flex md:flex-col">
         <div className="flex items-center gap-2 border-b px-5 py-4">
           <GraduationCap className="size-6 text-primary" />
           <span className="font-semibold text-sidebar-foreground">{APP_NAME}</span>
         </div>
-        <div className="flex-1 overflow-y-auto p-3">
+        <div className="min-h-0 flex-1 overflow-y-auto p-3">
           <NavLinks
             navItems={navItems}
             pathname={pathname}
