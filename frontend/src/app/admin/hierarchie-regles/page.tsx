@@ -32,7 +32,7 @@ interface GroupeRegles {
  * Écran « Profils méthodologiques et conflits de règles » (spec écrans F24-F26).
  *
  * Depuis le retrait de la notion d'établissement, il n'y a plus de niveau institutionnel
- * au-dessus des encadrants : les profils méthodologiques sont désormais l'unique source des
+ * au-dessus des encadreurs : les profils méthodologiques sont désormais l'unique source des
  * exigences appliquées aux étudiants. Cet écran conserve donc sa seule fonction réellement
  * utile - détecter un conflit concret et vérifiable : des profils portant le même type de
  * document × discipline mais des seuils de soumission différents, révélant des attentes
@@ -79,7 +79,7 @@ export default function HierarchieReglesPage() {
     <div>
       <PageHeader
         title="Profils méthodologiques et conflits de règles"
-        description="Vue transversale des exigences définies par chaque encadrant, et détection des attentes divergentes."
+        description="Vue transversale des exigences définies par chaque encadreur, et détection des attentes divergentes."
       />
 
       <Card>
@@ -104,7 +104,7 @@ export default function HierarchieReglesPage() {
                 <TableRow>
                   <TableHead>Type</TableHead>
                   <TableHead>Discipline</TableHead>
-                  <TableHead>Encadrants</TableHead>
+                  <TableHead>Encadreurs</TableHead>
                   <TableHead>Seuils de soumission</TableHead>
                   <TableHead className="text-right">Statut</TableHead>
                 </TableRow>

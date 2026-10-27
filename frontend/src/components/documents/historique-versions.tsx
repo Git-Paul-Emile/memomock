@@ -32,11 +32,12 @@ import {
 import { apiPatch } from "@/lib/api";
 import { diffTexte } from "@/lib/diff";
 import { cn, formatDateTime } from "@/lib/utils";
-import type { VersionDocument } from "@/types";
+import { bilanCommentaires } from "@/lib/versions";
+import type { CommentaireMarge, VersionDocument } from "@/types";
 
 /**
  * Historique des versions d'un document (spec section 29, écrans D69-D72) : un instantané par
- * transition clé (transmission à l'encadrant, décision de l'encadrant). Réutilisé par les
+ * transition clé (transmission à l'encadreur, décision de l'encadreur). Réutilisé par les
  * écrans étudiant et encadrant - `retourHref` change, `peutRestaurer` (réservé à l'étudiant
  * propriétaire) aussi.
  */
@@ -55,6 +56,13 @@ export function HistoriqueVersions({
     ordre: "desc",
     limite: 50,
   });
+
+  // Commentaires de l'encadreur : le comparateur montre ceux résolus et ceux encore ouverts.
+  const { data: commentaires } = useApiList<CommentaireMarge>("commentaires-marge", {
+    filtres: { documentId },
+    limite: 500,
+  });
+  const bilan = bilanCommentaires(commentaires);
 
   const [selection, setSelection] = React.useState<string[]>([]);
   const [comparateurOuvert, setComparateurOuvert] = React.useState(false);
@@ -110,7 +118,7 @@ export function HistoriqueVersions({
     <div className="mx-auto max-w-3xl">
       <PageHeader
         title="Historique des versions"
-        description="Un instantané est capturé à chaque transmission à l'encadrant et à chaque décision. Sélectionnez deux versions pour les comparer."
+        description="Un instantané est capturé à chaque soumission à l'encadreur et à chaque décision. Sélectionnez deux versions pour les comparer."
         actions={
           <div className="flex gap-2">
             <Button
@@ -140,7 +148,7 @@ export function HistoriqueVersions({
             <EmptyState
               icon={History}
               title="Aucune version pour l'instant"
-              description="Une version sera créée dès la première transmission à l'encadrant."
+              description="Une version sera créée dès la première soumission à l'encadreur."
             />
           ) : (
             <Table>
@@ -170,9 +178,24 @@ export function HistoriqueVersions({
                       <StatusBadge statut={version.statut} />
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {version.auteur === "etudiant" ? "Étudiant" : "Encadrant"}
+                      {version.auteur === "etudiant" ? "Étudiant" : "Encadreur"}
                     </TableCell>
-                    <TableCell>{version.scoreConformite} / 100</TableCell>
+                    <TableCell>
+                      {version.scoreConformite} %
+                      {data[index + 1] && (
+                        <span
+                          className={cn(
+                            "ml-1.5 text-xs",
+                            version.scoreConformite >= data[index + 1].scoreConformite
+                              ? "text-success"
+                              : "text-destructive"
+                          )}
+                        >
+                          {version.scoreConformite >= data[index + 1].scoreConformite ? "+" : ""}
+                          {version.scoreConformite - data[index + 1].scoreConformite}
+                        </span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-muted-foreground">
                       {formatDateTime(version.createdAt)}
                     </TableCell>
@@ -215,6 +238,48 @@ export function HistoriqueVersions({
               fonctionnalité).
             </DialogDescription>
           </DialogHeader>
+          {versionAncienne && versionNouvelle && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-lg border p-3 text-sm">
+                <p className="mb-1.5 font-medium">Évolution du score</p>
+                {(
+                  [
+                    ["Global", versionAncienne.scoreConformite, versionNouvelle.scoreConformite],
+                    ["Forme", versionAncienne.scoreForme, versionNouvelle.scoreForme],
+                    ["Fond", versionAncienne.scoreFond, versionNouvelle.scoreFond],
+                    ["Cohérence", versionAncienne.scoreCoherence, versionNouvelle.scoreCoherence],
+                  ] as const
+                ).map(([libelle, avant, apres]) => (
+                  <div key={libelle} className="flex justify-between text-xs text-muted-foreground">
+                    <span>{libelle}</span>
+                    <span className="font-medium text-foreground">
+                      {avant} → {apres} %{" "}
+                      <span className={apres >= avant ? "text-success" : "text-destructive"}>
+                        ({apres >= avant ? "+" : ""}
+                        {apres - avant})
+                      </span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="rounded-lg border p-3 text-sm">
+                <p className="mb-1.5 font-medium">Commentaires de l&apos;encadreur</p>
+                <p className="text-xs text-muted-foreground">
+                  {bilan.resolus} résolu(s) · {bilan.ouverts} encore ouvert(s) sur {bilan.total}
+                </p>
+                <ul className="mt-1.5 space-y-0.5 text-xs">
+                  {commentaires
+                    .filter((c) => !c.resolu)
+                    .slice(0, 5)
+                    .map((c) => (
+                      <li key={c.id} className="truncate">
+                        • {c.texte}
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            </div>
+          )}
           {lignesDiff.length === 0 ? (
             <p className="py-6 text-center text-sm text-muted-foreground">
               Aucun texte disponible pour l&apos;une de ces deux versions.

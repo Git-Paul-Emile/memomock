@@ -53,7 +53,7 @@ export function DetailClasse({
         <CardHeader>
           <CardTitle className="text-base">Code de rattachement</CardTitle>
           <CardDescription>
-            Les étudiants saisissent ce code (page « Rejoindre un encadrant ») pour rejoindre
+            Les étudiants saisissent ce code (page « Rejoindre un encadreur ») pour rejoindre
             automatiquement cette classe.
           </CardDescription>
         </CardHeader>
@@ -97,7 +97,7 @@ function SectionDiffusion({ classeId }: { classeId: string }) {
         etudiants.map((e) =>
           apiPost("notifications", {
             userId: e.id,
-            titre: "Message de votre encadrant",
+            titre: "Message de votre encadreur",
             message: texte.trim(),
             type: "systeme",
             lu: false,
@@ -344,7 +344,7 @@ function SectionEncadrants({
               <Input
                 value={recherche}
                 onChange={(e) => setRecherche(e.target.value)}
-                placeholder="Rechercher un encadrant…"
+                placeholder="Rechercher un encadreur…"
                 className="pl-8"
               />
             </div>

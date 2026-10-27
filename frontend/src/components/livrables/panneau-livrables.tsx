@@ -26,7 +26,7 @@ const EXTENSIONS_LIVRABLE_ACCEPTEES = ".pdf,.doc,.docx,.zip,.fig,.png,.jpg,.jpeg
 
 /**
  * Panneau des livrables d'un document, partagé étudiant/encadrant (spec sections 57-59) :
- * l'étudiant y dépose (fichier ou lien) ce qui est attendu, l'encadrant y vérifie chaque dépôt
+ * l'étudiant y dépose (fichier ou lien) ce qui est attendu, l'encadreur y vérifie chaque dépôt
  * (conforme / à corriger). `items` provient de `resoudreLivrables` (lib/livrables.ts).
  */
 export function PanneauLivrables({
@@ -34,6 +34,7 @@ export function PanneauLivrables({
   role,
   onDeposer,
   onVerifier,
+  onMarquerEnCours,
 }: {
   items: LivrableAffiche[];
   role: "etudiant" | "encadrant";
@@ -46,6 +47,8 @@ export function PanneauLivrables({
     decision: "valide" | "en_correction",
     commentaire: string
   ) => Promise<void>;
+  // Étudiant : signale qu'il a commencé un livrable (statut « En cours », spec v2, partie IX).
+  onMarquerEnCours?: (item: LivrableAffiche) => Promise<void>;
 }) {
   const [depotOuvert, setDepotOuvert] = React.useState<LivrableAffiche | null>(null);
   const [verifOuverte, setVerifOuverte] = React.useState<LivrableAffiche | null>(null);
@@ -60,7 +63,7 @@ export function PanneauLivrables({
           <EmptyState
             icon={Package}
             title="Aucun livrable attendu"
-            description="Votre encadrant n'a défini aucun livrable pour ce profil."
+            description="Votre encadreur n'a défini aucun livrable pour ce profil."
           />
         </CardContent>
       </Card>
@@ -134,11 +137,16 @@ export function PanneauLivrables({
             )}
 
             {role === "etudiant" &&
-              (item.statut === "a_faire" || item.statut === "en_correction") && (
-                <div className="ml-7">
+              (item.statut === "a_faire" || item.statut === "en_cours" || item.statut === "en_correction") && (
+                <div className="ml-7 flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => setDepotOuvert(item)}>
                     {item.statut === "en_correction" ? "Redéposer" : "Déposer"}
                   </Button>
+                  {item.statut === "a_faire" && onMarquerEnCours && (
+                    <Button size="sm" variant="ghost" onClick={() => onMarquerEnCours(item)}>
+                      Marquer en cours
+                    </Button>
+                  )}
                 </div>
               )}
 

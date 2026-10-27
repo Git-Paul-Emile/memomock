@@ -8,6 +8,7 @@
  * d'être recopiée dans chaque écran (DRY).
  */
 
+import { FIN_ANNEE_PAR_DEFAUT, RENTREE_PAR_DEFAUT } from "./afrique";
 import type { DocumentSubmission, Promotion, StatutDocument, TypeDocument } from "@/types";
 
 /** Variantes de badge exposées par `components/ui/badge.tsx`. */
@@ -106,7 +107,7 @@ export function libellePromotion(anneeDebut: number, anneeFin: number): string {
   return `${anneeDebut}-${anneeFin}`;
 }
 
-/** Période couverte par une promotion, en toutes lettres (« 1 oct. 2025 → 30 juin 2026 »). */
+/** Période couverte par une promotion, en toutes lettres (« 1 nov. 2025 → 31 juil. 2026 »). */
 export function periodePromotion(promotion: Pick<Promotion, "dateDebut" | "dateFin">): string {
   const format = new Intl.DateTimeFormat("fr-FR", {
     day: "numeric",
@@ -117,13 +118,14 @@ export function periodePromotion(promotion: Pick<Promotion, "dateDebut" | "dateF
 }
 
 /**
- * Dates par défaut d'une année académique : rentrée au 1er octobre de l'année de début,
- * clôture au 30 juin de l'année de fin.
+ * Dates par défaut d'une année académique, alignées sur le calendrier LMD le plus courant en
+ * Afrique de l'Ouest et centrale : rentrée le 1er novembre de l'année de début, clôture le
+ * 31 juillet de l'année de fin (voir lib/afrique.ts). L'établissement peut les ajuster.
  */
 export function datesParDefautPromotion(anneeDebut: number, anneeFin: number) {
   return {
-    dateDebut: new Date(Date.UTC(anneeDebut, 9, 1)).toISOString(),
-    dateFin: new Date(Date.UTC(anneeFin, 5, 30)).toISOString(),
+    dateDebut: new Date(Date.UTC(anneeDebut, RENTREE_PAR_DEFAUT.mois, RENTREE_PAR_DEFAUT.jour)).toISOString(),
+    dateFin: new Date(Date.UTC(anneeFin, FIN_ANNEE_PAR_DEFAUT.mois, FIN_ANNEE_PAR_DEFAUT.jour)).toISOString(),
   };
 }
 

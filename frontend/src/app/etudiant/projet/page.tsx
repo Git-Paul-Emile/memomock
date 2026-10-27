@@ -146,6 +146,29 @@ export default function MonProjetPage() {
     livrablesData?.validations ?? []
   );
 
+  const marquerEnCours = async (item: LivrableAffiche) => {
+    if (!document) return;
+    const maintenant = new Date().toISOString();
+    try {
+      await apiPost<Livrable>("livrables", {
+        documentId: document.id,
+        definitionId: item.definitionId,
+        nom: item.nom,
+        type: item.type,
+        obligatoire: item.obligatoire,
+        statut: "en_cours",
+        nomFichier: null,
+        tailleOctets: null,
+        urlExterne: null,
+        createdAt: maintenant,
+        updatedAt: maintenant,
+      });
+      refetch();
+    } catch {
+      toast.error("Le statut n'a pas pu être mis à jour.");
+    }
+  };
+
   const deposerLivrable = async (
     item: LivrableAffiche,
     valeurs: { fichier?: File; urlExterne?: string }
@@ -354,7 +377,12 @@ export default function MonProjetPage() {
       </Card>
 
       <div className="mb-4">
-        <PanneauLivrables items={livrablesAffiches} role="etudiant" onDeposer={deposerLivrable} />
+        <PanneauLivrables
+          items={livrablesAffiches}
+          role="etudiant"
+          onDeposer={deposerLivrable}
+          onMarquerEnCours={marquerEnCours}
+        />
       </div>
 
       {chapitresAffiches.length > 0 && (

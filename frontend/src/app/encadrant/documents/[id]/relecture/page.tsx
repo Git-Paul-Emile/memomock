@@ -28,6 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { apiGet, apiList, apiPatch, apiPost } from "@/lib/api";
 import { resoudreChapitres, type ChapitreAffiche } from "@/lib/canevas";
+import { finaliserDecision } from "@/lib/decision";
 import { NIVEAU_ALERTE_VARIANT } from "@/lib/constants";
 import { formatDateTime, getInitials } from "@/lib/utils";
 import type {
@@ -150,7 +151,7 @@ export default function RelectureDocumentPage() {
       await apiPost("notifications", {
         userId: document.etudiantId,
         titre: "Chapitre validé",
-        message: `« ${item.titre} » a été validé par votre encadrant.`,
+        message: `« ${item.titre} » a été validé par votre encadreur.`,
         type: "validation",
         lu: false,
         date: maintenant,
@@ -221,6 +222,7 @@ export default function RelectureDocumentPage() {
 
   const valider = async () => {
     if (!document) return;
+    await finaliserDecision(document, "valide");
     await apiPatch("documents", document.id, {
       statut: "valide",
       dateMaj: new Date().toISOString(),
@@ -228,7 +230,7 @@ export default function RelectureDocumentPage() {
     await apiPost("notifications", {
       userId: document.etudiantId,
       titre: "Mémoire validé",
-      message: `Félicitations, « ${document.titre} » a été validé par votre encadrant.`,
+      message: `Félicitations, « ${document.titre} » a été validé par votre encadreur.`,
       type: "validation",
       lu: false,
       date: new Date().toISOString(),
@@ -248,6 +250,7 @@ export default function RelectureDocumentPage() {
         date: new Date().toISOString(),
       });
     }
+    await finaliserDecision(document, "rejete");
     await apiPatch("documents", document.id, {
       statut: "rejete",
       dateMaj: new Date().toISOString(),
@@ -255,7 +258,7 @@ export default function RelectureDocumentPage() {
     await apiPost("notifications", {
       userId: document.etudiantId,
       titre: "Révision demandée",
-      message: `Votre encadrant a demandé des corrections sur « ${document.titre} ».`,
+      message: `Votre encadreur a demandé des corrections sur « ${document.titre} ».`,
       type: "validation",
       lu: false,
       date: new Date().toISOString(),
@@ -268,7 +271,7 @@ export default function RelectureDocumentPage() {
 
   /**
    * Décision distincte de « Demander une révision » (spec section 28) : reprise jugée trop
-   * importante par l'encadrant, statut `refuse` plutôt que `rejete`.
+   * importante par l'encadreur, statut `refuse` plutôt que `rejete`.
    */
   const refuser = async () => {
     if (!document) return;
@@ -280,6 +283,7 @@ export default function RelectureDocumentPage() {
         date: new Date().toISOString(),
       });
     }
+    await finaliserDecision(document, "refuse");
     await apiPatch("documents", document.id, {
       statut: "refuse",
       dateMaj: new Date().toISOString(),
@@ -287,7 +291,7 @@ export default function RelectureDocumentPage() {
     await apiPost("notifications", {
       userId: document.etudiantId,
       titre: "Document refusé",
-      message: `Votre encadrant a refusé « ${document.titre} » - une reprise importante est nécessaire.`,
+      message: `Votre encadreur a refusé « ${document.titre} » - une reprise importante est nécessaire.`,
       type: "validation",
       lu: false,
       date: new Date().toISOString(),

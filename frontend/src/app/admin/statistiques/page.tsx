@@ -29,7 +29,7 @@ const RepartitionChart = dynamic(
 /**
  * Écran « Statistiques de la plateforme » (spec écrans F27-F32, consolidés) : vue d'ensemble
  * de l'activité - nombre d'étudiants/encadrants, documents par statut/type/discipline,
- * classement par encadrant, taux de validation. Calculé côté client à partir des listes déjà
+ * classement par encadreur, taux de validation. Calculé côté client à partir des listes déjà
  * exposées (pas d'endpoint d'agrégation dédié) - un administrateur voit l'intégralité des
  * données (voir authorize.list, `estAdmin`).
  *
@@ -91,7 +91,7 @@ export default function AdminStatistiquesPage() {
       .slice(0, 8);
   }, [documents]);
 
-  // F30 : classement par encadrant.
+  // F30 : classement par encadreur.
   const statsParEncadrant = React.useMemo(() => {
     const encadrantsList = utilisateurs.filter((u) => u.role === "encadrant");
     return encadrantsList
@@ -131,7 +131,7 @@ export default function AdminStatistiquesPage() {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <Users className="size-4" />
-              Encadrants
+              Encadreurs
             </CardTitle>
           </CardHeader>
           <CardContent className="text-2xl font-semibold">{encadrants}</CardContent>

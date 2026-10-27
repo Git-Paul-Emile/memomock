@@ -24,6 +24,8 @@ import {
   GraduationCap,
   ScrollText,
   UserCog,
+  MessagesSquare,
+  BookOpen,
   type LucideIcon,
 } from "lucide-react";
 
@@ -53,6 +55,8 @@ const ICONS: Record<string, LucideIcon> = {
   GraduationCap,
   ScrollText,
   UserCog,
+  MessagesSquare,
+  BookOpen,
 };
 
 export function NavIcon({ name, className }: { name: string; className?: string }) {

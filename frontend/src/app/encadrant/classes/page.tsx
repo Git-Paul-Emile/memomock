@@ -42,7 +42,7 @@ function genererCodeClasse() {
 const NIVEAUX: TypeDocument[] = ["licence", "master", "doctorat"];
 
 /**
- * Classes suivies par l'encadrant connecté (spec sections 9, 71) - qu'elles soient rattachées à
+ * Classes suivies par l'encadreur connecté (spec sections 9, 71) - qu'elles soient rattachées à
  * un établissement ou créées en mode indépendant (spec section 95, `etablissementId: null`).
  */
 export default function ClassesEncadrantPage() {

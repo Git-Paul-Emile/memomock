@@ -14,8 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { apiGet, apiList } from "@/lib/api";
+import { apiGet, apiList, apiPatch } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { LIBELLES_CATEGORIE_COMMENTAIRE } from "@/types";
 import type {
   CommentaireMarge,
   DocumentSubmission,
@@ -35,9 +36,9 @@ interface DonneesRetour {
 }
 
 /**
- * Écran « Retour de l'encadrant » côté étudiant.
+ * Écran « Retour de l'encadreur » côté étudiant.
  *
- * Affiche les modifications directes de l'encadrant (texte barré = supprimé, souligné = ajouté),
+ * Affiche les modifications directes de l'encadreur (texte barré = supprimé, souligné = ajouté),
  * les commentaires en marge et la note / l'appréciation de fond - le tout chargé depuis la base
  * (document, segments de révision, commentaires en marge).
  */
@@ -92,7 +93,17 @@ export default function RetourEncadrantPage() {
 
   const document = data?.document ?? null;
   const encadrant = data?.encadrant ?? null;
-  const commentaires = data?.commentaires ?? [];
+  const [commentaires, setCommentaires] = useSyncedState<CommentaireMarge[]>(data?.commentaires, []);
+
+  // L'étudiant signale un commentaire comme traité ; l'encadreur peut le rouvrir (spec v2, § 34).
+  const basculerTraite = async (commentaire: CommentaireMarge) => {
+    const resolu = !commentaire.resolu;
+    const misAJour = await apiPatch<CommentaireMarge>("commentaires-marge", commentaire.id, {
+      resolu,
+      dateResolution: resolu ? new Date().toISOString() : null,
+    });
+    setCommentaires((prev) => prev.map((c) => (c.id === misAJour.id ? misAJour : c)));
+  };
   const [reponses, setReponses] = useSyncedState<ReponseCommentaire[]>(data?.reponses, []);
 
   const paragraphesSurlignes = React.useMemo(
@@ -123,12 +134,12 @@ export default function RetourEncadrantPage() {
     );
   }
 
-  const nomEncadrant = encadrant ? `${encadrant.prenom} ${encadrant.nom}` : "votre encadrant";
+  const nomEncadrant = encadrant ? `${encadrant.prenom} ${encadrant.nom}` : "votre encadreur";
 
   return (
     <div className="mx-auto max-w-5xl">
       <PageHeader
-        title="Retour de votre encadrant"
+        title="Retour de votre encadreur"
         description={document.titre}
         actions={
           <Button variant="outline" size="sm" asChild>
@@ -211,7 +222,7 @@ export default function RetourEncadrantPage() {
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-sm">
                 <MessageSquare className="size-4 text-muted-foreground" />
-                Commentaires en marge
+                Commentaires en marge ({commentaires.filter((c) => !c.resolu).length} à traiter)
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -221,10 +232,28 @@ export default function RetourEncadrantPage() {
                 commentaires.map((c, index) => (
                   <div key={c.id}>
                     <div className="flex items-start gap-2">
-                      <Badge variant="warning" className="mt-0.5 shrink-0">
+                      <Badge variant={c.resolu ? "success" : "warning"} className="mt-0.5 shrink-0">
                         {c.numero}
                       </Badge>
-                      <p className="text-sm text-muted-foreground">{c.texte}</p>
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <p className={cn("text-sm text-muted-foreground", c.resolu && "line-through")}>
+                          {c.texte}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {c.categorie && (
+                            <Badge variant="outline" className="text-[10px]">
+                              {LIBELLES_CATEGORIE_COMMENTAIRE[c.categorie]}
+                            </Badge>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => basculerTraite(c)}
+                            className="text-[11px] text-primary hover:underline"
+                          >
+                            {c.resolu ? "Marquer comme non traité" : "Marquer comme traité"}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                     <FilCommentaire
                       commentaireMargeId={c.id}
@@ -240,8 +269,23 @@ export default function RetourEncadrantPage() {
             </CardContent>
           </Card>
 
-          <Button className="w-full" asChild>
-            <Link href={`/etudiant/documents/${id}/correction`}>Retravailler mon document</Link>
+          {["rejete", "refuse"].includes(document.statut) && (
+            <Card>
+              <CardContent className="space-y-2 pt-6 text-sm text-muted-foreground">
+                <p>
+                  Après vos modifications, réimportez votre document : il sera réanalysé, puis
+                  vous pourrez soumettre la version révisée.
+                </p>
+                <Button className="w-full" asChild>
+                  <Link href={`/etudiant/soumission?documentId=${id}`}>
+                    Réimporter la version révisée
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+          <Button variant="outline" className="w-full" asChild>
+            <Link href={`/etudiant/documents/${id}/correction`}>Demander de l&apos;aide au tuteur IA</Link>
           </Button>
         </div>
       </div>

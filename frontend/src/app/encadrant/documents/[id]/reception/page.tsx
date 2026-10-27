@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { CheckCircle2, Download, Eye, FileText, PenLine } from "lucide-react";
+import { Download, Eye, PenLine } from "lucide-react";
 
 import { toast } from "sonner";
 
@@ -11,6 +11,10 @@ import { useApiResource } from "@/hooks/use-api-resource";
 import { PanneauLivrables } from "@/components/livrables/panneau-livrables";
 import { PageHeader } from "@/components/shared/page-header";
 import { ScoreJauge } from "@/components/shared/score-jauge";
+import { DetailScores } from "@/components/shared/detail-scores";
+import { BadgeSourceIa, PointAnalyseCarte } from "@/components/documents/point-analyse";
+import { FilMessagerie } from "@/components/documents/fil-messagerie";
+import { LIBELLE_SCORE } from "@/lib/score";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,6 +38,8 @@ interface DonneesReception {
   etudiant: PublicUser | null;
   points: PointAnalyse[];
   livrables: LivrableAffiche[];
+  // Nombre d'analyses successives (réimports) : mesure les corrections faites avant soumission.
+  nbVersions: number;
 }
 
 /**
@@ -57,11 +63,13 @@ export default function ReceptionPage() {
           : Promise.resolve(null),
         apiList<Livrable>("livrables", { filtres: { documentId: id }, limite: 50 }),
       ]);
+      const versions = await apiList<{ id: string }>("versions", { filtres: { documentId: id }, limite: 200 });
       return {
         document: doc,
         etudiant: etu,
         points: analyses.data.flatMap((a) => a.points),
         livrables: resoudreLivrables(profil?.livrablesAttendus ?? [], livrablesRes.data),
+        nbVersions: versions.data.length,
       };
     }
   );
@@ -91,7 +99,7 @@ export default function ReceptionPage() {
         titre: decision === "valide" ? "Livrable conforme" : "Livrable à corriger",
         message:
           decision === "valide"
-            ? `« ${item.nom} » a été validé par votre encadrant.`
+            ? `« ${item.nom} » a été validé par votre encadreur.`
             : `« ${item.nom} » nécessite une correction : ${commentaire}`,
         type: "correction",
         lu: false,
@@ -119,7 +127,7 @@ export default function ReceptionPage() {
     <div className="mx-auto max-w-4xl">
       <PageHeader
         title={document.titre}
-        description={`Version ${document.version} · ${document.nomFichier}`}
+        description={`Version ${document.version}${document.version > 1 ? " (révisée)" : ""}${document.nomFichier ? ` · ${document.nomFichier}` : ""}`}
         actions={
           <>
             <Button variant="outline" size="sm" asChild>
@@ -136,6 +144,7 @@ export default function ReceptionPage() {
                 </a>
               </Button>
             )}
+            <BadgeSourceIa source={document.sourceAnalyse} />
             <StatusBadge statut={document.statut} />
           </>
         }
@@ -184,7 +193,10 @@ export default function ReceptionPage() {
             <CardHeader>
               <CardTitle className="text-base">Résumé du prétraitement IA</CardTitle>
               <CardDescription>
-                Les corrections de forme sont déjà faites : concentrez-vous sur le fond.
+                {points.filter((p) => p.niveau !== "succes").length} point(s) à surveiller, dont{" "}
+                {points.filter((p) => p.avisEncadreur).length} relevant de votre jugement
+                scientifique. Les problèmes de forme ont été traités en amont : concentrez-vous
+                sur le fond.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -193,28 +205,24 @@ export default function ReceptionPage() {
                   Aucune analyse disponible pour ce document.
                 </p>
               ) : (
-                points.map((point) => (
-                  <div key={point.id} className="flex items-start gap-3 rounded-lg border p-3">
-                    {point.niveau === "succes" ? (
-                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" />
-                    ) : (
-                      <FileText
-                        className={`mt-0.5 size-4 shrink-0 ${
-                          point.niveau === "erreur" ? "text-destructive" : "text-warning"
-                        }`}
-                      />
-                    )}
-                    <div>
-                      <p className="text-sm font-medium">{point.libelle}</p>
-                      <p className="text-sm text-muted-foreground">{point.detail}</p>
-                    </div>
-                  </div>
-                ))
+                [...points]
+                  .sort((a, b) => Number(!!b.avisEncadreur) - Number(!!a.avisEncadreur))
+                  .filter((p) => p.niveau !== "succes")
+                  .map((point) => <PointAnalyseCarte key={point.id} point={point} />)
               )}
             </CardContent>
           </Card>
 
           <PanneauLivrables items={livrables} role="encadrant" onVerifier={verifierLivrable} />
+
+          <Card className="h-[420px] gap-0 overflow-hidden p-0">
+            <CardHeader className="border-b py-3">
+              <CardTitle className="text-sm">Messagerie avec l&apos;étudiant</CardTitle>
+            </CardHeader>
+            <div className="h-[360px]">
+              <FilMessagerie document={document} />
+            </div>
+          </Card>
         </div>
 
         <div className="space-y-4">
@@ -224,16 +232,16 @@ export default function ReceptionPage() {
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-3">
               <ScoreJauge score={document.scoreConformite} />
-              <div className="w-full space-y-1 text-xs text-muted-foreground">
-                <div className="flex justify-between">
-                  <span>Forme</span>
-                  <span className="font-medium text-foreground">{document.scoreForme}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Fond</span>
-                  <span className="font-medium text-foreground">{document.scoreFond}</span>
-                </div>
-              </div>
+              <p className="text-center text-[11px] leading-tight text-muted-foreground">
+                {LIBELLE_SCORE}
+              </p>
+              <DetailScores document={document} compact />
+              <p className="w-full border-t pt-2 text-xs text-muted-foreground">
+                {data?.nbVersions ?? 0} version(s) soumise(s) ·{" "}
+                {(document.pointsBloquants?.length ?? 0) === 0
+                  ? "aucun point bloquant"
+                  : `${document.pointsBloquants!.length} point(s) bloquant(s)`}
+              </p>
             </CardContent>
           </Card>
 

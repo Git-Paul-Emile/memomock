@@ -17,14 +17,16 @@ export interface ChapitreAffiche {
 /**
  * Fusionne les chapitres d'un canevas avec les décisions déjà prises pour un document donné.
  * Un chapitre sans décision correspondante reste "en_attente" - aucune ligne `ValidationChapitre`
- * n'est persistée tant que l'encadrant n'a rien décidé (même convention que `resoudreLivrables`).
+ * n'est persistée tant que l'encadreur n'a rien décidé (même convention que `resoudreLivrables`).
  */
 export function resoudreChapitres(
   chapitres: ChapitreCanevas[],
   criteres: CritereChapitre[],
   validations: ValidationChapitre[]
 ): ChapitreAffiche[] {
-  return [...chapitres]
+  // La validation se fait par chapitre de premier niveau : les sous-sections en font partie.
+  return chapitres
+    .filter((chapitre) => !chapitre.parentId)
     .sort((a, b) => a.ordre - b.ordre)
     .map((chapitre) => {
       const validation = validations.find((v) => v.chapitreId === chapitre.id) ?? null;

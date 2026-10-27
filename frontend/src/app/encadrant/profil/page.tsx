@@ -12,6 +12,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ListeLivrablesAttendus } from "@/components/profil/liste-livrables-attendus";
 import { ListeReferences } from "@/components/profil/liste-references";
+import { PanneauReglesProfil } from "@/components/profil/panneau-regles-profil";
 import { SelecteurProfil } from "@/components/profil/selecteur-profil";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -23,12 +24,17 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+
 import { apiList, apiPatch } from "@/lib/api";
+import { ExtractionTexteError, extraireTexte } from "@/lib/extraction-texte";
+import { extraireReglesAvecIa } from "@/lib/ia/client";
 import type {
   Canevas,
   ElementReference,
   LivrableDefinition,
   ProfilEncadrant,
+  RegleProfil,
   TypeLivrable,
 } from "@/types";
 
@@ -93,19 +99,66 @@ export default function ProfilEncadrantPage() {
     setProfils((prev) => prev.map((p) => (p.id === misAJour.id ? misAJour : p)));
   };
 
+  const mettreAJourRegles = async (regles: RegleProfil[]) => {
+    if (!profilSelectionne) return;
+    const misAJour = await apiPatch<ProfilEncadrant>("profils-encadrant", profilSelectionne.id, {
+      reglesProfil: regles,
+      updatedAt: new Date().toISOString(),
+    });
+    setProfils((prev) => prev.map((p) => (p.id === misAJour.id ? misAJour : p)));
+  };
+
+  /** Lit la ressource téléversée et en fait extraire les règles par l'IA (spec v2, § 19). */
+  const extraireRegles = async (fichier: File, titre: string): Promise<RegleProfil[]> => {
+    if (!profilSelectionne) return [];
+    try {
+      const texte = await extraireTexte(fichier);
+      if (!texte) {
+        toast.info("Aucun texte lisible dans ce fichier (document scanné ?).");
+        return [];
+      }
+      const { source, resultat } = await extraireReglesAvecIa({
+        texte,
+        titreRessource: titre,
+        typeDocument: profilSelectionne.typeDocument,
+        discipline: profilSelectionne.discipline,
+      });
+      toast.success(
+        `${resultat.length} règle(s) extraite(s)${source === "simulation" ? " (extraction simplifiée, IA indisponible)" : ""} : vérifiez-les dans « Règles du profil ».`
+      );
+      return resultat.map((r) => ({
+        id: crypto.randomUUID(),
+        categorie: r.categorie,
+        libelle: r.libelle,
+        detail: r.detail ?? null,
+        source: "ia",
+        ressource: titre,
+        statut: "a_verifier",
+      }));
+    } catch (err) {
+      toast.error(err instanceof ExtractionTexteError ? err.message : "La ressource n'a pas pu être analysée.");
+      return [];
+    }
+  };
+
   const ajouterElement = async (
     categorie: Categorie,
-    item: { titre: string; description: string }
+    item: { titre: string; description: string; fichier?: File | null }
   ) => {
     if (!profilSelectionne) return;
     const nouvelElement: ElementReference = {
       id: crypto.randomUUID(),
       titre: item.titre,
       description: item.description,
+      nomFichier: item.fichier?.name ?? null,
       ajouteLe: new Date().toISOString(),
     };
+    const reglesExtraites = item.fichier ? await extraireRegles(item.fichier, item.titre) : [];
     const misAJour = await apiPatch<ProfilEncadrant>("profils-encadrant", profilSelectionne.id, {
       [categorie]: [...profilSelectionne[categorie], nouvelElement],
+      ...(reglesExtraites.length > 0
+        ? { reglesProfil: [...(profilSelectionne.reglesProfil ?? []), ...reglesExtraites] }
+        : {}),
       updatedAt: new Date().toISOString(),
     });
     setProfils((prev) => prev.map((p) => (p.id === misAJour.id ? misAJour : p)));
@@ -214,6 +267,11 @@ export default function ProfilEncadrantPage() {
               </Select>
             </CardContent>
           </Card>
+
+          <PanneauReglesProfil
+            regles={profilSelectionne.reglesProfil ?? []}
+            onChange={mettreAJourRegles}
+          />
 
           <Tabs defaultValue="guidesRedaction">
             <TabsList className="mb-4 flex-wrap">

@@ -1,0 +1,1050 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>MemoAssistant AI — Spécification fonctionnelle et produit v2.0</title>
+<style>
+  :root {
+    --ink: #1c2430;
+    --muted: #5b6575;
+    --accent: #1f4e79;
+    --accent-soft: #e8eef6;
+    --line: #d5dbe3;
+    --ok: #1d7a46;
+    --ok-soft: #e3f3ea;
+    --warn: #9a5b00;
+    --warn-soft: #fbf0dc;
+    --todo: #8a2432;
+    --todo-soft: #f8e4e7;
+  }
+  @page {
+    size: A4;
+    margin: 22mm 18mm 20mm 18mm;
+    @bottom-right { content: counter(page); font: 9pt "Segoe UI", sans-serif; color: #5b6575; }
+    @bottom-left { content: "MemoAssistant AI — Spécification v2.0"; font: 9pt "Segoe UI", sans-serif; color: #5b6575; }
+  }
+  @page :first {
+    @bottom-right { content: none; }
+    @bottom-left { content: none; }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0;
+    background: #fff;
+    color: var(--ink);
+    font: 10.5pt/1.5 "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  }
+  h1, h2, h3, h4 { color: var(--accent); line-height: 1.25; break-after: avoid; }
+  h1.partie {
+    break-before: page;
+    font-size: 22pt;
+    margin: 0 0 6mm;
+    padding-bottom: 3mm;
+    border-bottom: 2px solid var(--accent);
+  }
+  h1.partie .num { display: block; font-size: 10pt; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 1mm; }
+  h2 { font-size: 14.5pt; margin: 9mm 0 3mm; }
+  h3 { font-size: 11.5pt; margin: 6mm 0 2mm; color: var(--ink); }
+  h4 { font-size: 10.5pt; margin: 4mm 0 1mm; color: var(--ink); }
+  p { margin: 0 0 2.5mm; }
+  ul, ol { margin: 0 0 3mm; padding-left: 6mm; }
+  li { margin-bottom: .6mm; }
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 9.5pt; break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  th, td { border: 1px solid var(--line); padding: 1.6mm 2.2mm; vertical-align: top; text-align: left; }
+  th { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  code { font-family: Consolas, "Cascadia Mono", monospace; font-size: 9pt; background: #f2f4f7; padding: 0 1mm; border-radius: 1mm; }
+  .note {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 2.5mm 3.5mm;
+    margin: 3mm 0 4mm;
+    break-inside: avoid;
+  }
+  .note.decision { border-color: var(--warn); background: var(--warn-soft); }
+  .note.garde { border-color: var(--todo); background: var(--todo-soft); }
+  .note strong:first-child { display: block; margin-bottom: .8mm; }
+  .citation { font-size: 12pt; font-style: italic; color: var(--accent); text-align: center; margin: 4mm 0; }
+  .flux { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5mm; margin: 3mm 0 4mm; break-inside: avoid; }
+  .flux span { border: 1px solid var(--accent); border-radius: 1.2mm; padding: 1mm 2.2mm; font-size: 9pt; background: #fff; }
+  .flux i { color: var(--muted); font-style: normal; }
+  .etat { display: inline-block; font-size: 8pt; font-weight: 600; padding: .2mm 1.6mm; border-radius: 1mm; white-space: nowrap; }
+  .etat.ok { color: var(--ok); background: var(--ok-soft); }
+  .etat.part { color: var(--warn); background: var(--warn-soft); }
+  .etat.todo { color: var(--todo); background: var(--todo-soft); }
+  .muted { color: var(--muted); }
+
+  /* Page de garde */
+  .garde-page { height: 250mm; display: flex; flex-direction: column; justify-content: space-between; }
+  .garde-page .haut { margin-top: 30mm; }
+  .garde-page .type { font-size: 11pt; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .garde-page .titre { font-size: 34pt; font-weight: 700; color: var(--accent); margin: 6mm 0 3mm; }
+  .garde-page .sous { font-size: 14pt; color: var(--ink); max-width: 140mm; }
+  .garde-page .bloc { border-top: 2px solid var(--accent); padding-top: 4mm; font-size: 10pt; }
+  .garde-page .bloc table td { border: none; padding: .8mm 0; }
+  .garde-page .bloc table td:first-child { color: var(--muted); width: 45mm; }
+
+  /* Sommaire */
+  .sommaire { break-before: page; }
+  .sommaire ol { list-style: none; padding: 0; }
+  .sommaire > ol > li { margin: 2.5mm 0 1mm; font-weight: 600; }
+  .sommaire ol ol { padding-left: 6mm; font-weight: 400; columns: 2; column-gap: 8mm; }
+  .sommaire ol ol li { break-inside: avoid; }
+  .sommaire a { color: var(--ink); text-decoration: none; }
+  a { color: var(--accent); }
+  .legende { display: flex; gap: 6mm; flex-wrap: wrap; font-size: 9pt; margin: 2mm 0 4mm; }
+</style>
+</head>
+<body>
+
+<!-- ===================================================================== -->
+<section class="garde-page">
+  <div class="haut">
+    <div class="type">Document de conception fonctionnelle et produit</div>
+    <div class="titre">MemoAssistant AI</div>
+    <div class="sous">Plateforme intelligente d'accompagnement et de pré-validation académique personnalisée</div>
+    <p class="citation" style="text-align:left;margin-top:12mm">« L'IA prépare, l'étudiant améliore, l'encadreur décide. »</p>
+  </div>
+  <div class="bloc">
+    <table>
+      <tr><td>Version</td><td><strong>2.0 — spécification consolidée</strong></td></tr>
+      <tr><td>Date</td><td>27 octobre 2026</td></tr>
+      <tr><td>Sources fusionnées</td><td>Document de conception fonctionnelle et produit v1.0 ; cahier des fonctionnalités (<code>feature.md</code>) ; maquette fonctionnelle Next.js (mock)</td></tr>
+      <tr><td>Usage</td><td>Référence unique pour la conception (UX/UI) et le développement</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===================================================================== -->
+<nav class="sommaire">
+  <h2 style="margin-top:0">Sommaire</h2>
+  <ol>
+    <li><a href="#p0">Avant-propos — comment lire ce document</a></li>
+    <li><a href="#p1">Partie I — Vision produit</a>
+      <ol>
+        <li>1. Présentation générale</li><li>2. Le problème</li><li>3. La solution</li><li>4. Positionnement</li><li>5. Objectifs</li><li>6. Principe directeur et garde-fous</li><li>7. Proposition de valeur et vision</li>
+      </ol></li>
+    <li><a href="#p2">Partie II — Acteurs, organisation et accès</a>
+      <ol>
+        <li>8. Les rôles</li><li>9. Modes d'utilisation</li><li>10. Organisation académique</li><li>11. Rattachement étudiant ↔ encadreur</li><li>12. Matrice des permissions</li>
+      </ol></li>
+    <li><a href="#p3">Partie III — Le référentiel de l'encadreur</a>
+      <ol>
+        <li>13. Le profil méthodologique</li><li>14. Ressources et normes</li><li>15. Le canevas</li><li>16. Contraintes de forme</li><li>17. Grille et seuils</li><li>18. Livrables attendus</li><li>19. Onboarding de l'encadreur</li><li>20. Hiérarchie des règles</li>
+      </ol></li>
+    <li><a href="#p4">Partie IV — Parcours de l'étudiant</a>
+      <ol>
+        <li>21. Vue d'ensemble</li><li>22. Création du document</li><li>23. Import et analyse IA</li><li>24. Score de conformité</li><li>25. Seuil de soumission</li><li>26. Boucle de correction</li><li>27. Tuteur IA</li><li>28. Soumission officielle</li><li>29. Retour et révision</li><li>30. Projet, livrables, planning, export</li>
+      </ol></li>
+    <li><a href="#p5">Partie V — Parcours de l'encadreur</a>
+      <ol>
+        <li>31. Tableau de bord</li><li>32. Réception</li><li>33. Correction</li><li>34. Commentaires</li><li>35. Validation par chapitre</li><li>36. Décision finale</li><li>37. Versions</li><li>38. Boucle d'apprentissage</li><li>39. Planning et retards</li><li>40. Classes et communication</li><li>41. Statistiques</li>
+      </ol></li>
+    <li><a href="#p6">Partie VI — Espace établissement</a></li>
+    <li><a href="#p7">Partie VII — Administration de la plateforme</a></li>
+    <li><a href="#p8">Partie VIII — Fonctions transverses</a></li>
+    <li><a href="#p9">Partie IX — Référentiels techniques</a>
+      <ol>
+        <li>Cycle de vie du document</li><li>Autres cycles de vie</li><li>Modèle de données</li><li>API REST</li><li>Inventaire des écrans</li><li>Architecture mock → production</li>
+      </ol></li>
+    <li><a href="#p10">Partie X — Décisions, écarts et feuille de route</a></li>
+  </ol>
+</nav>
+
+<!-- ===================================================================== -->
+<h1 class="partie" id="p0"><span class="num">Avant-propos</span>Comment lire ce document</h1>
+
+<p>Ce document fusionne trois sources qui décrivaient le même produit sous des angles différents :</p>
+<ul>
+  <li><strong>Le document de conception v1.0</strong> : vision, problème, principe de personnalisation de l'IA par encadreur, boucle d'apprentissage, score et seuil de soumission. Il reste la <strong>référence produit</strong>.</li>
+  <li><strong>Le cahier des fonctionnalités</strong> (<code>feature.md</code>, 98 fonctionnalités) : établissements, classes, canevas, livrables, validation par chapitre, planning, mise en relation, modèle économique.</li>
+  <li><strong>La maquette fonctionnelle</strong> (application Next.js sans backend réel, données servies par un mock) : elle implémente déjà une grande partie du parcours et a précisé de nombreux choix (statuts, entités, écrans, règles de calcul).</li>
+</ul>
+<p>Lorsque les sources divergeaient, un arbitrage a été fait pour obtenir un ensemble cohérent. Chaque arbitrage est signalé dans le texte par un encadré <em>Décision de fusion</em> et récapitulé en <a href="#p10">partie X</a>.</p>
+
+<h3>Indicateurs d'état</h3>
+<p>Chaque fonctionnalité porte un indicateur qui décrit son état <strong>dans la maquette actuelle</strong> :</p>
+<div class="legende">
+  <span><span class="etat ok">Maquetté</span> écran et comportement présents (données mock)</span>
+  <span><span class="etat part">Partiel</span> présent mais simplifié par rapport à la cible</span>
+  <span><span class="etat todo">À concevoir</span> décrit dans la cible, absent de la maquette</span>
+</div>
+<p>« Maquetté » ne veut pas dire « prêt pour la production » : toute l'IA est simulée et l'authentification est fictive (voir <a href="#p9">partie IX</a>).</p>
+
+<h3>Conventions de vocabulaire</h3>
+<table>
+  <thead><tr><th style="width:28%">Terme</th><th>Définition</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Document</strong> (ou mémoire)</td><td>Le travail académique de l'étudiant : mémoire de Licence, de Master ou thèse de Doctorat. Il porte aussi les métadonnées du projet (sujet, problématique, objectifs, date de soutenance).</td></tr>
+    <tr><td><strong>Encadreur</strong></td><td>Responsable académique du suivi du document. Clé technique du rôle : <code>encadrant</code>. Un « professeur » est un encadreur affilié à un établissement : ce n'est pas un rôle distinct.</td></tr>
+    <tr><td><strong>Profil méthodologique</strong></td><td>Ensemble des exigences d'un encadreur pour un couple <em>type de document × discipline</em>. Base de référence de l'IA.</td></tr>
+    <tr><td><strong>Canevas</strong></td><td>Structure attendue du document : chapitres ordonnés, chacun avec ses critères obligatoires ou optionnels.</td></tr>
+    <tr><td><strong>Score de conformité</strong></td><td>Score <em>estimatif</em> de conformité aux exigences configurées. Ce n'est jamais une note académique.</td></tr>
+    <tr><td><strong>Version</strong></td><td>Instantané figé d'un document à une transition clé (soumission, correction, révision).</td></tr>
+    <tr><td><strong>Règle apprise</strong></td><td>Préférence de l'encadreur détectée par l'IA à partir de ses corrections, puis confirmée, modifiée ou ignorée par lui.</td></tr>
+  </tbody>
+</table>
+
+<!-- ===================================================================== -->
+<h1 class="partie" id="p1"><span class="num">Partie I</span>Vision produit</h1>
+
+<h2>1. Présentation générale</h2>
+<p><strong>MemoAssistant AI</strong> est une plateforme d'accompagnement académique assistée par intelligence artificielle. Elle améliore la rédaction, la vérification et l'encadrement des documents académiques :</p>
+<ul>
+  <li>mémoires de Licence ;</li>
+  <li>mémoires de Master ;</li>
+  <li>thèses de Doctorat.</li>
+</ul>
+<p>Son objectif est de créer un espace de travail où l'étudiant soumet son document à une IA qui l'analyse <strong>selon les exigences de son propre encadreur</strong>, avant toute soumission officielle à ce dernier.</p>
+<p>MemoAssistant AI agit comme un <strong>premier filtre académique</strong>. Il analyse la forme et le fond, détecte les écarts avec les exigences de l'encadreur et propose des améliorations. Il ne remplace pas l'encadreur : il réduit les corrections répétitives pour que l'encadreur consacre son temps aux aspects scientifiques, méthodologiques et critiques.</p>
+
+<h2>2. Le problème</h2>
+<h3>2.1. Un exercice aux exigences multiples</h3>
+<p>L'étudiant doit respecter en même temps les exigences de son établissement, de sa filière, les règles méthodologiques, les normes de citation et de présentation, les exigences scientifiques et les attentes particulières de son encadreur. Il commet souvent des erreurs récurrentes : structure, formulation, grammaire, orthographe, citations, bibliographie, cohérence des parties, argumentation, méthodologie, consignes de l'encadreur. Ces erreurs entraînent de nombreux allers-retours.</p>
+<h3>2.2. Côté étudiant : l'incertitude</h3>
+<p class="citation">« Est-ce que mon document respecte réellement les attentes de mon encadreur ? »</p>
+<p>L'étudiant ne sait pas quand son document est prêt, quelles erreurs sont prioritaires, ce qui risque d'être rejeté, ni si sa méthodologie et son niveau de rédaction sont adaptés. Il transmet donc parfois un document encore très imparfait.</p>
+<h3>2.3. Côté encadreur : le temps perdu</h3>
+<p>L'encadreur suit plusieurs étudiants à la fois. Une partie de son temps part dans des corrections répétitives : orthographe, grammaire, formulations, structure, répétitions, normes bibliographiques, consignes de forme. Il lui reste moins de temps pour ce qui a le plus de valeur : la problématique, la méthodologie, la discussion des résultats, la contribution scientifique, l'orientation de la recherche.</p>
+<h3>2.4. Les limites des IA génériques</h3>
+<p>Les IA génériques appliquent des règles générales. Or deux encadreurs n'ont pas les mêmes attentes : structure, formulation, norme bibliographique, niveau d'analyse, présentation des résultats. La vraie question n'est donc pas « comment corriger un document ? », mais :</p>
+<p class="citation">« Comment vérifier qu'un document correspond aux attentes précises de l'encadreur qui va réellement l'évaluer ? »</p>
+
+<h2>3. La solution</h2>
+<p>MemoAssistant AI crée une IA personnalisée autour des exigences de chaque encadreur. L'encadreur fournit ses guides de rédaction, modèles, référentiels méthodologiques, grilles d'évaluation, normes bibliographiques, consignes de mise en forme et exigences particulières. La plateforme en tire un <strong>profil méthodologique</strong>, qui devient la référence de l'IA pour tous les étudiants rattachés à cet encadreur.</p>
+<p>Le cahier des fonctionnalités et la maquette élargissent ce cœur à l'<strong>organisation complète de l'encadrement</strong> :</p>
+<ul>
+  <li>établissements, filières, classes et promotions ;</li>
+  <li>canevas structurés en chapitres ;</li>
+  <li>validation chapitre par chapitre ;</li>
+  <li>livrables (cahier des charges, maquettes, code…) ;</li>
+  <li>planning des séances et suivi des retards ;</li>
+  <li>tableaux de bord pour chaque rôle.</li>
+</ul>
+
+<h2>4. Positionnement</h2>
+<p>MemoAssistant AI est un intermédiaire intelligent entre l'étudiant et l'encadreur. L'IA intervient <strong>avant</strong> l'encadreur : elle prépare le document, puis l'encadreur apporte son expertise humaine.</p>
+<div class="flux">
+  <span>Étudiant</span><i>→</i><span>Analyse de conformité</span><i>→</i><span>Corrections</span><i>→</i><span>Score de conformité</span><i>→</i><span>Soumission à l'encadreur</span><i>→</i><span>Correction et validation humaine</span><i>→</i><span>Apprentissage de l'IA</span>
+</div>
+
+<h2>5. Objectifs</h2>
+<p><strong>Objectif principal :</strong> réduire la charge de correction répétitive des encadreurs, tout en permettant aux étudiants d'améliorer leurs documents en continu avant la soumission officielle.</p>
+<p><strong>Objectifs secondaires :</strong></p>
+<ol>
+  <li>personnaliser l'assistance IA pour chaque encadreur ;</li>
+  <li>analyser la forme et le fond des documents ;</li>
+  <li>détecter les écarts avec les exigences méthodologiques ;</li>
+  <li>fournir des recommandations d'amélioration ;</li>
+  <li>permettre à l'étudiant de travailler en autonomie, 24 h/24 et 7 j/7 ;</li>
+  <li>mesurer la conformité aux exigences configurées ;</li>
+  <li>réduire les allers-retours dus aux erreurs basiques ;</li>
+  <li>laisser l'encadreur se concentrer sur le scientifique ;</li>
+  <li>apprendre progressivement les préférences réelles de l'encadreur ;</li>
+  <li>organiser le suivi : classes, échéances, livrables, séances, retards ;</li>
+  <li>donner aux établissements une vue d'ensemble de l'avancement de leurs promotions.</li>
+</ol>
+
+<h2>6. Principe directeur et garde-fous</h2>
+<p class="citation">« L'IA prépare, l'étudiant améliore, l'encadreur décide. »</p>
+<div class="note garde">
+  <strong>Ce que MemoAssistant AI ne doit jamais faire</strong>
+  <ul style="margin:0">
+    <li>remplacer l'encadreur, ni présenter ses conclusions comme une validation scientifique ;</li>
+    <li>attribuer seul une note officielle ou valider définitivement une thèse ;</li>
+    <li>transformer automatiquement une correction ponctuelle en règle générale ;</li>
+    <li>appliquer une règle de Licence à une thèse, ou les préférences d'un encadreur à un autre ;</li>
+    <li>réécrire tout le document à la place de l'étudiant ;</li>
+    <li>donner un score qui ressemble à une garantie académique.</li>
+  </ul>
+</div>
+<p>Exigences d'interface qui en découlent :</p>
+<ul>
+  <li>le score est toujours libellé <em>« Score estimatif de conformité aux exigences configurées »</em> ;</li>
+  <li>les points d'analyse délicats sont marqués <em>« Point nécessitant l'avis de votre encadreur »</em> ;</li>
+  <li>la note finale reste sous la responsabilité de l'encadreur ou du jury.</li>
+</ul>
+
+<h2>7. Proposition de valeur et vision</h2>
+<table>
+  <thead><tr><th style="width:20%">Pour</th><th>Bénéfices</th></tr></thead>
+  <tbody>
+    <tr><td><strong>L'étudiant</strong></td><td>Travaille 24 h/24 et 7 j/7 ; reçoit un premier retour immédiat ; comprend les attentes de son encadreur ; identifie ses erreurs ; suit sa progression ; voit ses échéances.</td></tr>
+    <tr><td><strong>L'encadreur</strong></td><td>Corrige moins de fautes répétitives ; reçoit des documents pré-analysés ; se concentre sur le fond ; personnalise l'IA ; gère ses classes, ses séances et ses livrables au même endroit.</td></tr>
+    <tr><td><strong>L'établissement</strong></td><td>Gagne en traçabilité et en homogénéité méthodologique ; réduit les délais d'encadrement ; voit l'avancement par promotion, filière et classe ; repère les apprenants inactifs.</td></tr>
+  </tbody>
+</table>
+<p><strong>Vision à long terme.</strong> Chaque encadreur dispose d'un assistant IA qui reproduit son cadre méthodologique. Plus il utilise la plateforme, plus l'IA comprend ses attentes. Plus les étudiants l'utilisent, plus ils arrivent préparés.</p>
+<div class="flux">
+  <span>Expertise de l'encadreur</span><i>→</i><span>Profil méthodologique</span><i>→</i><span>Assistance IA</span><i>→</i><span>Travail étudiant</span><i>→</i><span>Correction humaine</span><i>→</i><span>Capture des écarts</span><i>→</i><span>Amélioration de l'IA</span>
+</div>
+
+<!-- ===================================================================== -->
+<h1 class="partie" id="p2"><span class="num">Partie II</span>Acteurs, organisation et accès</h1>
+
+<h2>8. Les rôles</h2>
+<div class="note decision">
+  <strong>Décision de fusion — quatre rôles</strong>
+  Le document v1.0 décrivait trois acteurs, en regroupant l'administrateur et l'institution. La maquette les sépare. Le rôle « professeur » de <code>feature.md</code> devient un encadreur affilié à un établissement.
+</div>
+<table>
+  <thead><tr><th style="width:22%">Rôle (clé technique)</th><th>Mission</th><th style="width:30%">Inscription</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Étudiant</strong><br><code>etudiant</code></td><td>Rédige le document, l'améliore avec l'IA, le soumet, répond aux corrections, dépose ses livrables.</td><td>Libre, puis rattachement à un encadreur (§ 11).</td></tr>
+    <tr><td><strong>Encadreur</strong><br><code>encadrant</code></td><td>Configure ses profils méthodologiques et ses canevas, invite ses étudiants, corrige, valide, contrôle les règles apprises, planifie les séances.</td><td>Libre (mode indépendant) ou sur invitation d'un établissement.</td></tr>
+    <tr><td><strong>Administrateur d'établissement</strong><br><code>admin_etablissement</code></td><td>Gère l'espace de son école : structure, promotions, classes, professeurs, apprenants, normes par défaut, abonnement.</td><td>Libre : une école crée elle-même son espace.</td></tr>
+    <tr><td><strong>Super-administrateur</strong><br><code>admin</code></td><td>Équipe MemoAssistant : utilisateurs, forfaits, cohérence des profils, statistiques, audit, supervision technique.</td><td><strong>Jamais</strong> en libre-service : ce rôle ne doit pas pouvoir être choisi à l'inscription.</td></tr>
+  </tbody>
+</table>
+<p>Un administrateur peut donner un <strong>libellé personnalisé</strong> à un compte (par exemple « Coordinateur pédagogique »). Ce libellé est purement cosmétique et ne change aucune permission. Un compte peut aussi être <strong>désactivé</strong> : il ne peut alors plus se connecter. <span class="etat ok">Maquetté</span></p>
+
+<h2>9. Modes d'utilisation</h2>
+<table>
+  <thead><tr><th style="width:22%">Mode</th><th>Description</th><th style="width:14%">État</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Encadreur indépendant</strong></td><td>Un encadreur sans établissement utilise la plateforme seul : compte → profil → canevas → critères → classes et étudiants. Ses classes n'ont pas d'établissement ni de promotion.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td><strong>Établissement</strong></td><td>Une école ou université crée son espace, structure son offre (filières, niveaux, promotions, classes), affecte ses professeurs, suit ses apprenants et fixe ses normes par défaut.</td><td><span class="etat ok">Maquetté</span></td></tr>
+  </tbody>
+</table>
+
+<h2>10. Organisation académique</h2>
+<div class="flux">
+  <span>Établissement</span><i>→</i><span>Filières <span class="muted">(permanentes)</span></span><i>×</i><span>Niveaux <span class="muted">(Licence / Master / Doctorat)</span></span><i>→</i><span>Promotion <span class="muted">(année académique)</span></span><i>→</i><span>Classes</span><i>→</i><span>Groupes</span>
+</div>
+<ul>
+  <li><strong>Filières et niveaux sont permanents.</strong> Ils survivent aux années. Une promotion indique seulement les filières et les niveaux qu'elle ouvre.</li>
+  <li><strong>Une seule promotion active par établissement.</strong> C'est l'année courante, sur laquelle portent les tableaux de bord. Activer une nouvelle promotion archive d'abord l'ancienne. Les promotions archivées restent consultables.</li>
+  <li>Dates par défaut d'une promotion : du 1<sup>er</sup> octobre de l'année de début au 30 juin de l'année de fin. Libellé au format « 2025-2026 ».</li>
+  <li><strong>La classe</strong> (par exemple « Master Informatique — Promotion 2026 ») appartient à une filière, un niveau et une promotion. Elle a un <strong>code de rattachement</strong> et peut avoir <strong>plusieurs encadreurs</strong>, par exemple le professeur A pour les étudiants 1 à 10 et le professeur B pour les étudiants 11 à 20.</li>
+  <li><strong>Les groupes</strong> (A, B, C…) divisent une classe. Ils partagent le même canevas mais sont suivis séparément.</li>
+  <li><strong>Les affectations</strong> relient un encadreur à un périmètre : promotion, filière, niveau, classe, groupe. La liste des encadreurs de la classe reste la référence pour l'accès aux documents. Les deux sont tenues synchronisées.</li>
+</ul>
+<p><span class="etat todo">À concevoir</span> Le document v1.0 mentionne aussi les <strong>départements</strong> et les <strong>disciplines</strong> comme niveaux de règles. La maquette n'a pas d'entité « département », et la discipline y est un texte libre porté par le profil méthodologique. Voir la partie X.</p>
+
+<h2>11. Rattachement étudiant ↔ encadreur</h2>
+<p>Le rattachement identifie l'encadreur, puis le profil méthodologique applicable (et donc le canevas, les contraintes et les seuils).</p>
+<table>
+  <thead><tr><th style="width:22%">Mode</th><th>Fonctionnement</th><th style="width:14%">État</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Code d'invitation encadreur</strong></td><td>L'encadreur génère une invitation (code, éventuellement envoyée par e-mail). L'étudiant saisit le code ou suit le lien : il est rattaché immédiatement et l'invitation passe à « acceptée ».</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td><strong>Code de classe</strong></td><td>Par exemple <code>MASTER-INFO-26</code>. L'étudiant saisit le code et rejoint la classe (et éventuellement un groupe), avec ses encadreurs.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td><strong>Invitation par l'établissement</strong></td><td>L'administrateur invite un encadreur ou un étudiant par e-mail. Pour un étudiant, le code porte le rattachement à une classe.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td><strong>Demande d'encadrement</strong></td><td>L'étudiant cherche un encadreur (filière, domaine, disponibilité, charge actuelle) et lui envoie une demande avec un message. L'encadreur accepte ou refuse.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td><strong>Import d'une liste d'e-mails</strong></td><td>Invitation en masse d'une classe.</td><td><span class="etat todo">À concevoir</span></td></tr>
+  </tbody>
+</table>
+<p>Un code (encadreur ou classe) rattache <strong>immédiatement</strong>, car c'est l'encadreur ou l'établissement qui a pris l'initiative. Une demande d'encadrement, elle, attend l'accord de l'encadreur.</p>
+
+<h2>12. Matrice des permissions</h2>
+<table>
+  <thead><tr><th>Capacité</th><th>Étudiant</th><th>Encadreur</th><th>Admin étab.</th><th>Super-admin</th></tr></thead>
+  <tbody>
+    <tr><td>Créer, importer, corriger et soumettre son document</td><td>✔</td><td></td><td></td><td></td></tr>
+    <tr><td>Consulter l'analyse IA d'un document</td><td>le sien</td><td>ses étudiants</td><td>synthèse (score, statut)</td><td></td></tr>
+    <tr><td>Configurer profils, canevas, contraintes, grille</td><td></td><td>✔</td><td>normes par défaut</td><td>lecture (cohérence)</td></tr>
+    <tr><td>Corriger, commenter, valider un document</td><td>répondre aux commentaires</td><td>✔</td><td></td><td></td></tr>
+    <tr><td>Contrôler les règles apprises</td><td></td><td>les siennes</td><td></td><td></td></tr>
+    <tr><td>Gérer les classes et les invitations</td><td></td><td>ses classes</td><td>tout l'établissement</td><td></td></tr>
+    <tr><td>Structure, promotions, professeurs, abonnement</td><td></td><td></td><td>✔</td><td></td></tr>
+    <tr><td>Utilisateurs, forfaits, audit, supervision</td><td></td><td></td><td></td><td>✔</td></tr>
+  </tbody>
+</table>
+<p>À l'entrée de chaque espace, une <strong>garde de route</strong> vérifie le rôle de l'utilisateur connecté et le redirige vers <code>/acces-refuse</code> si nécessaire. <span class="etat ok">Maquetté</span> En production, ce contrôle doit <strong>aussi</strong> être fait côté serveur, avec une vérification d'appartenance sur chaque ressource pour qu'un utilisateur ne puisse pas accéder aux données d'un autre.</p>
+
+<!-- ===================================================================== -->
+<h1 class="partie" id="p3"><span class="num">Partie III</span>Le référentiel de l'encadreur</h1>
+
+<h2>13. Le profil méthodologique</h2>
+<p>Le profil méthodologique est le <strong>cœur du produit</strong>. Un encadreur n'a pas un profil unique : il en a <strong>un par couple type de document × discipline</strong>.</p>
+<div class="flux"><span>Licence — Informatique</span><span>Master — Informatique</span><span>Doctorat — Informatique</span><span>Master — Management</span></div>
+<p>Chaque profil (<code>ProfilEncadrant</code>) contient :</p>
+<table>
+  <thead><tr><th style="width:26%">Composant</th><th>Contenu</th><th style="width:14%">État</th></tr></thead>
+  <tbody>
+    <tr><td>Identification</td><td>Type de document, discipline, nom libre, profil actif ou non.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Ressources (§ 14)</td><td>Guides de rédaction, mémoires modèles, normes, exigences.</td><td><span class="etat part">Partiel</span></td></tr>
+    <tr><td>Canevas (§ 15)</td><td>Structure en chapitres et critères, réutilisable.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Contraintes de forme (§ 16)</td><td>Norme, ton, police, interligne, marges, pages minimum, sections obligatoires, consignes libres.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Grille et seuils (§ 17)</td><td>Critères pondérés, seuil de soumission global, seuil minimal par catégorie.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Livrables attendus (§ 18)</td><td>Liste des livrables, avec type, caractère obligatoire et échéance.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Règles de fond</td><td>Niveau d'argumentation, profondeur attendue, justification, exigences méthodologiques et de discussion, contribution scientifique.</td><td><span class="etat part">Partiel</span><br><span class="muted">saisies comme « exigences » libres</span></td></tr>
+  </tbody>
+</table>
+<p>À la création d'un document, la plateforme <strong>détermine le profil applicable</strong> (encadreur × type × discipline) et l'enregistre sur le document. Le profil d'un document ne change pas tant que l'encadreur ne le réaffecte pas.</p>
+
+<h2>14. Ressources et normes</h2>
+<p>L'encadreur (ou l'établissement) apporte :</p>
+<ul>
+  <li>le guide officiel de rédaction ;</li>
+  <li>des modèles de mémoires ou de thèses, et d'anciens travaux validés ;</li>
+  <li>des référentiels méthodologiques et des grilles de notation ;</li>
+  <li>les consignes de l'établissement ;</li>
+  <li>des versions de normes (par exemple Norme 2019, 2025 ou 2026), en choisissant celle qui s'applique.</li>
+</ul>
+<p>Normes bibliographiques proposées : <strong>APA 7, APA 6, ISO 690, Chicago, MLA, Vancouver</strong>, ou une autre norme.</p>
+<p><span class="etat part">Partiel</span> Dans la maquette, chaque ressource est une fiche (titre et description), sans fichier attaché ni analyse. La cible prévoit de <strong>téléverser les fichiers</strong> (DOCX, PDF) et de les faire analyser par l'IA pour en extraire des règles (§ 19).</p>
+
+<h2>15. Le canevas</h2>
+<p>Le canevas décrit <strong>comment le document doit être construit</strong>. C'est une entité indépendante du profil, ce qui permet de la dupliquer et de la réutiliser. Par exemple, on duplique « Canevas Master Informatique 2025 » en « … 2026 », puis on l'associe à un profil.</p>
+<table>
+  <thead><tr><th style="width:30%">Fonction</th><th>Description</th><th style="width:14%">État</th></tr></thead>
+  <tbody>
+    <tr><td>Chapitres ordonnés</td><td>Titre, description, obligatoire ou non, ordre, échéance indicative (par exemple « Chapitre 1 → 5 septembre »).</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Critères par chapitre</td><td>Par exemple, l'introduction doit contenir le contexte, la problématique, les objectifs et l'annonce du plan. Chaque critère est <strong>obligatoire</strong> (non conforme s'il manque, ❌) ou <strong>optionnel</strong> (simple recommandation, ⚠️).</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Création, modification, duplication</td><td>Ajouter une section « Étude comparative », supprimer un chapitre, modifier une règle… sans repartir de zéro.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Import depuis un fichier</td><td>Les titres de chapitres sont extraits d'un .docx ou d'un .pdf pour préremplir le canevas. L'extraction se fait dans le navigateur, au mieux, avec 30 chapitres au maximum.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Association à un contexte</td><td>Le canevas est rattaché à un profil (type × discipline). Exemple : « Master + Informatique → Canevas A ».</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Sous-sections hiérarchiques</td><td>Arborescence chapitre → section → sous-section.</td><td><span class="etat todo">À concevoir</span><br><span class="muted">un seul niveau aujourd'hui</span></td></tr>
+  </tbody>
+</table>
+<p>Exemple de structure type : Page de garde, Remerciements, Résumé, Abstract, Table des matières, Introduction, Chapitres, Méthodologie, Résultats, Conclusion, Bibliographie, Annexes.</p>
+
+<h2>16. Contraintes de forme</h2>
+<p>Ce sont les règles formelles que l'IA vérifie automatiquement, pour chaque profil (écran « Contraintes ») :</p>
+<ul>
+  <li>norme de citation et ton rédactionnel ;</li>
+  <li>nombre minimal de pages ;</li>
+  <li>police, interligne, marges ;</li>
+  <li>pagination et numérotation, styles de titres ;</li>
+  <li>sections obligatoires (liste simple, distincte des chapitres du canevas) ;</li>
+  <li>consignes libres.</li>
+</ul>
+<p>Si l'encadreur ne redéfinit pas une contrainte, le profil reprend la valeur des <strong>normes par défaut de l'établissement</strong> (§ 20 et partie VI). <span class="etat ok">Maquetté</span></p>
+
+<h2>17. Grille d'évaluation et seuils</h2>
+<p>Chaque profil a <strong>une grille pondérée</strong>, dont le total vaut 100 %. Exemple :</p>
+<table>
+  <thead><tr><th>Critère</th><th>Problématique</th><th>Revue de littérature</th><th>Méthodologie</th><th>Analyse</th><th>Discussion</th><th>Conclusion</th><th>Forme</th></tr></thead>
+  <tbody><tr><td>Poids</td><td>15 %</td><td>15 %</td><td>20 %</td><td>20 %</td><td>15 %</td><td>5 %</td><td>10 %</td></tr></tbody>
+</table>
+<p>La grille <strong>oriente</strong> l'analyse de l'IA. Elle ne remplace pas la note de l'encadreur.</p>
+<p>Le profil porte aussi deux seuils configurables :</p>
+<ul>
+  <li><strong>seuil de soumission</strong> : score global minimal pour soumettre le document (80 % par défaut) ;</li>
+  <li><strong>seuil minimal par catégorie</strong> : si une catégorie est en dessous, la soumission reste bloquée même quand le score global est atteint (§ 25).</li>
+</ul>
+<p><span class="etat ok">Maquetté</span></p>
+
+<h2>18. Livrables attendus</h2>
+<p>L'encadreur définit dans le profil la liste des livrables attendus, valable pour tous les documents de ce profil. Exemples pour un projet informatique : cahier des charges, étude de marché, UX/UI, identité visuelle, conception, application, code.</p>
+<p>Chaque livrable a un nom, une description, une nature (<strong>fichier</strong> ou <strong>lien</strong> : dépôt Git, application déployée, démonstration), un caractère obligatoire et une échéance indicative. <span class="etat ok">Maquetté</span></p>
+<p>Lors d'un dépôt, le nom, la nature et le caractère obligatoire du livrable sont <strong>copiés</strong>. Si l'encadreur modifie ensuite son profil, les dépôts déjà faits ne changent donc pas.</p>
+
+<h2>19. Onboarding de l'encadreur</h2>
+<p>Parcours cible :</p>
+<div class="flux">
+  <span>Création du compte</span><i>→</i><span>Création d'un profil</span><i>→</i><span>Type de document</span><i>→</i><span>Discipline</span><i>→</i><span>Import des ressources</span><i>→</i><span>Règles de forme</span><i>→</i><span>Grille</span><i>→</i><span>Analyse des ressources par l'IA</span><i>→</i><span>Prévisualisation des règles extraites</span><i>→</i><span>Validation du profil</span><i>→</i><span>Code d'invitation</span>
+</div>
+<p><span class="etat part">Partiel</span> La maquette propose un assistant en trois étapes (bienvenue, premier profil, finalisation). Les autres réglages se font ensuite sur les écrans dédiés : profil, canevas, contraintes, grille, invitations.</p>
+<p><span class="etat todo">À concevoir</span> <strong>Synthèse du profil IA généré.</strong> Après analyse des ressources, la plateforme présente les règles détectées, par exemple pour « Master — Informatique » :</p>
+<ul>
+  <li>15 règles de forme ;</li>
+  <li>8 règles bibliographiques ;</li>
+  <li>12 règles méthodologiques ;</li>
+  <li>10 règles structurelles ;</li>
+  <li>7 critères d'évaluation.</li>
+</ul>
+<p>L'encadreur peut <strong>confirmer, modifier, supprimer ou ajouter</strong> chaque règle. On ne considère jamais que l'IA a parfaitement compris les documents : l'encadreur doit contrôler les règles importantes.</p>
+
+<h2>20. Hiérarchie des règles</h2>
+<p>Pour éviter les conflits, les règles s'appliquent dans cet ordre de priorité, de la plus forte à la plus faible :</p>
+<table>
+  <thead><tr><th style="width:6%">#</th><th style="width:30%">Niveau</th><th>Source</th><th style="width:16%">État</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Règles institutionnelles</td><td>Normes de l'établissement</td><td><span class="etat part">Partiel</span></td></tr>
+    <tr><td>2</td><td>Règles du département</td><td>Entité département</td><td><span class="etat todo">À concevoir</span></td></tr>
+    <tr><td>3</td><td>Règles disciplinaires</td><td>Règles apprises de niveau « discipline »</td><td><span class="etat part">Partiel</span></td></tr>
+    <tr><td>4</td><td>Profil de l'encadreur</td><td>Préférences générales apprises</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>5</td><td>Profil du type de document</td><td>Profil méthodologique, canevas, contraintes</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>6</td><td>Préférences du projet</td><td>Règles apprises de niveau « projet »</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>7</td><td>Corrections ponctuelles</td><td>Règles apprises de niveau « document »</td><td><span class="etat ok">Maquetté</span></td></tr>
+  </tbody>
+</table>
+<div class="note decision">
+  <strong>Décision de fusion — règles institutionnelles par défaut ou obligatoires</strong>
+  Dans la maquette, les normes de l'établissement sont des <em>valeurs par défaut</em> que l'encadreur peut changer. Le document v1.0 exige qu'une préférence personnelle n'écrase pas une règle institutionnelle <em>obligatoire</em>. Cible retenue : chaque norme de l'établissement est marquée <strong>« par défaut »</strong> (l'encadreur peut la changer) ou <strong>« imposée »</strong> (l'encadreur ne peut pas la changer, et l'écran Contraintes l'affiche verrouillée). <span class="etat todo">À concevoir</span>
+</div>
+<p>L'écran super-admin « Profils méthodologiques et conflits de règles » repère les incohérences entre encadreurs : par exemple, deux profils de même type et même discipline avec des seuils de soumission différents. <span class="etat ok">Maquetté</span></p>
+
+<!-- ===================================================================== -->
+<h1 class="partie" id="p4"><span class="num">Partie IV</span>Parcours de l'étudiant</h1>
+
+<h2>21. Vue d'ensemble</h2>
+<div class="flux">
+  <span>Compte</span><i>→</i><span>Rattachement</span><i>→</i><span>Création du document</span><i>→</i><span>Import</span><i>→</i><span>Analyse IA</span><i>→</i><span>Corrections + tuteur IA</span><i>↻</i><span>Nouvelle analyse</span><i>→</i><span>Seuil atteint</span><i>→</i><span>Soumission</span><i>→</i><span>Retour de l'encadreur</span><i>→</i><span>Révision</span><i>→</i><span>Validation</span>
+</div>
+<p>Un <strong>onboarding étudiant</strong> en quatre étapes (bienvenue, type de mémoire, sujet, finalisation) crée le premier document en brouillon. <span class="etat ok">Maquetté</span></p>
+<p>Navigation de l'espace étudiant :</p>
+<ul>
+  <li>Tableau de bord ;</li>
+  <li>Mon projet ;</li>
+  <li>Planning ;</li>
+  <li>Mes documents ;</li>
+  <li>Soumettre un document ;</li>
+  <li>Notifications, Paramètres, Aide.</li>
+</ul>
+
+<h2>22. Création du document</h2>
+<p>L'étudiant choisit le type (Licence, Master ou Doctorat) et renseigne le titre et la discipline. L'encadreur est déjà connu grâce au rattachement. Le document est créé au statut <strong>Brouillon</strong>, sans fichier. La plateforme détermine le profil méthodologique applicable.</p>
+<p>Il porte aussi les <strong>métadonnées du projet</strong> (écran « Mon projet ») : sujet, problématique, objectifs et date de soutenance prévue. La date de soutenance sert à calculer le temps restant et les retards. <span class="etat ok">Maquetté</span></p>
+
+<h2>23. Import et analyse IA</h2>
+<p>L'étudiant importe son document au format <strong>DOCX ou PDF</strong>. La plateforme conserve sa structure autant que possible et lance l'analyse (statut « Analyse IA en cours »). L'écran d'analyse se met à jour seul quand le traitement se termine.</p>
+<div class="note decision">
+  <strong>Décision de fusion — quatre axes d'analyse</strong>
+  Le document v1.0 décrivait la forme, le fond et la cohérence globale. La maquette ajoute la <strong>structure</strong> (contrôle par rapport au canevas). On retient ces quatre axes. La méthodologie et la bibliographie sont des <em>sous-catégories</em> qui apparaissent dans le détail du score (§ 24).
+</div>
+<table>
+  <thead><tr><th style="width:17%">Axe</th><th>Ce que l'IA vérifie</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Forme</strong></td><td>Orthographe, grammaire, ponctuation, syntaxe, fluidité, répétitions, registre académique, citations, bibliographie, et respect des contraintes : police, taille, interligne, marges, pagination (par exemple « attendue en bas à droite »), styles de titres, sommaire.</td></tr>
+    <tr><td><strong>Structure</strong></td><td>Présence des chapitres du canevas (par exemple « ❌ Chapitre 2 absent »), éléments obligatoires (Résumé, Abstract, Bibliographie…), <strong>critères de chaque chapitre</strong> (l'introduction contient-elle la problématique ?), équilibre du découpage.</td></tr>
+    <tr><td><strong>Fond</strong></td><td>Cohérence logique, argumentation, pertinence des développements, cohérence méthodologique, qualité de l'analyse, respect des exigences de l'encadreur.</td></tr>
+    <tr><td><strong>Cohérence globale</strong></td><td>Comparaison entre les parties. Exemples : objectif « analyser l'impact de X » mais résultats « analyse de Y » → <em>incohérence potentielle</em> ; question causale mais méthodologie purement descriptive → <em>à vérifier par l'encadreur</em> ; annonce du plan différente du déroulé réel ; redondances entre parties.</td></tr>
+  </tbody>
+</table>
+<p>Chaque axe produit un score et une liste de <strong>points</strong>, avec un libellé, une explication et un niveau :</p>
+<ul>
+  <li><strong>succès</strong> ✅ ;</li>
+  <li><strong>information</strong> ;</li>
+  <li><strong>attention</strong> ⚠️ (recommandation) ;</li>
+  <li><strong>erreur</strong> ❌ (non-conformité).</li>
+</ul>
+<p>Les explications sont concrètes : on écrit « La section “Problématique” semble absente » plutôt qu'un simple « Non conforme ».</p>
+<p><span class="etat part">Partiel</span> La maquette tire des points au hasard dans une banque de modèles, sans lire le document. Avec la vraie IA, chaque point devra <strong>citer la règle de l'encadreur concernée</strong> et <strong>situer le passage</strong> dans le document.</p>
+
+<h2>24. Score de conformité</h2>
+<p>Le score estime la conformité du document au profil de l'encadreur. Il est affiché sous forme de jauge, avec le détail par catégorie. Exemple :</p>
+<table>
+  <thead><tr><th>Global</th><th>Forme</th><th>Structure</th><th>Fond</th><th>Cohérence</th><th>dont Méthodologie</th><th>dont Bibliographie</th></tr></thead>
+  <tbody><tr><td><strong>84 %</strong></td><td>92 %</td><td>88 %</td><td>78 %</td><td>80 %</td><td>81 %</td><td>90 %</td></tr></tbody>
+</table>
+<div class="note decision">
+  <strong>Décision de fusion — calcul du score global</strong>
+  Aujourd'hui, la maquette calcule la moyenne simple de la forme, du fond et de la cohérence. Dans la cible, le score global est <strong>pondéré par la grille d'évaluation</strong> du profil (§ 17). Chaque critère de la grille est rattaché à un axe ou à une sous-catégorie. La structure entre dans le calcul.
+</div>
+<p>Ce score n'est <strong>jamais une note</strong>. Libellé obligatoire : « Score estimatif de conformité aux exigences configurées ».</p>
+
+<h2>25. Seuil de soumission</h2>
+<p>Le bouton « Soumettre à l'encadreur » n'est actif que si le document est <strong>prêt pour la soumission</strong>, c'est-à-dire si les trois conditions suivantes sont remplies :</p>
+<ol>
+  <li>le score global atteint le seuil de soumission du profil (80 % par défaut) ;</li>
+  <li>aucune catégorie n'est sous le seuil minimal par catégorie ;</li>
+  <li>il ne reste aucune erreur bloquante, par exemple un chapitre obligatoire absent ou un problème méthodologique majeur.</li>
+</ol>
+<p>Le serveur fournit cet état avec la liste des <strong>points bloquants</strong>. L'écran affiche par exemple :</p>
+<p class="citation" style="font-size:10.5pt">« Votre document atteint le score global requis, mais certains points critiques doivent être corrigés avant la soumission. »</p>
+<p>Exemple : score global de 87 %, mais méthodologie à 48 % → la soumission reste bloquée.</p>
+<p><span class="etat ok">Maquetté</span> (affichage et blocage). Le calcul réel des conditions 2 et 3 sera fait par le serveur.</p>
+
+<h2>26. Boucle de correction</h2>
+<div class="flux"><span>Importer / rédiger</span><i>→</i><span>Analyse IA</span><i>→</i><span>Problèmes détectés</span><i>→</i><span>Suggestions</span><i>→</i><span>Correction par l'étudiant</span><i>→</i><span>Nouvelle analyse</span><i>→</i><span>Score mis à jour</span></div>
+<p>Écran de correction (statut « À corriger ») :</p>
+<ul>
+  <li>liste des points par axe ;</li>
+  <li>points bloquants ;</li>
+  <li>score en cours ;</li>
+  <li>échange avec le tuteur IA ;</li>
+  <li>nouvel import pour relancer l'analyse.</li>
+</ul>
+<p><span class="etat ok">Maquetté</span></p>
+<p><span class="etat todo">À concevoir</span> <strong>Rédaction directe dans la plateforme</strong> : un éditeur partagé où l'étudiant écrit et où l'encadreur consulte et corrige au même endroit, sans échanger de fichiers. La maquette ne fonctionne qu'avec des imports.</p>
+
+<h2>27. Le tuteur IA conversationnel</h2>
+<p>L'étudiant pose des questions :</p>
+<ul>
+  <li>« Pourquoi cette partie n'est-elle pas conforme ? »</li>
+  <li>« Quelle règle de mon encadreur s'applique ici ? »</li>
+  <li>« Comment améliorer cette section ? »</li>
+</ul>
+<p>L'IA répond à partir du document, du profil de l'encadreur, des règles applicables et des documents de référence. Elle <strong>explique sans réécrire</strong> : l'étudiant garde le contrôle de son travail.</p>
+<p><span class="etat part">Partiel</span> Dans la maquette, les réponses sont des modèles pré-écrits et chaque échange fait légèrement progresser le score. Dans la cible, le score ne change <strong>qu'après une nouvelle analyse</strong>.</p>
+
+<h2>28. Soumission officielle à l'encadreur</h2>
+<p>L'étudiant clique sur « Soumettre à l'encadreur », puis confirme sur un écran récapitulatif. Le système :</p>
+<ul>
+  <li>crée une <strong>nouvelle version officielle</strong> ;</li>
+  <li>passe le document au statut « Soumis à l'encadreur » ;</li>
+  <li>notifie l'encadreur.</li>
+</ul>
+<p>L'encadreur reçoit :</p>
+<ul>
+  <li>le nom de l'étudiant, le type de document et la version ;</li>
+  <li>le score de conformité, les analyses de forme et de fond ;</li>
+  <li>les points critiques et les problèmes restant à surveiller ;</li>
+  <li>le nombre de corrections effectuées.</li>
+</ul>
+<p><span class="etat ok">Maquetté</span></p>
+
+<h2>29. Retour de l'encadreur et révision</h2>
+<p>L'étudiant reçoit :</p>
+<ul>
+  <li>les corrections (suivi des modifications) ;</li>
+  <li>les commentaires en marge, auxquels il peut répondre ;</li>
+  <li>les passages surlignés ;</li>
+  <li>la décision par chapitre et la décision globale, avec l'appréciation.</li>
+</ul>
+<p>Il passe d'un commentaire à l'autre, fait ses modifications, réimporte son document (nouvelle analyse) puis clique sur « Soumettre la version révisée ».</p>
+<p>Les chapitres <strong>validés sont verrouillés</strong> : l'étudiant ne peut plus les modifier sans l'autorisation de l'encadreur (§ 35). <span class="etat ok">Maquetté</span></p>
+
+<h2>30. Projet, livrables, planning, export</h2>
+<table>
+  <thead><tr><th style="width:22%">Écran</th><th>Contenu</th><th style="width:14%">État</th></tr></thead>
+  <tbody>
+    <tr><td>Mon projet</td><td>Sujet, problématique, objectifs, date de soutenance ; livrables attendus avec leur statut ; dépôt d'un fichier ou d'un lien.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Planning</td><td>Séances à venir et passées, tâche prévue pour chaque séance, échéances des livrables et des chapitres, retards, jours restants avant la soutenance.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Mes documents</td><td>Liste avec filtres par statut. Chaque document mène à l'écran adapté à son statut.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Aperçu</td><td>Prévisualisation du rendu du document.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Versions</td><td>Historique des versions, avec leurs scores, et comparaison entre deux versions.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Export</td><td>Téléchargement Word ou PDF, à tout moment. La maquette renvoie le fichier d'origine, ce qui préserve sa mise en forme. La cible intègre les corrections acceptées.</td><td><span class="etat part">Partiel</span></td></tr>
+  </tbody>
+</table>
+
+<!-- ===================================================================== -->
+<h1 class="partie" id="p5"><span class="num">Partie V</span>Parcours de l'encadreur</h1>
+<p>Navigation de l'espace encadreur :</p>
+<ul>
+  <li>Tableau de bord ;</li>
+  <li>Mon profil pédagogique, Canevas, Contraintes, Grille d'évaluation ;</li>
+  <li>Planning ;</li>
+  <li>Mes classes, Inviter des étudiants ;</li>
+  <li>Jumeau numérique ;</li>
+  <li>Statistiques ;</li>
+  <li>Notifications, Paramètres, Aide.</li>
+</ul>
+
+<h2>31. Tableau de bord</h2>
+<p>Il reste simple et centré sur le rôle de l'encadreur. Il affiche :</p>
+<ul>
+  <li>le nombre d'<strong>étudiants suivis</strong> (en cours, en retard, validés) ;</li>
+  <li>les <strong>documents reçus</strong>, qui attendent son intervention ;</li>
+  <li>les <strong>corrections en attente</strong> ;</li>
+  <li>les <strong>révisions reçues</strong> ;</li>
+  <li>les <strong>documents validés</strong> ;</li>
+  <li>les <strong>livrables à vérifier</strong> (par exemple « 5 cahiers des charges, 3 maquettes ») ;</li>
+  <li>les <strong>séances de la semaine</strong> ;</li>
+  <li>les <strong>retards</strong> ;</li>
+  <li>l'<strong>activité de l'IA</strong> (corrections récurrentes détectées).</li>
+</ul>
+<p>Il montre aussi la progression de chaque étudiant (par exemple Paul 80 %, Jean 60 %) et propose des filtres par classe, par groupe et par statut. <span class="etat ok">Maquetté</span></p>
+
+<h2>32. Réception d'un document</h2>
+<p>Vue de synthèse du prétraitement par l'IA, par exemple : Étudiant : Paul — Mémoire de Master — V3 — Conformité 86 % (Forme 92 %, Fond 81 %, Méthodologie 84 %) — 3 points à surveiller.</p>
+<p>Depuis cette vue, l'encadreur ouvre le document. <span class="etat ok">Maquetté</span></p>
+
+<h2>33. Correction du document</h2>
+<p>L'encadreur travaille dans un <strong>éditeur avec suivi des modifications</strong>. Il peut :</p>
+<ul>
+  <li>ajouter du texte (affiché comme un ajout) ;</li>
+  <li>supprimer ou barrer du texte (affiché barré) ;</li>
+  <li>remplacer une formulation ;</li>
+  <li>surligner un passage ;</li>
+  <li>commenter en marge ;</li>
+  <li>demander une modification.</li>
+</ul>
+<p>La plateforme garde l'historique pour savoir ce qui a été demandé et ce que l'étudiant a réellement corrigé. Exemple :</p>
+<ul>
+  <li>10 août, encadreur : « Reformuler cette partie » ;</li>
+  <li>11 août, étudiant : modification effectuée ;</li>
+  <li>12 août, encadreur : modification validée.</li>
+</ul>
+<p><span class="etat ok">Maquetté</span> (suivi des modifications par paragraphe, surlignage, commentaires en marge, historique, aperçu).</p>
+
+<h2>34. Commentaires</h2>
+<p>Chaque commentaire en marge est numéroté et ouvre un <strong>fil de discussion</strong> : l'étudiant répond (« C'est ajouté dans le paragraphe suivant »), l'encadreur répond à son tour. <span class="etat ok">Maquetté</span></p>
+<p><span class="etat todo">À concevoir</span> <strong>Catégorie de commentaire</strong>, pour que l'IA comprenne la nature d'une correction :</p>
+<table>
+  <thead><tr><th style="width:25%">Catégorie</th><th>Exemple</th></tr></thead>
+  <tbody>
+    <tr><td>Forme</td><td>« Reformulez cette phrase. »</td></tr>
+    <tr><td>Méthodologique</td><td>« Cette méthode ne permet pas de répondre à votre question de recherche. »</td></tr>
+    <tr><td>Scientifique</td><td>« Cette affirmation doit être justifiée par une source scientifique. »</td></tr>
+    <tr><td>Général</td><td>« La discussion doit être approfondie. »</td></tr>
+  </tbody>
+</table>
+<p><span class="etat todo">À concevoir</span> <strong>Statut résolu / non résolu</strong> pour chaque commentaire. Il sert à comparer deux versions (§ 37).</p>
+
+<h2>35. Validation par chapitre</h2>
+<p>L'encadreur valide le document <strong>progressivement</strong>, chapitre par chapitre. Exemple :</p>
+<ul>
+  <li>Introduction ✅ ;</li>
+  <li>Chapitre 1 ✅ ;</li>
+  <li>Chapitre 2 ⏳ (en attente) ;</li>
+  <li>Conclusion ⏳.</li>
+</ul>
+<p>Pour chaque chapitre :</p>
+<ul>
+  <li><strong>Valider</strong> : le chapitre est aussitôt <strong>verrouillé</strong> ;</li>
+  <li><strong>Refuser</strong> : avec un motif ou un commentaire ;</li>
+  <li><strong>Déverrouiller</strong> : seul l'encadreur peut le faire. Le chapitre repasse alors « en attente ».</li>
+</ul>
+<p>Un chapitre sans décision est « en attente » par défaut. <span class="etat ok">Maquetté</span></p>
+
+<h2>36. Décision finale</h2>
+<table>
+  <thead><tr><th style="width:25%">Décision</th><th>Effet</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Valider</strong></td><td>Le document est conforme. L'encadreur peut autoriser le téléchargement de la version finale ou le passage à l'étape suivante.</td></tr>
+    <tr><td><strong>Demander une révision</strong></td><td>Des corrections supplémentaires sont nécessaires. L'étudiant reprend la boucle de correction.</td></tr>
+    <tr><td><strong>Refuser</strong></td><td>Le document doit être repris en profondeur.</td></tr>
+  </tbody>
+</table>
+<p>Quelle que soit la décision, l'encadreur ajoute une <strong>appréciation globale</strong> et, selon les règles de l'établissement, une <strong>note</strong> indicative ou finale. L'IA n'attribue jamais seule la note officielle. <span class="etat ok">Maquetté</span></p>
+
+<h2>37. Gestion des versions</h2>
+<p>Chaque transition clé crée une version. Exemple : V1 (analyse IA) → V2 (correction de l'encadreur) → V3 (révision de l'étudiant) → V4.</p>
+<p>Chaque version conserve :</p>
+<ul>
+  <li>sa date et son auteur ;</li>
+  <li>ses scores ;</li>
+  <li>le texte extrait du document ;</li>
+  <li>son statut.</li>
+</ul>
+<p>Le comparateur affiche les différences entre deux versions. <span class="etat ok">Maquetté</span></p>
+<p><span class="etat part">Partiel</span> Lors d'une nouvelle soumission, l'encadreur doit aussi voir les commentaires résolus et non résolus, et l'évolution du score entre la version précédente et la nouvelle.</p>
+
+<h2>38. Boucle d'apprentissage (« jumeau numérique »)</h2>
+<p>Après la correction de l'encadreur, un <strong>Diff Engine</strong> compare la version analysée par l'IA et la version corrigée. Toutes les corrections ne deviennent pas des règles : chacune est classée selon sa <strong>portée</strong>.</p>
+<table>
+  <thead><tr><th style="width:8%">Niv.</th><th style="width:26%">Portée</th><th>Libellé à l'écran</th><th style="width:20%">Clé technique</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Correction ponctuelle</td><td>Ce document uniquement</td><td><code>ponctuelle</code></td></tr>
+    <tr><td>2</td><td>Préférence du projet</td><td>Ce projet</td><td><code>projet</code></td></tr>
+    <tr><td>3</td><td>Règle du type de document</td><td>Ce type de document</td><td><code>type_document</code></td></tr>
+    <tr><td>4</td><td>Règle disciplinaire</td><td>Cette discipline</td><td><code>discipline</code></td></tr>
+    <tr><td>5</td><td>Préférence générale</td><td>Tous mes documents</td><td><code>generale</code></td></tr>
+  </tbody>
+</table>
+<p><strong>Validation des règles.</strong> Quand l'IA détecte une préférence potentielle (par exemple « vous semblez préférer la formulation X à la formulation Y »), elle propose une règle. L'encadreur choisit sa portée et l'<strong>adopte</strong>, ou l'<strong>ignore</strong>.</p>
+<p><strong>Écran « Ce que MemoAssistant a appris ».</strong> Exemples de règles : « Préfère les titres de niveau 2 en formulation nominale », « Exige une source pour toute affirmation statistique ».</p>
+<p>Chaque règle affiche :</p>
+<ul>
+  <li>sa source (par exemple « Comparaison du document n° 124 ») ;</li>
+  <li>sa date de détection ;</li>
+  <li>sa portée ;</li>
+  <li>son statut : proposée, adoptée ou ignorée ;</li>
+  <li>un indice de confiance, de 0 à 100.</li>
+</ul>
+<p>L'encadreur peut accepter, modifier, désactiver ou supprimer chaque règle.</p>
+<p><span class="etat part">Partiel</span> La maquette affiche des règles pré-calculées et permet de les adopter ou de les ignorer. <span class="etat todo">À concevoir</span> : le vrai Diff Engine, la modification d'une règle, et la réutilisation des règles adoptées dans les analyses suivantes, en plus du profil initial et de l'historique.</p>
+
+<h2>39. Planning, séances et retards</h2>
+<table>
+  <thead><tr><th style="width:26%">Fonction</th><th>Description</th><th style="width:14%">État</th></tr></thead>
+  <tbody>
+    <tr><td>Disponibilités</td><td>Créneaux hebdomadaires récurrents (par exemple du lundi au vendredi, de 18 h à 21 h).</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Séances</td><td>Titre, date et heure, durée, tâche, notes. Statut : planifiée, effectuée ou annulée.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Génération d'un planning</td><td>À partir de la date de début, de la date de soutenance, du nombre de séances et des disponibilités. Les séances sont réparties régulièrement sur les créneaux libres.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Tâches par séance</td><td>Séance 1 : définition du sujet ; 2 : cahier des charges ; 3 : UX/UI ; 4 : conception ; ensuite : livrables ; deux dernières : rédaction et relecture.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Retards</td><td>Livrable ou chapitre dont l'échéance est passée sans validation ; séance passée encore « planifiée » ; date de soutenance dépassée.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Relance</td><td>Bouton « Relancer », qui crée une notification de type <em>retard</em>.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Alertes automatiques</td><td>Détection et notification des retards par une tâche planifiée côté serveur.</td><td><span class="etat todo">À concevoir</span></td></tr>
+  </tbody>
+</table>
+<div class="note decision">
+  <strong>Décision de fusion — planning calculé, pas « IA »</strong>
+  La génération du planning est un algorithme de calcul de dates qui donne toujours le même résultat pour les mêmes données. On la présente comme une « proposition automatique ». Une version enrichie par l'IA, qui tiendrait compte du travail restant, pourra venir plus tard.
+</div>
+
+<h2>40. Classes, invitations et communication</h2>
+<ul>
+  <li><strong>Mes classes</strong> : liste et détail (étudiants, groupes, code de rattachement). <span class="etat ok">Maquetté</span></li>
+  <li><strong>Invitations</strong> : génération d'un code ou envoi par e-mail ; suivi des statuts en attente, acceptée et expirée ; traitement des demandes d'encadrement. <span class="etat ok">Maquetté</span></li>
+  <li><strong>Diffusion d'une consigne à toute une classe</strong>, par exemple « Tous les étudiants doivent corriger la pagination ». Chaque étudiant reçoit une notification. <span class="etat ok">Maquetté</span></li>
+  <li><strong>Messagerie</strong> encadreur ↔ étudiant, liée au projet. <span class="etat todo">À concevoir</span></li>
+</ul>
+
+<h2>41. Statistiques d'encadrement</h2>
+<p>Temps de correction, cycles de révision et progression par étudiant. <span class="etat ok">Maquetté</span></p>
+
+<!-- ===================================================================== -->
+<h1 class="partie" id="p6"><span class="num">Partie VI</span>Espace établissement</h1>
+<p>Cet espace est réservé au rôle <code>admin_etablissement</code>. Chaque établissement ne voit que ses propres données.</p>
+<table>
+  <thead><tr><th style="width:22%">Écran</th><th>Contenu</th><th style="width:14%">État</th></tr></thead>
+  <tbody>
+    <tr><td>Tableau de bord</td><td>Indicateurs de la promotion active, alerte d'inactivité, activité récente.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Structure</td><td>Arborescence filières → niveaux → classes, avec le taux de dépôt.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Promotions</td><td>Années académiques, choix de l'année courante, création (années, filières, niveaux ouverts).</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Classes</td><td>Liste filtrable, création, code de rattachement, détail d'une classe.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Professeurs</td><td>Recherche, invitation, affectation (filière, classe, groupe), activation ou désactivation.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Apprenants</td><td>Tableau filtrable : score IA, statut, fiche détaillée.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Normes par défaut</td><td>Référentiel commun à tous les encadreurs : format de citation, nombre minimal de sources, types de sources acceptées, nombre de parties de l'introduction, position de la pagination, style (académique formel ou semi-formel), voix (impersonnelle ou personnelle autorisée), police, taille, interligne, marges.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Abonnement</td><td>Forfait souscrit ; un seul abonnement actif à la fois.</td><td><span class="etat ok">Maquetté</span></td></tr>
+  </tbody>
+</table>
+
+<h3>Statut d'un apprenant vu par l'administration</h3>
+<p>L'administration lit un statut <strong>simplifié</strong>, calculé à partir du statut du document :</p>
+<table>
+  <thead><tr><th style="width:28%">Statut apprenant</th><th>Statuts du document correspondants</th></tr></thead>
+  <tbody>
+    <tr><td>Pas de dépôt</td><td>Aucun document, ou Brouillon</td></tr>
+    <tr><td>À corriger</td><td>À corriger (analyse terminée, ou correction en cours par l'étudiant)</td></tr>
+    <tr><td>Attente encadreur</td><td>Déposé, Analyse IA en cours, Soumis à l'encadreur, En correction (encadreur)</td></tr>
+    <tr><td>En révision</td><td>Révision demandée, Refusé</td></tr>
+    <tr><td>Validé</td><td>Validé</td></tr>
+  </tbody>
+</table>
+<p><strong>Apprenant inactif</strong> : il n'a rien déposé et sa dernière activité remonte à plus de <strong>15 jours</strong>. Il est alors signalé sur le tableau de bord.</p>
+<p><strong>Pagination et recherche côté serveur</strong> pour les grandes listes (apprenants, professeurs). Le filtrage peut se faire côté client pour les petites listes (classes, filières).</p>
+
+<!-- ===================================================================== -->
+<h1 class="partie" id="p7"><span class="num">Partie VII</span>Administration de la plateforme</h1>
+<p>Cet espace est réservé au rôle <code>admin</code>, c'est-à-dire à l'équipe MemoAssistant.</p>
+<table>
+  <thead><tr><th style="width:26%">Écran</th><th>Contenu</th><th style="width:14%">État</th></tr></thead>
+  <tbody>
+    <tr><td>Utilisateurs</td><td>Recherche, rôle, activation ou désactivation, libellé de rôle personnalisé.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Forfaits</td><td>Catalogue des offres : prix mensuel, nombre maximal d'étudiants et d'encadreurs, fonctionnalités, mise en relation payante ou non.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Profils méthodologiques</td><td>Vue d'ensemble des exigences des encadreurs et détection des conflits (§ 20).</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Statistiques</td><td>Activité globale, statistiques par encadreur.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Journal d'audit</td><td>Actions sensibles : qui, quoi, sur quoi, quand.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Supervision technique</td><td>Files de traitement (analyses en attente, en cours, terminées, en échec, nombre de tentatives) et journal des erreurs.</td><td><span class="etat ok">Maquetté</span></td></tr>
+    <tr><td>Gestion des établissements, départements, disciplines</td><td>Administration transverse des établissements et des référentiels.</td><td><span class="etat todo">À concevoir</span></td></tr>
+  </tbody>
+</table>
+<div class="note decision">
+  <strong>Point ouvert — modèle économique</strong>
+  Les tarifs et le payeur de la mise en relation (étudiant, encadreur ou établissement) ne sont pas arrêtés. Les forfaits de la maquette sont indicatifs : aucune facturation réelle n'y est rattachée.
+</div>
+
+<!-- ===================================================================== -->
+<h1 class="partie" id="p8"><span class="num">Partie VIII</span>Fonctions transverses</h1>
+
+<h2>Authentification et compte</h2>
+<ul>
+  <li><strong>Inscription et connexion</strong> par e-mail et mot de passe, avec un bouton pour afficher ou masquer le mot de passe. Le téléphone (format international) est obligatoire mais pas vérifié. <span class="etat ok">Maquetté (fictif)</span></li>
+  <li><strong>Connexion avec Google</strong>, suivie de la complétion du profil. <span class="etat part">Partiel</span> (simulée)</li>
+  <li><strong>Mot de passe oublié</strong> et <strong>vérification de l'e-mail</strong>. <span class="etat part">Partiel</span> (sans envoi réel)</li>
+  <li><strong>Sessions actives</strong> : liste des appareils et révocation des autres sessions. <span class="etat ok">Maquetté</span></li>
+</ul>
+<h2>Notifications</h2>
+<p>Types de notifications :</p>
+<ul>
+  <li>soumission ;</li>
+  <li>analyse ;</li>
+  <li>correction (par exemple « 🔔 Nouvelle correction de votre encadreur ») ;</li>
+  <li>validation ;</li>
+  <li>retard ;</li>
+  <li>système.</li>
+</ul>
+<p>Canaux : dans l'application (toujours) et par e-mail (selon la préférence de l'utilisateur, simulé). Les notifications sont marquées lues ou non lues, avec un lien vers le document concerné. <span class="etat ok">Maquetté</span></p>
+<h2>Données personnelles (RGPD)</h2>
+<ul>
+  <li><strong>Accès et portabilité</strong> : export JSON complet (profil, documents, analyses, notifications).</li>
+  <li><strong>Effacement</strong> : les données identifiantes sont anonymisées et le compte est neutralisé. Les travaux académiques sont conservés mais détachés de l'identité, ce qui est expliqué avant confirmation.</li>
+  <li><strong>Rectification</strong> du profil.</li>
+  <li><strong>Information</strong> : pages Confidentialité et Protection des données.</li>
+</ul>
+<p><span class="etat ok">Maquetté</span></p>
+<h2>Aide et support</h2>
+<p>FAQ, tutoriels, centre d'aide, formulaire de contact. Les demandes de support ont trois statuts : nouvelle, en cours, résolue. <span class="etat ok">Maquetté</span></p>
+<h2>Pages publiques</h2>
+<p>Accueil (avec témoignages), Comment ça marche, Pour les étudiants, Pour les encadreurs, Tarification, À propos, FAQ, Contact, Conditions d'utilisation, Confidentialité, Statut du service, page 404, accès refusé. <span class="etat ok">Maquetté</span></p>
+<h2>Exigences non fonctionnelles</h2>
+<ul>
+  <li><strong>Accessibilité</strong> : niveau WCAG AA visé.</li>
+  <li><strong>Mode hors ligne</strong> : un bandeau prévient l'utilisateur quand il n'a plus de connexion.</li>
+  <li><strong>Sécurité</strong> : le rôle <code>admin</code> ne s'obtient jamais par l'inscription ; chaque ressource fait l'objet d'un contrôle d'accès côté serveur ; les mots de passe sont hachés en production.</li>
+  <li><strong>Traçabilité</strong> : journal d'audit des actions sensibles.</li>
+  <li><strong>Traitements longs</strong> : analyses en file d'attente, avec nouvelles tentatives et suivi dans l'écran de supervision.</li>
+</ul>
+
+<!-- ===================================================================== -->
+<h1 class="partie" id="p9"><span class="num">Partie IX</span>Référentiels techniques</h1>
+
+<h2>Cycle de vie du document</h2>
+<div class="note decision">
+  <strong>Décision de fusion — statuts unifiés</strong>
+  Les libellés du document v1.0 sont conservés pour l'interface. Les clés techniques de la maquette sont conservées pour les données. « Prêt pour soumission » n'est <strong>pas un statut enregistré</strong> : c'est un état calculé (<code>pretPourSoumission</code>). « Révisé » correspond au statut « Soumis à l'encadreur » avec un numéro de version supérieur à 1.
+</div>
+<table>
+  <thead><tr><th style="width:21%">Libellé (interface)</th><th style="width:21%">Clé technique</th><th>Déclencheur</th><th style="width:12%">Acteur</th></tr></thead>
+  <tbody>
+    <tr><td>Brouillon</td><td><code>brouillon</code></td><td>Document créé sans fichier</td><td>Étudiant</td></tr>
+    <tr><td>Déposé</td><td><code>soumis</code></td><td>Fichier reçu, analyse pas encore démarrée. Ce statut ne vient que des données de démo : aucun écran ne le produit.</td><td>Système</td></tr>
+    <tr><td>Analyse IA en cours</td><td><code>analyse_en_cours</code></td><td>Import ou réimport du fichier</td><td>Système</td></tr>
+    <tr><td>À corriger</td><td><code>analyse_terminee</code><br><code>en_correction</code></td><td>Analyse terminée ; puis l'étudiant travaille dans la boucle de correction</td><td>Étudiant</td></tr>
+    <tr><td><em>Prêt pour soumission</em></td><td><em>calculé</em></td><td>Seuil global et seuils par catégorie atteints, aucun point bloquant</td><td>—</td></tr>
+    <tr><td>Soumis à l'encadreur<br><span class="muted">(« Révisé » si version &gt; 1)</span></td><td><code>pret_pour_encadrant</code></td><td>Confirmation de la soumission ; une version est créée</td><td>Étudiant</td></tr>
+    <tr><td>En correction (encadreur)</td><td><code>en_relecture</code></td><td>L'encadreur ouvre la relecture</td><td>Encadreur</td></tr>
+    <tr><td>Révision demandée</td><td><code>rejete</code></td><td>Décision « Demander une révision »</td><td>Encadreur</td></tr>
+    <tr><td>Refusé</td><td><code>refuse</code></td><td>Décision « Refuser »</td><td>Encadreur</td></tr>
+    <tr><td>Validé</td><td><code>valide</code></td><td>Décision « Valider »</td><td>Encadreur</td></tr>
+  </tbody>
+</table>
+<div class="flux">
+  <span>Brouillon</span><i>→</i><span>Analyse IA</span><i>→</i><span>À corriger</span><i>↻ réimport →</i><span>Analyse IA</span><i>→ seuil atteint →</i><span>Soumis</span><i>→</i><span>En correction</span><i>→</i><span>Validé</span><i>|</i><span>Révision demandée → À corriger</span><i>|</i><span>Refusé</span>
+</div>
+<p>Écran ouvert selon le statut, côté étudiant :</p>
+<ul>
+  <li>Brouillon → Soumission ;</li>
+  <li>Analyse IA, Soumis, En correction (encadreur) → Analyse ;</li>
+  <li>À corriger → Correction ;</li>
+  <li>Validé, Révision demandée, Refusé → Retour.</li>
+</ul>
+<p><strong>Libellés d'interface à harmoniser.</strong> Aujourd'hui, la maquette affiche « Soumis » pour la clé <code>soumis</code> et « Prêt pour l'encadrant » pour <code>pret_pour_encadrant</code>. Les libellés ci-dessus remplacent ces deux libellés, qui prêtent à confusion.</p>
+
+<h2>Autres cycles de vie</h2>
+<table>
+  <thead><tr><th style="width:24%">Objet</th><th>Statuts</th></tr></thead>
+  <tbody>
+    <tr><td>Livrable</td><td>À faire (aucun dépôt, non enregistré) → Soumis → À corriger → Validé. Le document v1.0 prévoyait aussi « En cours » (<span class="etat todo">À concevoir</span>).</td></tr>
+    <tr><td>Chapitre d'un document</td><td>En attente (non enregistré) → Validé (verrouillé) ou Refusé. Le déverrouillage le repasse en attente.</td></tr>
+    <tr><td>Séance</td><td>Planifiée → Effectuée ou Annulée</td></tr>
+    <tr><td>Règle apprise</td><td>Proposée → Adoptée ou Ignorée. La cible ajoute « Désactivée ».</td></tr>
+    <tr><td>Invitation (encadreur ou établissement)</td><td>En attente → Acceptée ou Expirée</td></tr>
+    <tr><td>Demande d'encadrement</td><td>En attente → Acceptée ou Refusée</td></tr>
+    <tr><td>Promotion</td><td>Active (une seule) ou Archivée</td></tr>
+    <tr><td>Abonnement</td><td>Actif, Expiré ou Annulé</td></tr>
+    <tr><td>Tâche de traitement</td><td>En attente → En cours → Terminée ou Échec (avec nouvelles tentatives)</td></tr>
+    <tr><td>Demande de support</td><td>Nouvelle → En cours → Résolue</td></tr>
+  </tbody>
+</table>
+
+<h2>Modèle de données</h2>
+<p>Les entités sont définies dans <code>src/types/index.ts</code>, qui sert de contrat entre les écrans et l'API. En production, ces types correspondent aux objets échangés avec l'API réelle.</p>
+<table>
+  <thead><tr><th style="width:25%">Domaine</th><th>Entités (collection REST)</th></tr></thead>
+  <tbody>
+    <tr><td>Comptes</td><td><code>users</code> (rôle, établissement, classe, groupe, domaines d'expertise, disponibilité, actif) ; <code>sessions</code> ; <code>passwordResets</code></td></tr>
+    <tr><td>Organisation</td><td><code>etablissements</code> ; <code>filieres</code> ; <code>promotions</code> ; <code>classes</code> (code, encadreurs) ; <code>groupes</code> ; <code>affectations-encadrant</code> ; <code>normes-etablissement</code></td></tr>
+    <tr><td>Rattachement</td><td><code>invitations</code> (encadreur) ; <code>invitations-etablissement</code> ; <code>demandes-encadrement</code> ; <code>encadrants</code> (vue publique)</td></tr>
+    <tr><td>Référentiel encadreur</td><td><code>profils-encadrant</code> (ressources, contraintes, livrables attendus, seuils, canevas) ; <code>grilles-evaluation</code> ; <code>canevas</code> ; <code>chapitres-canevas</code> ; <code>criteres-chapitre</code></td></tr>
+    <tr><td>Document</td><td><code>documents</code> (statut, scores, type, discipline, profil, projet, note, appréciation) ; <code>versions</code> ; <code>analyses</code> (type, score, points) ; <code>livrables</code> ; <code>validations-chapitre</code></td></tr>
+    <tr><td>Correction</td><td><code>revisions</code> (segments normal, supprimé, ajouté par paragraphe) ; <code>surlignages</code> ; <code>commentaires-marge</code> ; <code>reponses-commentaire</code> ; <code>messages</code> (tuteur IA)</td></tr>
+    <tr><td>Apprentissage</td><td><code>regles-apprises</code> (règle, source, confiance, statut, portée, contexte)</td></tr>
+    <tr><td>Suivi</td><td><code>seances</code> ; <code>disponibilites-encadrant</code> ; <code>notifications</code></td></tr>
+    <tr><td>Business</td><td><code>forfaits</code> ; <code>abonnements</code></td></tr>
+    <tr><td>Exploitation</td><td><code>files-attente</code> ; <code>logsErreurs</code> ; journal d'audit ; <code>demandes-support</code> ; <code>faq</code> ; <code>temoignages</code></td></tr>
+  </tbody>
+</table>
+<p><strong>Conventions de modélisation :</strong></p>
+<ul>
+  <li>les états par défaut (livrable « à faire », chapitre « en attente ») ne sont pas enregistrés : ils se déduisent de l'absence d'enregistrement ;</li>
+  <li>les informations d'une définition sont copiées au moment du dépôt ;</li>
+  <li>les affectations sont une table de liaison, où chaque ligne se modifie seule ;</li>
+  <li>une classe ou une promotion peut ne pas avoir d'établissement (mode indépendant).</li>
+</ul>
+<p><span class="etat todo">À concevoir</span> pour couvrir la cible :</p>
+<ul>
+  <li>une catégorie et un statut résolu sur les commentaires ;</li>
+  <li>des entités « département » et « discipline » ;</li>
+  <li>un indicateur « imposée » sur les normes de l'établissement ;</li>
+  <li>les fichiers de ressources et les règles extraites du profil ;</li>
+  <li>le lien entre les critères de la grille et les axes d'analyse.</li>
+</ul>
+
+<h2>API REST</h2>
+<ul>
+  <li>Ressources au pluriel. Verbes : GET, POST, PATCH, PUT, DELETE.</li>
+  <li>Paramètres de requête :
+    <ul>
+      <li>pagination : <code>_page</code>, <code>_limit</code> ;</li>
+      <li>tri : <code>_sort</code>, <code>_order</code> ;</li>
+      <li>recherche plein texte : <code>q</code> ;</li>
+      <li>filtres par champ (par exemple <code>?encadrantId=…&amp;statut=…</code>).</li>
+    </ul></li>
+  <li>Réponse paginée : <code>{ data, total, page, limite, totalPages }</code>.</li>
+  <li><code>GET /documents/:id</code> renvoie en plus les champs calculés <code>pretPourSoumission</code> et <code>pointsBloquants</code>.</li>
+  <li>Authentification : jeton dans l'en-tête <code>Authorization</code> (format fictif <code>mock-token-{userId}</code>). L'API ne garde pas d'état de session.</li>
+</ul>
+
+<h2>Inventaire des écrans</h2>
+<table>
+  <thead><tr><th style="width:17%">Espace</th><th>Routes</th></tr></thead>
+  <tbody>
+    <tr><td>Public</td><td><code>/</code>, <code>/comment-ca-marche</code>, <code>/pour-etudiants</code>, <code>/pour-encadreurs</code>, <code>/tarification</code>, <code>/a-propos</code>, <code>/faq</code>, <code>/contact</code>, <code>/tutoriels</code>, <code>/aide</code>, <code>/statut</code>, <code>/conditions-utilisation</code>, <code>/confidentialite</code>, <code>/protection-donnees</code></td></tr>
+    <tr><td>Accès</td><td><code>/login</code>, <code>/register</code>, <code>/completer-profil</code>, <code>/verification-email</code>, <code>/reinitialiser-mot-de-passe</code>, <code>/rattachement-encadrant</code>, <code>/onboarding/etudiant</code>, <code>/onboarding/encadrant</code>, <code>/acces-refuse</code></td></tr>
+    <tr><td>Étudiant</td><td><code>/etudiant/dashboard</code>, <code>/projet</code>, <code>/planning</code>, <code>/documents</code>, <code>/documents/nouveau</code>, <code>/soumission</code> ; pour un document <code>/documents/[id]/</code> : <code>analyse</code>, <code>correction</code>, <code>confirmation</code>, <code>retour</code>, <code>versions</code>, <code>apercu</code>, <code>export</code></td></tr>
+    <tr><td>Encadreur</td><td><code>/encadrant/dashboard</code>, <code>/profil</code>, <code>/canevas</code>, <code>/canevas/[id]</code>, <code>/contraintes</code>, <code>/grille</code>, <code>/planning</code>, <code>/classes</code>, <code>/classes/[id]</code>, <code>/invitations</code>, <code>/jumeau-numerique</code>, <code>/statistiques</code> ; pour un document <code>/documents/[id]/</code> : <code>reception</code>, <code>relecture</code>, <code>correction</code>, <code>validation</code>, <code>versions</code>, <code>apercu</code></td></tr>
+    <tr><td>Établissement</td><td><code>/etablissement/dashboard</code>, <code>/filieres</code>, <code>/promotions</code>, <code>/promotions/nouvelle</code>, <code>/classes</code>, <code>/classes/[id]</code>, <code>/professeurs</code>, <code>/apprenants</code>, <code>/normes</code>, <code>/abonnement</code></td></tr>
+    <tr><td>Super-admin</td><td><code>/admin/utilisateurs</code>, <code>/forfaits</code>, <code>/hierarchie-regles</code>, <code>/statistiques</code>, <code>/journal-audit</code>, <code>/supervision</code></td></tr>
+    <tr><td>Tous rôles</td><td><code>/notifications</code>, <code>/parametres</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Architecture : de la maquette à la production</h2>
+<table>
+  <thead><tr><th style="width:24%">Brique</th><th>Maquette</th><th>Production</th></tr></thead>
+  <tbody>
+    <tr><td>Interface</td><td>Next.js 16, React 19, TypeScript strict, Tailwind v4, composants Radix dans l'esprit shadcn/ui</td><td>Inchangée</td></tr>
+    <tr><td>Données</td><td><code>json-server</code> sur <code>data.json</code> ; route Next.js de secours <code>/api/mock</code> en déploiement (données en mémoire)</td><td>API REST et base relationnelle, avec le même contrat (<code>types/index.ts</code>)</td></tr>
+    <tr><td>Authentification</td><td><code>lib/firebase.ts</code> imite le SDK Firebase et lit les comptes dans les données mock</td><td>Fournisseur d'identité réel, jetons courts, contrôle d'accès côté serveur</td></tr>
+    <tr><td>IA</td><td><code>lib/mock-ai.ts</code> : modèles de texte et scores aléatoires</td><td>Service d'analyse (forme, structure, fond, cohérence) branché sur le profil, en file d'attente</td></tr>
+    <tr><td>Fichiers</td><td>Noms et tailles seuls ; URL fictives</td><td>Stockage des fichiers, extraction du texte et de la structure DOCX/PDF</td></tr>
+    <tr><td>Accès aux données côté écrans</td><td>Client HTTP <code>lib/api.ts</code> et hooks <code>useApiList</code>, <code>useApiResource</code>, <code>useEtablissement</code> (cache TanStack Query)</td><td>Inchangé : il suffit de changer l'URL de base</td></tr>
+  </tbody>
+</table>
+<p>La maquette sépare déjà l'accès au réseau (centralisé dans le client HTTP et les hooks) de la logique métier, écrite en fonctions pures testables : statut d'un apprenant, retards, planning, livrables, chapitres. Remplacer le mock par un vrai serveur ne demande donc pas de réécrire les écrans.</p>
+
+<!-- ===================================================================== -->
+<h1 class="partie" id="p10"><span class="num">Partie X</span>Décisions, écarts et feuille de route</h1>
+
+<h2>Décisions de fusion</h2>
+<table>
+  <thead><tr><th style="width:4%">#</th><th style="width:22%">Sujet</th><th>Décision retenue</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Nom du produit</td><td><strong>MemoAssistant AI</strong>. L'application affiche aujourd'hui « MemoAI Assistant » : à harmoniser.</td></tr>
+    <tr><td>2</td><td>Vocabulaire</td><td>« Encadreur » dans les textes et l'interface ; clé technique <code>encadrant</code> conservée. « Professeur » = encadreur affilié.</td></tr>
+    <tr><td>3</td><td>Rôles</td><td>Quatre rôles : étudiant, encadreur, administrateur d'établissement, super-administrateur (§ 8).</td></tr>
+    <tr><td>4</td><td>Statuts du document</td><td>Libellés du document v1.0, clés de la maquette. « Prêt pour soumission » est calculé ; « Révisé » = version supérieure à 1 (partie IX).</td></tr>
+    <tr><td>5</td><td>Axes d'analyse</td><td>Forme, Structure, Fond, Cohérence. Méthodologie et Bibliographie sont des sous-catégories (§ 23).</td></tr>
+    <tr><td>6</td><td>Score global</td><td>Pondéré par la grille du profil, et non plus moyenne simple (§ 24).</td></tr>
+    <tr><td>7</td><td>Règles institutionnelles</td><td>Deux modes : « par défaut » (modifiable) ou « imposée » (verrouillée) (§ 20).</td></tr>
+    <tr><td>8</td><td>Planning</td><td>Proposition automatique calculée, sans IA pour l'instant (§ 39).</td></tr>
+    <tr><td>9</td><td>Tuteur IA</td><td>Les échanges ne changent pas le score : seule une nouvelle analyse le modifie (§ 27).</td></tr>
+  </tbody>
+</table>
+
+<h2>Ajouts au document v1.0 (issus du cahier des fonctionnalités et de la maquette)</h2>
+<ul>
+  <li>Espace établissement complet : structure, promotions, classes, groupes, professeurs, apprenants, normes, abonnement.</li>
+  <li>Modes indépendant et établissement ; codes de classe ; demandes d'encadrement et mise en relation.</li>
+  <li>Canevas structuré : chapitres, critères obligatoires ou optionnels, duplication, import depuis un fichier.</li>
+  <li>Validation par chapitre avec verrouillage et déverrouillage.</li>
+  <li>Livrables (fichiers et liens) avec statuts et échéances.</li>
+  <li>Planning : disponibilités, séances, génération, tâches par séance, retards et relances.</li>
+  <li>Diffusion d'une consigne à une classe ; statistiques pour l'encadreur et la plateforme.</li>
+  <li>RGPD, sessions actives, aide et support, pages publiques.</li>
+  <li>Super-administration : forfaits, audit, supervision technique, conflits entre profils.</li>
+</ul>
+
+<h2>Reste à concevoir et à développer</h2>
+<table>
+  <thead><tr><th style="width:5%">Prio.</th><th style="width:30%">Élément</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td>P1</td><td>Moteur d'analyse IA réel</td><td>Analyse forme, structure, fond et cohérence selon le profil ; points liés à une règle et à un passage ; marque « avis de l'encadreur requis ».</td></tr>
+    <tr><td>P1</td><td>Backend et authentification réels</td><td>API avec le même contrat, contrôle d'accès côté serveur, mots de passe hachés, stockage des fichiers.</td></tr>
+    <tr><td>P1</td><td>Calcul serveur du seuil de soumission</td><td>Seuil global, seuils par catégorie, points bloquants, score pondéré par la grille.</td></tr>
+    <tr><td>P1</td><td>Ingestion des ressources</td><td>Téléversement des guides et modèles, extraction des règles, écran de prévisualisation et de validation (§ 19).</td></tr>
+    <tr><td>P2</td><td>Diff Engine et apprentissage</td><td>Comparaison des versions IA et encadreur, proposition de règles, modification et désactivation, réutilisation dans les analyses suivantes (§ 38).</td></tr>
+    <tr><td>P2</td><td>Commentaires enrichis</td><td>Catégorie (forme, méthodologique, scientifique, général) et statut résolu ; vue « version précédente / nouvelle version » (§ 34, § 37).</td></tr>
+    <tr><td>P2</td><td>Normes imposées, départements, disciplines</td><td>Les niveaux manquants de la hiérarchie des règles (§ 20).</td></tr>
+    <tr><td>P2</td><td>Notifications automatiques</td><td>Détection des retards et rappels d'échéance par une tâche planifiée ; envoi réel des e-mails.</td></tr>
+    <tr><td>P3</td><td>Éditeur de rédaction partagé</td><td>Rédaction dans la plateforme, export Word ou PDF intégrant les corrections.</td></tr>
+    <tr><td>P3</td><td>Messagerie et invitations en masse</td><td>Messages encadreur ↔ étudiant ; import d'une liste d'e-mails.</td></tr>
+    <tr><td>P3</td><td>Sous-sections du canevas et statut « En cours » des livrables</td><td>Compléments de modèle.</td></tr>
+    <tr><td>—</td><td>Modèle économique</td><td>Tarifs, payeur de la mise en relation, facturation : <strong>décision produit à prendre</strong>.</td></tr>
+  </tbody>
+</table>
+
+<h2 style="break-before: page; margin-top: 0">Résumé du fonctionnement</h2>
+<ol>
+  <li>L'encadreur définit ses exigences dans un profil méthodologique : canevas, contraintes, grille, livrables.</li>
+  <li>L'établissement, s'il existe, fixe les normes par défaut et organise ses promotions et ses classes.</li>
+  <li>L'étudiant se rattache, crée son document et l'importe.</li>
+  <li>L'IA analyse la forme, la structure, le fond et la cohérence, puis calcule un score estimatif.</li>
+  <li>L'étudiant corrige avec l'aide du tuteur IA, jusqu'à atteindre le seuil sans point bloquant.</li>
+  <li>Il soumet : une version est créée et l'encadreur est notifié.</li>
+  <li>L'encadreur corrige, commente, valide les chapitres et rend sa décision.</li>
+  <li>Les écarts entre l'IA et l'encadreur deviennent des règles proposées, que l'encadreur confirme.</li>
+  <li>Le cycle recommence jusqu'à la validation finale.</li>
+</ol>
+<p class="citation">Une IA qui ne se contente pas de dire si un document est « bon », mais qui cherche à savoir s'il est conforme aux attentes de l'encadreur qui l'évaluera réellement.</p>
+
+</body>
+</html>

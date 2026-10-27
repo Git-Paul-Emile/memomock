@@ -37,6 +37,8 @@ import { apiDelete, apiGet, apiList, apiPatch } from "@/lib/api";
 import { obtenirSessionId } from "@/lib/session-id";
 import { getInitials } from "@/lib/utils";
 import { ROLE_LABELS } from "@/lib/constants";
+import { PAYS_PAR_DEFAUT, paysDepuisTelephone } from "@/lib/afrique";
+import { SelectPays } from "@/components/shared/select-pays";
 import type {
   CanalNotification,
   DocumentSubmission,
@@ -45,7 +47,10 @@ import type {
   SessionConnexion,
 } from "@/types";
 
+// Les relais SMS / WhatsApp / e-mail sont simulés en mode mock (aucun envoi réel).
 const CANAL_LABELS: Record<CanalNotification, string> = {
+  whatsapp: "WhatsApp + dans l'application",
+  sms: "SMS + dans l'application",
   email: "E-mail + dans l'application",
   in_app: "Dans l'application uniquement",
 };
@@ -61,6 +66,7 @@ const schemaProfil = z.object({
     .regex(TELEPHONE_REGEX, "Numéro invalide (format : +221771234567)")
     .or(z.literal("")),
   filiere: z.string().optional(),
+  pays: z.string().min(2, "Choisissez votre pays"),
 });
 
 type FormValues = z.infer<typeof schemaProfil>;
@@ -109,6 +115,7 @@ export default function ParametresPage() {
           email: user.email,
           telephone: user.telephone ?? "",
           filiere: user.filiere ?? "",
+          pays: user.pays ?? paysDepuisTelephone(user.telephone)?.code ?? PAYS_PAR_DEFAUT,
         }
       : undefined,
   });
@@ -171,7 +178,7 @@ export default function ParametresPage() {
     }
   };
 
-  // RGPD - droit à la portabilité (art. 20) : télécharge un export JSON complet de toutes les
+  // Protection des données - droit d'accès et de portabilité : télécharge un export JSON complet de toutes les
   // données personnelles rattachées au compte.
   const handleExporterDonnees = async () => {
     setExportEnCours(true);
@@ -199,7 +206,7 @@ export default function ParametresPage() {
     }
   };
 
-  // RGPD - droit à l'effacement (art. 17), mis en œuvre par anonymisation. Confirmation
+  // Protection des données - droit à l'effacement, mis en œuvre par anonymisation. Confirmation
   // explicite requise (saisie du mot "SUPPRIMER") avant toute action irréversible.
   const handleSupprimerCompte = async () => {
     setSuppressionEnCours(true);
@@ -208,7 +215,7 @@ export default function ParametresPage() {
         actif: false,
         nom: "Compte supprimé",
         prenom: "",
-        email: `anonymise-${user.id}@memoai.fr`,
+        email: `anonymise-${user.id}@memoassistant.africa`,
         telephone: null,
         avatarUrl: null,
       });
@@ -338,7 +345,12 @@ export default function ParametresPage() {
               </p>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="telephone">Numéro de téléphone</Label>
+              <Label htmlFor="pays">Pays</Label>
+              <SelectPays id="pays" avecIndicatif={false} {...register("pays")} />
+              {errors.pays && <p className="text-xs text-destructive">{errors.pays.message}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="telephone">Numéro de téléphone (avec indicatif)</Label>
               <Input
                 id="telephone"
                 placeholder="+221771234567"
@@ -527,8 +539,9 @@ export default function ParametresPage() {
         <CardHeader>
           <CardTitle className="text-base">Vos données personnelles</CardTitle>
           <CardDescription>
-            Conformément au RGPD, vous pouvez à tout moment récupérer une copie de vos données ou
-            supprimer votre compte. Voir notre{" "}
+            Conformément à la loi de protection des données de votre pays et à la Convention de
+            Malabo, vous pouvez à tout moment récupérer une copie de vos données ou supprimer votre
+            compte. Voir notre{" "}
             <Link href="/confidentialite" className="text-primary hover:underline">
               politique de confidentialité
             </Link>

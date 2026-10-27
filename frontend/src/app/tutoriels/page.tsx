@@ -70,7 +70,7 @@ const TUTORIELS_ADMIN: Tutoriel[] = [
   },
   {
     titre: "Repérer les exigences divergentes",
-    description: "Comparer les profils méthodologiques des encadrants sur un même type de mémoire.",
+    description: "Comparer les profils méthodologiques des encadreurs sur un même type de mémoire.",
     lien: "/admin/hierarchie-regles",
   },
   {

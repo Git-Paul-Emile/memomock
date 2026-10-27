@@ -5,7 +5,7 @@ import type { RevisionSegment, TypeSegment } from "@/types";
 /**
  * Reconstitue le texte "actuel" d'un paragraphe à partir de ses segments de révision : les
  * segments "normal" et "ajoute" forment le texte de travail, les segments "supprime" restent
- * visibles dans l'écran de retour (barrés) mais ne font plus partie du texte que l'encadrant
+ * visibles dans l'écran de retour (barrés) mais ne font plus partie du texte que l'encadreur
  * continue de corriger.
  */
 export function texteCourantDuParagraphe(segments: RevisionSegment[]): string {

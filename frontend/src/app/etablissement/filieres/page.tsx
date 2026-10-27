@@ -1,5 +1,9 @@
 "use client";
 
+import { useApiList } from "@/hooks/use-api-list";
+import { ETABLISSEMENT_INCONNU } from "@/lib/etablissement";
+import type { Departement } from "@/types";
+
 import * as React from "react";
 import Link from "next/link";
 import { ChevronDown, Folder, GitBranch, Plus, Trash2 } from "lucide-react";
@@ -64,6 +68,27 @@ export default function StructurePage() {
   const [nom, setNom] = React.useState("");
   const [enCours, setEnCours] = React.useState(false);
   const [aSupprimer, setASupprimer] = React.useState<Filiere | null>(null);
+  const [departementId, setDepartementId] = React.useState("");
+  const [nomDepartement, setNomDepartement] = React.useState("");
+
+  // Départements (UFR, facultés) : niveau intermédiaire entre l'établissement et les filières.
+  const { data: departements, refetch: refetchDepartements } = useApiList<Departement>("departements", {
+    filtres: { etablissementId: etablissement?.id ?? ETABLISSEMENT_INCONNU },
+    tri: "nom",
+    limite: 200,
+  });
+
+  const creerDepartement = async () => {
+    if (!nomDepartement.trim() || !etablissement) return;
+    await apiPost<Departement>("departements", {
+      etablissementId: etablissement.id,
+      nom: nomDepartement.trim(),
+      createdAt: new Date().toISOString(),
+    });
+    setNomDepartement("");
+    refetchDepartements();
+    toast.success("Département créé.");
+  };
 
   const structure = React.useMemo(() => {
     // Comptage des apprenants et des dépôts par classe, en une passe sur les étudiants.
@@ -124,6 +149,7 @@ export default function StructurePage() {
     try {
       await apiPost<Filiere>("filieres", {
         etablissementId: etablissement.id,
+        departementId: departementId || null,
         nom: nom.trim(),
         createdAt: new Date().toISOString(),
       });
@@ -163,7 +189,7 @@ export default function StructurePage() {
     <div className="mx-auto max-w-3xl">
       <PageHeader
         title="Structure de l'établissement"
-        description="Organisez vos filières, niveaux et classes."
+        description="Organisez vos départements, filières, niveaux et classes."
         actions={
           <Dialog open={dialogueOuvert} onOpenChange={setDialogueOuvert}>
             <DialogTrigger asChild>
@@ -188,6 +214,22 @@ export default function StructurePage() {
                   Les niveaux (Licence, Master, Doctorat) apparaissent automatiquement dès
                   qu&apos;une classe de ce niveau est créée dans la filière.
                 </p>
+                <Label htmlFor="filiere-departement" className="pt-2">
+                  Département (UFR / faculté)
+                </Label>
+                <select
+                  id="filiere-departement"
+                  value={departementId}
+                  onChange={(e) => setDepartementId(e.target.value)}
+                  className="h-9 w-full rounded-md border border-input bg-transparent px-2 text-sm"
+                >
+                  <option value="">Aucun</option>
+                  {departements.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.nom}
+                    </option>
+                  ))}
+                </select>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setDialogueOuvert(false)}>
@@ -201,6 +243,35 @@ export default function StructurePage() {
           </Dialog>
         }
       />
+
+      <Card className="mb-4">
+        <CardContent className="space-y-3 pt-6">
+          <p className="text-sm font-medium">Départements (UFR, facultés)</p>
+          <div className="flex flex-wrap gap-2">
+            {departements.length === 0 ? (
+              <span className="text-sm text-muted-foreground">Aucun département pour l&apos;instant.</span>
+            ) : (
+              departements.map((d) => (
+                <Badge key={d.id} variant="secondary">
+                  {d.nom} · {referentiel.filieres.filter((f) => f.departementId === d.id).length} filière(s)
+                </Badge>
+              ))
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Input
+              value={nomDepartement}
+              onChange={(e) => setNomDepartement(e.target.value)}
+              placeholder="Ex : UFR Sciences économiques et de gestion"
+              className="h-9"
+            />
+            <Button size="sm" onClick={creerDepartement} disabled={!nomDepartement.trim()}>
+              <Plus className="size-4" />
+              Ajouter
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {structure.length === 0 ? (
         <EmptyState
@@ -226,6 +297,11 @@ export default function StructurePage() {
                   >
                     <Folder className="size-5 text-primary" />
                     <span className="font-medium">{filiere.nom}</span>
+                    {filiere.departementId && (
+                      <span className="hidden text-xs text-muted-foreground sm:inline">
+                        {departements.find((d) => d.id === filiere.departementId)?.nom}
+                      </span>
+                    )}
                     <Badge variant="outline">
                       {niveaux.length} niveau{niveaux.length > 1 ? "x" : ""}
                     </Badge>

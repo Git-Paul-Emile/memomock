@@ -14,6 +14,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { apiGet } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import {
+  annexeSuggestions,
+  corpsDocument,
+  documentHtmlComplet,
+  exporterPdf,
+  exporterWord,
+} from "@/lib/export-document";
 import type { DocumentSubmission } from "@/types";
 
 /**
@@ -51,12 +58,34 @@ export default function ExportPage() {
   const [enCours, setEnCours] = React.useState(false);
   const [pret, setPret] = React.useState(false);
 
-  // Aucune conversion de format (pas de génération Word/PDF à la volée) : le fichier téléchargé
-  // est le fichier d'origine (`document.urlFichier`), ce qui préserve sa mise en forme à
-  // l'identique - l'objectif énoncé dans le cahier des charges.
+  // Deux voies (spec v2, § 30) :
+  //  - « Conserver la mise en forme d'origine » avec un fichier importé : on renvoie ce fichier
+  //    tel quel (mise en forme préservée à l'identique) ;
+  //  - sinon : export généré depuis le texte, corrections de l'encadreur intégrées (Word .doc,
+  //    ou PDF via l'impression du navigateur).
   const telecharger = async () => {
-    if (!document?.urlFichier) {
-      toast.error("Aucun fichier disponible pour ce document.");
+    if (!document) return;
+    if (!conserverMiseEnForme || !document.urlFichier) {
+      setEnCours(true);
+      try {
+        const corps = await corpsDocument(document.id);
+        if (!corps) {
+          toast.error("Aucun texte disponible : importez ou rédigez d'abord votre document.");
+          return;
+        }
+        const annexe = inclureCommentaires ? await annexeSuggestions(document.id) : "";
+        const html = documentHtmlComplet(document, corps + annexe);
+        if (format === "pdf") {
+          if (!exporterPdf(html)) toast.error("Autorisez l'ouverture de fenêtres pour exporter en PDF.");
+        } else {
+          exporterWord(document, html);
+        }
+        setPret(true);
+      } catch {
+        toast.error("L'export a échoué. Réessayez dans quelques instants.");
+      } finally {
+        setEnCours(false);
+      }
       return;
     }
     setEnCours(true);
@@ -152,7 +181,8 @@ export default function ExportPage() {
                   Conserver la mise en forme d&apos;origine
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  Marges, styles, police et structure du document initial.
+                  Renvoie le fichier importé tel quel. Désactivez pour obtenir une version qui
+                  intègre les corrections de votre encadreur.
                 </p>
               </div>
               <Switch
@@ -191,14 +221,18 @@ export default function ExportPage() {
             <Button
               className="w-full"
               onClick={telecharger}
-              disabled={enCours || !document?.urlFichier}
+              disabled={enCours || !document}
             >
               {enCours ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
                 <Download className="size-4" />
               )}
-              Télécharger le fichier {format === "pdf" ? ".pdf" : ".docx"}
+              {conserverMiseEnForme && document?.urlFichier
+                ? `Télécharger le fichier d'origine`
+                : format === "pdf"
+                  ? "Générer le PDF (corrections intégrées)"
+                  : "Télécharger le Word (corrections intégrées)"}
             </Button>
           )}
         </CardContent>

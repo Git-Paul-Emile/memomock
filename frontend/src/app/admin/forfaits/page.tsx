@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { apiDelete, apiPost } from "@/lib/api";
+import { formaterMontant } from "@/lib/afrique";
 import type { Forfait } from "@/types";
 
 /** Catalogue des forfaits de la plateforme (spec section 96), géré par le super-admin. */
@@ -71,6 +72,7 @@ export default function ForfaitsAdminPage() {
         nom: nom.trim(),
         description: description.trim(),
         prixMensuel,
+        devise: "XOF",
         maxEtudiants: maxEtudiants.trim() ? Number(maxEtudiants) : null,
         maxEncadrants: maxEncadrants.trim() ? Number(maxEncadrants) : null,
         fonctionnalites,
@@ -139,7 +141,7 @@ export default function ForfaitsAdminPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="forfait-prix">Prix mensuel (€)</Label>
+                  <Label htmlFor="forfait-prix">Prix mensuel (F CFA)</Label>
                   <Input
                     id="forfait-prix"
                     type="number"
@@ -160,7 +162,7 @@ export default function ForfaitsAdminPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="forfait-max-encadrants">Encadrants max (vide = illimité)</Label>
+                    <Label htmlFor="forfait-max-encadrants">Encadreurs max (vide = illimité)</Label>
                     <Input
                       id="forfait-max-encadrants"
                       type="number"
@@ -247,7 +249,7 @@ export default function ForfaitsAdminPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium">{f.nom}</p>
-                    <Badge variant="outline">{f.prixMensuel} €/mois</Badge>
+                    <Badge variant="outline">{formaterMontant(f.prixMensuel, f.devise ?? "XOF")} / mois</Badge>
                     {f.miseEnRelationPayante && (
                       <Badge variant="secondary" className="text-[10px]">
                         Mise en relation payante

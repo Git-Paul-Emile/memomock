@@ -23,14 +23,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { apiPost } from "@/lib/api";
+import { useAuth } from "@/context/auth-context";
+import { creerProfil } from "@/lib/profil";
 import { LIBELLES_TYPE_DOCUMENT } from "@/types";
 import type { ProfilEncadrant, TypeDocument } from "@/types";
 
 const TYPES_DOCUMENT: TypeDocument[] = ["licence", "master", "doctorat"];
 
 /**
- * Sélecteur de profil méthodologique (spec section 8 : un encadrant en possède plusieurs - un
+ * Sélecteur de profil méthodologique (spec section 8 : un encadreur en possède plusieurs - un
  * par type de document × discipline, ex. "Master Informatique", "Doctorat Informatique").
  * Réutilisé par `/encadrant/profil` et `/encadrant/contraintes` (Phase 3) : chaque écran affiche
  * ensuite le contenu du profil sélectionné.
@@ -46,6 +47,7 @@ export function SelecteurProfil({
   onSelectionner: (id: string) => void;
   onCree: (profil: ProfilEncadrant) => void;
 }) {
+  const { user } = useAuth();
   const [dialogOuvert, setDialogOuvert] = React.useState(false);
   const [typeDocument, setTypeDocument] = React.useState<TypeDocument>("master");
   const [discipline, setDiscipline] = React.useState("");
@@ -61,11 +63,8 @@ export function SelecteurProfil({
     }
     setEnCours(true);
     try {
-      const profil = await apiPost<ProfilEncadrant>("profils-encadrant", {
-        typeDocument,
-        discipline: discipline.trim(),
-        ...(nom.trim() ? { nom: nom.trim() } : {}),
-      });
+      if (!user) return;
+      const profil = await creerProfil(user.id, { typeDocument, discipline, nom });
       onCree(profil);
       onSelectionner(profil.id);
       setDialogOuvert(false);

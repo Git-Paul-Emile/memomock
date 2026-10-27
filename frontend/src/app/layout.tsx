@@ -4,8 +4,9 @@ import { Providers } from "@/app/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MemoAI Assistant",
-  description: "Assistant IA d'aide à la rédaction et à l'encadrement de mémoires académiques.",
+  title: "MemoAssistant AI",
+  description:
+    "Assistant IA de pré-validation des mémoires et thèses selon les exigences de chaque encadreur - universités d'Afrique de l'Ouest et centrale.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

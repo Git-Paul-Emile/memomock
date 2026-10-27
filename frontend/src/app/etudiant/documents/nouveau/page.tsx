@@ -64,7 +64,7 @@ export default function NouveauDocumentPage() {
 
   const onSubmit = async (values: FormValues) => {
     if (!user?.encadrantId) {
-      toast.error("Aucun encadrant n'est associé à votre compte.");
+      toast.error("Aucun encadreur n'est associé à votre compte.");
       return;
     }
     setIsSubmitting(true);

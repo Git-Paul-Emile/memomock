@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -24,7 +25,7 @@ import { apiGet, apiPatch, apiPost } from "@/lib/api";
 import { formatDate, getInitials } from "@/lib/utils";
 import type { DemandeEncadrement, Invitation, PublicUser } from "@/types";
 
-/** Code d'invitation lisible, propre à un encadrant (partagé par toutes ses invitations). */
+/** Code d'invitation lisible, propre à un encadreur (partagé par toutes ses invitations). */
 function genererCodeInvitation() {
   return `MEMO-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 }
@@ -57,7 +58,7 @@ export default function InvitationsPage() {
     limite: 100,
   });
 
-  // Le code d'invitation partagé est commun à l'encadrant : on réutilise celui de ses
+  // Le code d'invitation partagé est commun à l'encadreur : on réutilise celui de ses
   // invitations existantes pour rester cohérent, sinon le brouillon généré côté client.
   const codeInvitation = invitations[0]?.code ?? codeGenere;
 
@@ -68,6 +69,32 @@ export default function InvitationsPage() {
       setSaisie("");
     }
   };
+
+  // Invitation en masse (spec v2, § 11) : toutes les adresses trouvées dans un texte collé ou un
+  // fichier CSV/TXT (export de liste de classe) sont ajoutées, sans doublon.
+  const importerListe = (texte: string) => {
+    const trouvees = (texte.match(/[^\s,;<>"']+@[^\s,;<>"']+\.[a-z]{2,}/gi) ?? []).map((e) =>
+      e.toLowerCase()
+    );
+    const nouvelles = [...new Set(trouvees)].filter((e) => !emails.includes(e));
+    setEmails((prev) => [...prev, ...nouvelles]);
+    toast.success(
+      nouvelles.length > 0
+        ? `${nouvelles.length} adresse(s) ajoutée(s) à la liste.`
+        : "Aucune nouvelle adresse trouvée."
+    );
+  };
+
+  const importerFichier = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fichier = e.target.files?.[0];
+    e.target.value = "";
+    if (fichier) importerListe(await fichier.text());
+  };
+
+  // Partage du code via WhatsApp, canal le plus utilisé par les étudiants de la zone.
+  const lienWhatsApp = `https://wa.me/?text=${encodeURIComponent(
+    `Bonjour, rejoignez mon espace d'encadrement sur MemoAssistant AI avec le code ${codeInvitation} (menu « Rejoindre un encadreur »).`
+  )}`;
 
   const copierCode = () => {
     navigator.clipboard?.writeText(codeInvitation).catch(() => {});
@@ -134,7 +161,7 @@ export default function InvitationsPage() {
                     ajouterEmail();
                   }
                 }}
-                placeholder="prenom.nom@etu.exemple.fr"
+                placeholder="prenom.nom@etu.universite.sn"
                 type="email"
               />
               <Button variant="outline" onClick={ajouterEmail}>
@@ -142,6 +169,25 @@ export default function InvitationsPage() {
                 Ajouter
               </Button>
             </div>
+
+            <details className="rounded-lg border p-3 text-sm">
+              <summary className="cursor-pointer font-medium">
+                Importer une liste (copier-coller ou fichier CSV)
+              </summary>
+              <div className="mt-3 space-y-2">
+                <Textarea
+                  rows={3}
+                  placeholder="Collez ici une liste d'adresses (séparées par des virgules, points-virgules ou retours à la ligne)"
+                  onBlur={(e) => {
+                    if (e.target.value.trim()) {
+                      importerListe(e.target.value);
+                      e.target.value = "";
+                    }
+                  }}
+                />
+                <Input type="file" accept=".csv,.txt" onChange={importerFichier} aria-label="Fichier de liste d'e-mails" />
+              </div>
+            </details>
 
             {emails.length > 0 && (
               <div className="flex flex-wrap gap-2">
@@ -197,6 +243,11 @@ export default function InvitationsPage() {
               <Button variant="outline" onClick={copierCode}>
                 <Copy className="size-4" />
                 {copie ? "Copié !" : "Copier"}
+              </Button>
+              <Button variant="outline" asChild>
+                <a href={lienWhatsApp} target="_blank" rel="noopener noreferrer">
+                  WhatsApp
+                </a>
               </Button>
             </div>
           </CardContent>
@@ -321,8 +372,8 @@ function CarteDemandes() {
         userId: demande.etudiantId,
         titre: accepter ? "Demande d'encadrement acceptée" : "Demande d'encadrement refusée",
         message: accepter
-          ? "Votre encadrant a accepté votre demande. Vous pouvez soumettre votre premier document."
-          : "Votre demande d'encadrement n'a pas été retenue par cet encadrant.",
+          ? "Votre encadreur a accepté votre demande. Vous pouvez soumettre votre premier document."
+          : "Votre demande d'encadrement n'a pas été retenue par cet encadreur.",
         type: "systeme",
         lu: false,
         date: maintenant,

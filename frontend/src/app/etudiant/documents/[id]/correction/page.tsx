@@ -1,14 +1,17 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { Bot, Send, Wand2, User } from "lucide-react";
+import { Bot, RefreshCw, Send, Wand2, User } from "lucide-react";
 import { toast } from "sonner";
 
 import { useApiResource } from "@/hooks/use-api-resource";
 import { useSyncedState } from "@/hooks/use-synced-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { ScoreJauge } from "@/components/shared/score-jauge";
+import { DetailScores } from "@/components/shared/detail-scores";
+import { BadgeSourceIa } from "@/components/documents/point-analyse";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,14 +19,17 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { apiGet, apiList, apiPatch, apiPost } from "@/lib/api";
-import { genererReponseTuteur, libelleAuteur, progresserScore } from "@/lib/mock-ai";
-import { SEUIL_SCORE_CONFORMITE } from "@/lib/constants";
+import { chargerContenu, chargerReferentiel, construireContexte } from "@/lib/analyse-document";
+import { questionnerTuteur } from "@/lib/ia/client";
+import { libelleAuteur } from "@/lib/mock-ai";
+import { LIBELLE_SCORE } from "@/lib/score";
 import { cn, formatDateTime } from "@/lib/utils";
-import type { DocumentSubmission, MessageCorrection } from "@/types";
+import type { Analyse, DocumentSubmission, MessageCorrection } from "@/types";
 
 interface DonneesCorrectionEtudiant {
   document: DocumentSubmission;
   messages: MessageCorrection[];
+  analyses: Analyse[];
 }
 
 export default function CorrectionDocumentPage() {
@@ -36,7 +42,7 @@ export default function CorrectionDocumentPage() {
   const { data, isLoading } = useApiResource<DonneesCorrectionEtudiant>(
     ["document-correction-etudiant", id],
     async () => {
-      const [doc, listeMessages] = await Promise.all([
+      const [doc, listeMessages, listeAnalyses] = await Promise.all([
         apiGet<DocumentSubmission>("documents", id),
         apiList<MessageCorrection>("messages", {
           filtres: { documentId: id },
@@ -44,6 +50,7 @@ export default function CorrectionDocumentPage() {
           tri: "date",
           ordre: "asc",
         }),
+        apiList<Analyse>("analyses", { filtres: { documentId: id }, limite: 10 }),
       ]);
 
       if (doc.statut === "analyse_terminee") {
@@ -53,14 +60,13 @@ export default function CorrectionDocumentPage() {
         });
       }
 
-      return { document: doc, messages: listeMessages.data };
+      return { document: doc, messages: listeMessages.data, analyses: listeAnalyses.data };
     }
   );
 
-  // Le document/les messages sont dupliqués en état local pour permettre les mises à jour
-  // optimistes (nouveau message, score qui progresse) sans attendre un refetch réseau ; ils
-  // sont resynchronisés avec la donnée serveur à chaque nouveau chargement.
-  const [document, setDocument] = useSyncedState<DocumentSubmission | null>(data?.document, null);
+  // Les messages sont dupliqués en état local pour l'affichage optimiste des nouveaux échanges ;
+  // ils sont resynchronisés avec la donnée serveur à chaque nouveau chargement.
+  const document = data?.document ?? null;
   const [messages, setMessages] = useSyncedState<MessageCorrection[]>(data?.messages, []);
 
   React.useEffect(() => {
@@ -81,22 +87,40 @@ export default function CorrectionDocumentPage() {
         contenu,
         date: maintenant,
       });
+      setMessages((prev) => [...prev, messageEtudiant]);
+
+      // Le tuteur répond à partir du document, des règles de l'encadreur et des points de la
+      // dernière analyse. Il ne modifie pas le score : seule une nouvelle analyse le fait
+      // (spec v2, § 27).
+      const [referentiel, contenuDocument] = await Promise.all([
+        chargerReferentiel(document),
+        chargerContenu(document.id),
+      ]);
+      const contexte = construireContexte(document, referentiel);
+      const { resultat } = await questionnerTuteur({
+        question: contenu,
+        historique: messages.slice(-10).map((m) => ({
+          auteur: m.auteur === "ia" ? "ia" : "etudiant",
+          contenu: m.contenu,
+        })),
+        contexte: {
+          titre: document.titre,
+          typeDocument: contexte.typeDocument,
+          points: (data?.analyses ?? [])
+            .flatMap((a) => a.points)
+            .filter((p) => p.niveau !== "succes")
+            .map((p) => `${p.libelle} : ${p.detail}`),
+          regles: [...contexte.reglesImposees, ...contexte.regles, ...contexte.reglesApprises],
+          extrait: (contenuDocument?.texte ?? "").slice(0, 30_000),
+        },
+      });
       const messageIA = await apiPost<MessageCorrection>("messages", {
         documentId: document.id,
         auteur: "ia",
-        contenu: genererReponseTuteur(),
+        contenu: resultat,
         date: new Date().toISOString(),
       });
-      setMessages((prev) => [...prev, messageEtudiant, messageIA]);
-
-      const nouveauScoreFond = progresserScore(document.scoreFond);
-      const nouveauScoreConformite = Math.round((document.scoreForme + nouveauScoreFond) / 2);
-      const docMisAJour = await apiPatch<DocumentSubmission>("documents", document.id, {
-        scoreFond: nouveauScoreFond,
-        scoreConformite: nouveauScoreConformite,
-        dateMaj: new Date().toISOString(),
-      });
-      setDocument(docMisAJour);
+      setMessages((prev) => [...prev, messageIA]);
     } catch {
       toast.error("Le message n'a pas pu être envoyé.");
     } finally {
@@ -104,25 +128,8 @@ export default function CorrectionDocumentPage() {
     }
   };
 
-  const transmettreEncadrant = async () => {
-    if (!document) return;
-    const docMisAJour = await apiPatch<DocumentSubmission>("documents", document.id, {
-      statut: "pret_pour_encadrant",
-      dateMaj: new Date().toISOString(),
-    });
-    await apiPost("notifications", {
-      userId: document.encadrantId,
-      titre: "Document prêt pour relecture",
-      message: `« ${document.titre} » a atteint le score de conformité requis après correction.`,
-      type: "validation",
-      lu: false,
-      date: new Date().toISOString(),
-      lienDocumentId: document.id,
-    });
-    setDocument(docMisAJour);
-    toast.success("Document transmis à votre encadrant !");
-    router.push("/etudiant/dashboard");
-  };
+  // La soumission officielle passe par l'écran de confirmation, qui crée la version.
+  const soumettreEncadreur = () => router.push(`/etudiant/documents/${id}/confirmation`);
 
   if (isLoading || !document) {
     return (
@@ -133,15 +140,15 @@ export default function CorrectionDocumentPage() {
     );
   }
 
-  // `pretPourSoumission` peut être fourni par l'API ; à défaut, on retombe sur une comparaison
-  // au seuil de conformité générique.
-  const scoreSuffisant =
-    document.pretPourSoumission ?? document.scoreConformite >= SEUIL_SCORE_CONFORMITE;
+  const scoreSuffisant = document.pretPourSoumission === true;
 
   return (
     <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1fr_260px]">
       <div>
-        <PageHeader title="Correction interactive" description={document.titre} />
+        <PageHeader
+          title="Correction avec le tuteur IA"
+          description={`${document.titre} - le tuteur explique les points relevés et la règle de votre encadreur qui s'applique ; il ne réécrit pas votre texte.`}
+        />
 
         <Card className="flex h-[65vh] flex-col">
           <CardContent className="flex-1 overflow-hidden p-0">
@@ -149,8 +156,9 @@ export default function CorrectionDocumentPage() {
               <div className="flex flex-col gap-4">
                 {messages.length === 0 && (
                   <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-                    Décrivez une section de votre mémoire ou posez une question au tuteur IA pour
-                    démarrer l&apos;échange.
+                    Posez une question au tuteur IA, par exemple : « Pourquoi cette partie
+                    n&apos;est-elle pas conforme ? », « Quelle règle de mon encadreur s&apos;applique
+                    ici ? » ou « Comment améliorer mon introduction ? ».
                   </div>
                 )}
                 {messages.map((message) => {
@@ -218,16 +226,26 @@ export default function CorrectionDocumentPage() {
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-3">
             <ScoreJauge score={document.scoreConformite} />
-            <div className="w-full space-y-1 text-xs text-muted-foreground">
-              <div className="flex justify-between">
-                <span>Forme</span>
-                <span className="font-medium text-foreground">{document.scoreForme}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Fond</span>
-                <span className="font-medium text-foreground">{document.scoreFond}</span>
-              </div>
-            </div>
+            <p className="text-center text-[11px] leading-tight text-muted-foreground">
+              {LIBELLE_SCORE}
+            </p>
+            <BadgeSourceIa source={document.sourceAnalyse} />
+            <DetailScores document={document} compact />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="space-y-3 pt-6">
+            <p className="text-sm text-muted-foreground">
+              Vous avez corrigé votre document ? Réimportez-le pour une nouvelle analyse et un
+              nouveau score.
+            </p>
+            <Button variant="outline" className="w-full" asChild>
+              <Link href={`/etudiant/soumission?documentId=${document.id}`}>
+                <RefreshCw className="size-4" />
+                Réimporter et réanalyser
+              </Link>
+            </Button>
           </CardContent>
         </Card>
 
@@ -235,9 +253,9 @@ export default function CorrectionDocumentPage() {
           <Card className="border-success/40 bg-success/5">
             <CardContent className="space-y-3 pt-6 text-center">
               <Wand2 className="mx-auto size-6 text-success" />
-              <p className="text-sm font-medium">Score suffisant pour transmission</p>
-              <Button className="w-full" onClick={transmettreEncadrant}>
-                Transmettre à l&apos;encadrant
+              <p className="text-sm font-medium">Prêt pour la soumission</p>
+              <Button className="w-full" onClick={soumettreEncadreur}>
+                Soumettre à l&apos;encadreur
               </Button>
             </CardContent>
           </Card>

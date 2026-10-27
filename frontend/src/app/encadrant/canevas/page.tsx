@@ -31,7 +31,7 @@ import {
 } from "@/lib/canevas-import";
 import type { Canevas, ChapitreCanevas, CritereChapitre } from "@/types";
 
-/** Liste des canevas de l'encadrant (spec sections 14, 16). */
+/** Liste des canevas de l'encadreur (spec sections 14, 16). */
 export default function CanevasListePage() {
   const { user } = useAuth();
   const {
@@ -252,7 +252,7 @@ interface TitreDetecte {
 }
 
 /** Import d'un canevas depuis un .docx ou .pdf : détection best-effort des titres de chapitres,
- * revus et sélectionnés par l'encadrant avant création (voir lib/canevas-import.ts). */
+ * revus et sélectionnés par l'encadreur avant création (voir lib/canevas-import.ts). */
 function ImporterCanevasDialog({
   encadrantId,
   onImporte,

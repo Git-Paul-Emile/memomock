@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { apiList, apiPatch } from "@/lib/api";
+import { apiDelete, apiList, apiPatch } from "@/lib/api";
 import { STATUT_REGLE_LABELS } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
 import { LIBELLES_NIVEAU_REGLE, LIBELLES_TYPE_DOCUMENT } from "@/types";
@@ -44,6 +44,7 @@ const VARIANT_STATUT: Record<StatutRegle, "default" | "success" | "outline"> = {
   proposee: "outline",
   adoptee: "success",
   ignoree: "default",
+  desactivee: "default",
 };
 
 export default function JumeauNumeriquePage() {
@@ -56,7 +57,7 @@ export default function JumeauNumeriquePage() {
         filtres: { encadrantId: user!.id },
         tri: "dateApprentissage",
         ordre: "desc",
-        limite: 50,
+        limite: 200,
       });
       return res.data;
     },
@@ -111,7 +112,7 @@ export default function JumeauNumeriquePage() {
         ...(niveauChoisi === "discipline" ? { discipline: disciplineChoisie.trim() } : {}),
       });
       setRegles((prev) => prev.map((r) => (r.id === misAJour.id ? misAJour : r)));
-      toast.success("Règle adoptée par votre jumeau numérique.");
+      toast.success("Règle adoptée : elle sera appliquée aux prochaines analyses.");
       setRegleAAdopter(null);
     } catch {
       toast.error("L'adoption a échoué. Réessayez dans quelques instants.");
@@ -120,7 +121,34 @@ export default function JumeauNumeriquePage() {
     }
   };
 
-  const adoptees = regles.filter((r) => r.statut === "adoptee");
+  // Contrôle des règles adoptées (spec v2, § 38) : modifier, désactiver, supprimer.
+  const [regleAModifier, setRegleAModifier] = React.useState<RegleApprise | null>(null);
+  const [texteModifie, setTexteModifie] = React.useState("");
+
+  const enregistrerModification = async () => {
+    if (!regleAModifier || !texteModifie.trim()) return;
+    const misAJour = await apiPatch<RegleApprise>("regles-apprises", regleAModifier.id, {
+      regle: texteModifie.trim(),
+    });
+    setRegles((prev) => prev.map((r) => (r.id === misAJour.id ? misAJour : r)));
+    setRegleAModifier(null);
+    toast.success("Règle modifiée.");
+  };
+
+  const basculerActivation = async (regle: RegleApprise) => {
+    const statut = regle.statut === "desactivee" ? "adoptee" : "desactivee";
+    const misAJour = await apiPatch<RegleApprise>("regles-apprises", regle.id, { statut });
+    setRegles((prev) => prev.map((r) => (r.id === misAJour.id ? misAJour : r)));
+    toast.success(statut === "desactivee" ? "Règle désactivée : l'IA ne l'applique plus." : "Règle réactivée.");
+  };
+
+  const supprimer = async (regle: RegleApprise) => {
+    await apiDelete("regles-apprises", regle.id);
+    setRegles((prev) => prev.filter((r) => r.id !== regle.id));
+    toast.success("Règle supprimée.");
+  };
+
+  const adoptees = regles.filter((r) => r.statut === "adoptee" || r.statut === "desactivee");
   const proposees = regles.filter((r) => r.statut === "proposee");
 
   if (isLoading) {
@@ -135,8 +163,8 @@ export default function JumeauNumeriquePage() {
   return (
     <div className="mx-auto max-w-3xl">
       <PageHeader
-        title="Jumeau numérique"
-        description="L'IA compare vos corrections manuelles aux corrections automatiques et propose des règles à adopter pour affiner ses futures analyses."
+        title="Ce que MemoAssistant a appris"
+        description="Après chacune de vos corrections, l'IA compare la version qu'elle avait analysée à la vôtre (Diff Engine) et propose des préférences. Rien n'est appliqué sans votre accord : vous choisissez la portée, et vous pouvez modifier, désactiver ou supprimer chaque règle."
       />
 
       {regles.length === 0 ? (
@@ -165,7 +193,8 @@ export default function JumeauNumeriquePage() {
                         </Badge>
                       </div>
                       <CardDescription>
-                        Source : {regle.source} · {formatDate(regle.dateApprentissage)}
+                        Source : {regle.source} · {formatDate(regle.dateApprentissage)} · portée
+                        suggérée : {LIBELLES_NIVEAU_REGLE[regle.niveau].toLowerCase()}
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
@@ -194,11 +223,11 @@ export default function JumeauNumeriquePage() {
 
           <div>
             <h2 className="mb-3 text-sm font-medium text-muted-foreground">
-              Règles actives de votre jumeau numérique ({adoptees.length})
+              Règles adoptées ({adoptees.length})
             </h2>
             <div className="space-y-3">
               {adoptees.map((regle) => (
-                <Card key={regle.id}>
+                <Card key={regle.id} className={regle.statut === "desactivee" ? "opacity-60" : undefined}>
                   <CardHeader className="pb-2">
                     <div className="flex items-start justify-between gap-3">
                       <CardTitle className="text-sm font-medium leading-snug">
@@ -215,12 +244,31 @@ export default function JumeauNumeriquePage() {
                       Source : {regle.source} · {formatDate(regle.dateApprentissage)}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-3">
                     <div className="flex items-center gap-2">
                       <Progress value={regle.confiance} className="h-1.5 flex-1" />
                       <span className="text-xs text-muted-foreground">
                         {regle.confiance}% de confiance
                       </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setRegleAModifier(regle);
+                          setTexteModifie(regle.regle);
+                        }}
+                      >
+                        Modifier
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => basculerActivation(regle)}>
+                        {regle.statut === "desactivee" ? "Réactiver" : "Désactiver"}
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => supprimer(regle)}>
+                        <X className="size-4" />
+                        Supprimer
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -229,6 +277,27 @@ export default function JumeauNumeriquePage() {
           </div>
         </div>
       )}
+
+      <Dialog open={!!regleAModifier} onOpenChange={(ouvert) => !ouvert && setRegleAModifier(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Modifier la règle</DialogTitle>
+            <DialogDescription>
+              Reformulez la préférence telle que l&apos;IA doit l&apos;appliquer lors des prochaines
+              analyses.
+            </DialogDescription>
+          </DialogHeader>
+          <Input value={texteModifie} onChange={(e) => setTexteModifie(e.target.value)} />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRegleAModifier(null)}>
+              Annuler
+            </Button>
+            <Button onClick={enregistrerModification} disabled={!texteModifie.trim()}>
+              Enregistrer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!regleAAdopter} onOpenChange={(ouvert) => !ouvert && setRegleAAdopter(null)}>
         <DialogContent>

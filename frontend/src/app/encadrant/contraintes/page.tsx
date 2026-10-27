@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Loader2, Save, Settings2 } from "lucide-react";
+import { Lock, Loader2, Save, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/context/auth-context";
@@ -25,8 +25,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { apiList, apiPatch } from "@/lib/api";
+import { phrasesNormes } from "@/lib/analyse-document";
 import { cn } from "@/lib/utils";
-import type { ContraintesProfil, ProfilEncadrant } from "@/types";
+import type { ContraintesProfil, NormesEtablissement, ProfilEncadrant } from "@/types";
 
 /**
  * Écran « Paramétrage des contraintes » côté encadrant.
@@ -82,6 +83,30 @@ export default function ContraintesPage() {
     },
     { enabled: !!user }
   );
+
+  // Normes de l'établissement : les champs « imposés » verrouillent les contraintes
+  // correspondantes (spec v2, § 20). Un encadreur indépendant n'en a pas.
+  const { data: normes } = useApiResource<NormesEtablissement | null>(
+    ["normes-etablissement", user?.etablissementId],
+    async () => {
+      const res = await apiList<NormesEtablissement>("normes-etablissement", {
+        filtres: { etablissementId: user!.etablissementId! },
+        limite: 1,
+      });
+      return res.data[0] ?? null;
+    },
+    { enabled: !!user?.etablissementId }
+  );
+  const imposes = new Set(normes?.champsImposes ?? []);
+  const reglesImposees = phrasesNormes(normes ?? null).imposees;
+  const verrou = (champ: "police" | "interligne" | "marges" | "norme") =>
+    champ === "norme"
+      ? imposes.has("formatCitation")
+      : champ === "police"
+        ? imposes.has("police") || imposes.has("taillePolice")
+        : champ === "interligne"
+          ? imposes.has("interligne")
+          : imposes.has("margesCm");
 
   const [profils, setProfils] = useSyncedState<ProfilEncadrant[]>(data, []);
   const [profilSelectionneId, setProfilSelectionneId] = React.useState<string | null>(null);
@@ -170,6 +195,26 @@ export default function ContraintesPage() {
         />
       ) : (
         <div className="space-y-6">
+          {reglesImposees.length > 0 && (
+            <Card className="border-warning/40 bg-warning/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Lock className="size-4" />
+                  Normes imposées par votre établissement
+                </CardTitle>
+                <CardDescription>
+                  Elles priment sur vos propres règles et ne peuvent pas être modifiées ici.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="list-disc space-y-1 pl-5 text-sm">
+                  {reglesImposees.map((r) => (
+                    <li key={r}>{r}</li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Norme de citation & ton</CardTitle>
@@ -182,6 +227,7 @@ export default function ContraintesPage() {
                 <Label>Norme de citation</Label>
                 <Select
                   value={contraintes.norme}
+                  disabled={verrou("norme")}
                   onValueChange={(valeur) => setContraintes((prev) => ({ ...prev, norme: valeur }))}
                 >
                   <SelectTrigger className="w-full">
@@ -221,7 +267,8 @@ export default function ContraintesPage() {
             <CardHeader>
               <CardTitle className="text-base">Structure & mise en forme</CardTitle>
               <CardDescription>
-                Règles de mise en page imposées par votre établissement.
+                Vos règles de mise en page (les champs verrouillés sont imposés par votre
+                établissement).
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
@@ -244,6 +291,7 @@ export default function ContraintesPage() {
                 <Label htmlFor="police">Police & taille</Label>
                 <Input
                   id="police"
+                  disabled={verrou("police")}
                   value={contraintes.police ?? ""}
                   onChange={(e) => setContraintes((prev) => ({ ...prev, police: e.target.value }))}
                 />
@@ -252,6 +300,7 @@ export default function ContraintesPage() {
                 <Label htmlFor="interligne">Interligne</Label>
                 <Input
                   id="interligne"
+                  disabled={verrou("interligne")}
                   value={contraintes.interligne ?? ""}
                   onChange={(e) =>
                     setContraintes((prev) => ({ ...prev, interligne: e.target.value }))
@@ -263,6 +312,7 @@ export default function ContraintesPage() {
                 <Label htmlFor="marges">Marges</Label>
                 <Input
                   id="marges"
+                  disabled={verrou("marges")}
                   value={contraintes.marges ?? ""}
                   onChange={(e) => setContraintes((prev) => ({ ...prev, marges: e.target.value }))}
                   className="w-28"

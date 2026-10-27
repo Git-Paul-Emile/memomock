@@ -27,10 +27,13 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { APP_NAME } from "@/lib/constants";
+import { PAYS_PAR_DEFAUT, trouverPays } from "@/lib/afrique";
+import { SelectPays } from "@/components/shared/select-pays";
 import type { EncadrantPublic, Etablissement, RoleInscription } from "@/types";
 
 // Format international strict (ex : +221771234567) : "+" et indicatif pays obligatoires.
 const TELEPHONE_REGEX = /^\+[1-9]\d{7,14}$/;
+const INDICATIF_REGEX = /^\+\d{1,3}$/;
 
 // Trois rôles auto-inscriptibles : étudiant, encadrant, et administrateur d'établissement (une
 // école crée elle-même son espace, spec section 6). `admin` (super-admin plateforme) n'est pas un
@@ -40,11 +43,13 @@ const schemaBase = z.object({
   prenom: z.string().min(2, "Prénom trop court"),
   nom: z.string().min(2, "Nom trop court"),
   email: z.string().email("Adresse e-mail invalide"),
+  pays: z.string().min(2, "Choisissez votre pays"),
   telephone: z.string().regex(TELEPHONE_REGEX, "Numéro invalide (format : +221771234567)"),
   motDePasse: z.string().min(6, "6 caractères minimum"),
   filiere: z.string().optional(),
   encadrantId: z.string().optional(),
   etablissementNom: z.string().optional(),
+  etablissementVille: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof schemaBase>;
@@ -55,7 +60,7 @@ export default function RegisterPage() {
   const [role, setRole] = React.useState<RoleInscription>("etudiant");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  // Liste des encadrants exposée par le mock json-server sur la ressource top-level `/encadrants`,
+  // Liste des encadreurs exposée par le mock json-server sur la ressource top-level `/encadrants`,
   // accessible avant la création du compte.
   const { data: encadrants } = useApiList<EncadrantPublic>("encadrants", { limite: 100 });
 
@@ -63,31 +68,54 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     setValue,
+    getValues,
     control,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schemaBase),
-    defaultValues: { role: "etudiant" },
+    defaultValues: {
+      role: "etudiant",
+      pays: PAYS_PAR_DEFAUT,
+      telephone: trouverPays(PAYS_PAR_DEFAUT)!.indicatif,
+    },
   });
 
   const encadrantId = useWatch({ control, name: "encadrantId" });
+  const codePays = useWatch({ control, name: "pays" });
+  const paysChoisi = trouverPays(codePays) ?? trouverPays(PAYS_PAR_DEFAUT)!;
+
+  // Le changement de pays préremplit l'indicatif si le numéro n'a pas encore été saisi.
+  const surChangementPays = (code: string) => {
+    const pays = trouverPays(code);
+    if (!pays) return;
+    const actuel = getValues("telephone") ?? "";
+    if (!actuel || INDICATIF_REGEX.test(actuel.trim())) setValue("telephone", pays.indicatif);
+  };
 
   const onSubmit = async (values: FormValues) => {
     if (role === "etudiant" && !values.encadrantId) {
-      toast.error("Merci de sélectionner votre encadrant.");
+      toast.error("Merci de sélectionner votre encadreur.");
       return;
     }
     if (role === "admin_etablissement" && !values.etablissementNom?.trim()) {
       toast.error("Merci d'indiquer le nom de votre établissement.");
       return;
     }
+    if (!values.telephone.replace(/\s/g, "").startsWith(paysChoisi.indicatif)) {
+      toast.error(`Le numéro doit commencer par l'indicatif ${paysChoisi.indicatif} (${paysChoisi.nom}).`);
+      return;
+    }
     setIsSubmitting(true);
     try {
-      const user = await creerCompte({ ...values, role });
+      const { etablissementVille, ...donnees } = values;
+      const user = await creerCompte({ ...donnees, telephone: values.telephone.replace(/\s/g, ""), role });
       if (role === "admin_etablissement") {
         const etablissement = await apiPost<Etablissement>("etablissements", {
           nom: values.etablissementNom!.trim(),
           adminId: user.id,
+          pays: paysChoisi.code,
+          ville: etablissementVille?.trim() || null,
+          devise: paysChoisi.devise,
           createdAt: new Date().toISOString(),
         });
         await apiPatch("users", user.id, { etablissementId: etablissement.id });
@@ -134,7 +162,7 @@ export default function RegisterPage() {
                   {r === "etudiant"
                     ? "Étudiant·e"
                     : r === "encadrant"
-                      ? "Encadrant·e"
+                      ? "Encadreur·e"
                       : "Établissement"}
                 </button>
               ))}
@@ -168,10 +196,19 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="telephone">Numéro de téléphone</Label>
+                <Label htmlFor="pays">Pays</Label>
+                <SelectPays
+                  id="pays"
+                  {...register("pays", { onChange: (e) => surChangementPays(e.target.value) })}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="telephone">Numéro de téléphone (WhatsApp de préférence)</Label>
                 <Input
                   id="telephone"
-                  placeholder="+221771234567"
+                  inputMode="tel"
+                  placeholder={`${paysChoisi.indicatif} ${paysChoisi.exempleNumero}`}
                   aria-invalid={!!errors.telephone}
                   {...register("telephone")}
                 />
@@ -203,10 +240,10 @@ export default function RegisterPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label>Encadrant·e</Label>
+                    <Label>Encadreur·e</Label>
                     <Select value={encadrantId} onValueChange={(v) => setValue("encadrantId", v)}>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Sélectionnez votre encadrant" />
+                        <SelectValue placeholder="Sélectionnez votre encadreur" />
                       </SelectTrigger>
                       <SelectContent>
                         {encadrants.map((e) => (
@@ -217,7 +254,7 @@ export default function RegisterPage() {
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-muted-foreground">
-                      Pas encore d&apos;encadrant ? Choisissez-en un provisoirement, vous pourrez
+                      Pas encore d&apos;encadreur ? Choisissez-en un provisoirement, vous pourrez
                       rejoindre une classe par code juste après.
                     </p>
                   </div>
@@ -229,8 +266,16 @@ export default function RegisterPage() {
                   <Label htmlFor="etablissementNom">Nom de l&apos;établissement</Label>
                   <Input
                     id="etablissementNom"
-                    placeholder="Ex : École Supérieure X"
+                    placeholder="Ex : Institut Supérieur de Management de Dakar"
                     {...register("etablissementNom")}
+                  />
+                  <Label htmlFor="etablissementVille" className="pt-2">
+                    Ville
+                  </Label>
+                  <Input
+                    id="etablissementVille"
+                    placeholder="Ex : Dakar, Abidjan, Douala…"
+                    {...register("etablissementVille")}
                   />
                 </div>
               )}

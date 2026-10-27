@@ -5,9 +5,9 @@ import { PublicFooter } from "@/components/marketing/public-footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { APP_NAME } from "@/lib/constants";
 
-// Écran A12 (spec ESPACE PUBLIC) : distinct de /confidentialite (RGPD général), centré
+// Écran A12 (spec ESPACE PUBLIC) : distinct de /confidentialite (cadre légal général), centré
 // spécifiquement sur la protection du contenu académique (mémoires, échanges avec le tuteur IA,
-// corrections de l'encadrant) - "particulièrement important pour les documents académiques".
+// corrections de l'encadreur) - "particulièrement important pour les documents académiques".
 export default function ProtectionDonneesPage() {
   return (
     <div className="flex flex-1 flex-col">
@@ -24,7 +24,8 @@ export default function ProtectionDonneesPage() {
                 Un mémoire ou une thèse en cours de rédaction contient souvent des données
                 personnelles (enquêtes, entretiens, terrains de recherche) et représente un travail
                 académique non publié. {APP_NAME} traite ce contenu avec le même niveau
-                d&apos;exigence qu&apos;une donnée personnelle sensible, au-delà du minimum RGPD.
+                d&apos;exigence qu&apos;une donnée personnelle sensible, au-delà du minimum
+                exigé par les lois de protection des données de la zone.
               </p>
             </section>
 
@@ -33,8 +34,8 @@ export default function ProtectionDonneesPage() {
               <ul className="mt-2 list-disc space-y-1 pl-5">
                 <li>Vous-même, en tant qu&apos;auteur.</li>
                 <li>
-                  Votre encadrant assigné, uniquement une fois le document transmis (jamais avant,
-                  jamais un autre encadrant que le vôtre).
+                  Votre encadreur assigné, uniquement une fois le document transmis (jamais avant,
+                  jamais un autre encadreur que le vôtre).
                 </li>
                 <li>
                   L&apos;administrateur de votre établissement, à des fins de supervision académique
@@ -42,7 +43,7 @@ export default function ProtectionDonneesPage() {
                 </li>
               </ul>
               <p className="mt-2">
-                Aucun autre étudiant, aucun autre encadrant, ne peut jamais consulter votre
+                Aucun autre étudiant, aucun autre encadreur, ne peut jamais consulter votre
                 document.
               </p>
             </section>
@@ -51,8 +52,10 @@ export default function ProtectionDonneesPage() {
               <h2 className="mb-1 font-medium text-foreground">Traitement par l&apos;IA</h2>
               <p>
                 L&apos;analyse lit le texte de votre document pour produire un score de conformité
-                et des suggestions. Dans cette version de démonstration, cette analyse est simulée
-                localement : aucun texte n&apos;est envoyé à un modèle tiers.
+                et des suggestions. Ce texte est transmis à l&apos;API Gemini de Google (serveurs
+                hors d&apos;Afrique), uniquement pour produire l&apos;analyse ; il n&apos;est pas
+                publié. Si l&apos;IA est indisponible, l&apos;analyse est simulée localement et
+                l&apos;écran l&apos;indique.
               </p>
             </section>
 

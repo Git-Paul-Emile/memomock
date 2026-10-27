@@ -8,23 +8,25 @@ import type {
   StatutRegle,
 } from "@/types";
 
-export const APP_NAME = "MemoAI Assistant";
+export const APP_NAME = "MemoAssistant AI";
 
 export const ROLE_LABELS: Record<Role, string> = {
   etudiant: "Étudiant",
-  encadrant: "Encadrant",
+  encadrant: "Encadreur",
   admin: "Administrateur",
   admin_etablissement: "Établissement",
 };
 
 export const STATUT_DOCUMENT_LABELS: Record<StatutDocument, string> = {
+  // Libellés de la spécification v2 (partie IX) : « À corriger » regroupe les deux états de la
+  // boucle de correction de l'étudiant ; « En correction » désigne le travail de l'encadreur.
   brouillon: "Brouillon",
-  soumis: "Soumis",
-  analyse_en_cours: "Analyse en cours",
-  analyse_terminee: "Analyse terminée",
-  en_correction: "En correction",
-  pret_pour_encadrant: "Prêt pour l'encadrant",
-  en_relecture: "En relecture",
+  soumis: "Déposé",
+  analyse_en_cours: "Analyse IA en cours",
+  analyse_terminee: "À corriger",
+  en_correction: "À corriger",
+  pret_pour_encadrant: "Soumis à l'encadreur",
+  en_relecture: "En correction (encadreur)",
   valide: "Validé",
   rejete: "Révision demandée",
   refuse: "Refusé",
@@ -67,10 +69,12 @@ export const STATUT_REGLE_LABELS: Record<StatutRegle, string> = {
   proposee: "Proposée",
   adoptee: "Adoptée",
   ignoree: "Ignorée",
+  desactivee: "Désactivée",
 };
 
 export const STATUT_LIVRABLE_LABELS: Record<StatutLivrable, string> = {
   a_faire: "À faire",
+  en_cours: "En cours",
   soumis: "Soumis",
   en_correction: "À corriger",
   valide: "Validé",
@@ -81,6 +85,7 @@ export const STATUT_LIVRABLE_VARIANT: Record<
   "default" | "secondary" | "outline" | "destructive" | "success" | "warning"
 > = {
   a_faire: "outline",
+  en_cours: "secondary",
   soumis: "secondary",
   en_correction: "warning",
   valide: "success",
@@ -101,7 +106,7 @@ export const STATUT_CHAPITRE_VARIANT: Record<
   refuse: "destructive",
 };
 
-/** Seuil à partir duquel un document est considéré prêt à être transmis à l'encadrant. */
+/** Seuil par défaut (profil sans seuil) à partir duquel un document peut être soumis. */
 export const SEUIL_SCORE_CONFORMITE = 80;
 
 /**
@@ -128,6 +133,7 @@ export const NAV_ETUDIANT = [
   { href: "/etudiant/planning", label: "Planning", icon: "CalendarClock" },
   { href: "/etudiant/documents", label: "Mes documents", icon: "Files" },
   { href: "/etudiant/soumission", label: "Soumettre un document", icon: "UploadCloud" },
+  { href: "/messagerie", label: "Messagerie", icon: "MessagesSquare" },
   { href: "/notifications", label: "Notifications", icon: "Bell" },
   { href: "/parametres", label: "Paramètres", icon: "Settings" },
   { href: "/aide", label: "Aide & support", icon: "LifeBuoy" },
@@ -142,7 +148,8 @@ export const NAV_ENCADRANT = [
   { href: "/encadrant/grille", label: "Grille d'évaluation", icon: "ClipboardList" },
   { href: "/encadrant/classes", label: "Mes classes", icon: "Users" },
   { href: "/encadrant/invitations", label: "Inviter des étudiants", icon: "UserPlus" },
-  { href: "/encadrant/jumeau-numerique", label: "Jumeau numérique", icon: "Wand2" },
+  { href: "/messagerie", label: "Messagerie", icon: "MessagesSquare" },
+  { href: "/encadrant/jumeau-numerique", label: "Ce que l'IA a appris", icon: "Wand2" },
   { href: "/encadrant/statistiques", label: "Statistiques", icon: "BarChart3" },
   { href: "/notifications", label: "Notifications", icon: "Bell" },
   { href: "/parametres", label: "Paramètres", icon: "Settings" },
@@ -165,6 +172,8 @@ export const NAV_ETABLISSEMENT = [
 
 export const NAV_ADMIN = [
   { href: "/admin/utilisateurs", label: "Utilisateurs", icon: "Users" },
+  { href: "/admin/etablissements", label: "Établissements", icon: "Building2" },
+  { href: "/admin/referentiels", label: "Disciplines", icon: "BookOpen" },
   { href: "/admin/forfaits", label: "Forfaits", icon: "CreditCard" },
   { href: "/admin/hierarchie-regles", label: "Profils méthodologiques", icon: "GitBranch" },
   { href: "/admin/statistiques", label: "Statistiques", icon: "BarChart3" },

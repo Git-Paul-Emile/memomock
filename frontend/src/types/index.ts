@@ -1,5 +1,5 @@
 /**
- * Types partagés de l'application MemoAI Assistant.
+ * Types partagés de l'application MemoAssistant AI.
  * Ce fichier centralise le "contrat de données" entre le frontend et l'API simulée
  * (json-server). En production, ces types correspondraient aux DTO exposés par
  * l'API REST réelle (Node/Express + PostgreSQL décrite dans le mémo de cadrage).
@@ -32,7 +32,7 @@ export interface User {
   // hors rattachement à un établissement (mode indépendant, spec section 95).
   filiere?: string;
   // Rattachement à la hiérarchie établissement (spec section 2) : etablissementId seul pour un
-  // admin_etablissement ou un encadrant affilié ; classeId/groupeId en plus pour un étudiant
+  // admin_etablissement ou un encadreur affilié ; classeId/groupeId en plus pour un étudiant
   // rejoint via un code de classe (voir /rattachement-encadrant).
   etablissementId?: string | null;
   classeId?: string | null;
@@ -40,6 +40,9 @@ export interface User {
   telephone?: string; // Format international, ex : +221772995851. Obligatoire à l'inscription,
   // mais non vérifié (pas de code OTP).
   canalNotificationPrefere?: CanalNotification;
+  // Pays de résidence (code ISO 3166-1 alpha-2, ex. « SN », « CM ») : conditionne l'indicatif
+  // téléphonique proposé, la devise affichée et le fuseau horaire (voir lib/afrique.ts).
+  pays?: string | null;
   // Compte désactivé par un administrateur (spec écrans F8-F11) : un compte inactif ne peut
   // plus se connecter. Absent = actif (valeur par défaut).
   actif?: boolean;
@@ -53,8 +56,9 @@ export interface User {
 }
 
 // Canal de relais des notifications. "in_app" est toujours présent (visible sur /notifications) ;
-// "email" y ajouterait un envoi par e-mail (simulé). Le canal WhatsApp a été retiré.
-export type CanalNotification = "email" | "in_app";
+// les autres y ajoutent un relais simulé. SMS et WhatsApp sont les canaux les plus consultés en
+// Afrique de l'Ouest et centrale.
+export type CanalNotification = "email" | "in_app" | "sms" | "whatsapp";
 
 export type PublicUser = Omit<User, "motDePasse">;
 
@@ -63,7 +67,35 @@ export interface ElementReference {
   id: string;
   titre: string;
   description: string;
+  // Fichier source téléversé (guide, modèle...) : seul son nom est conservé en mode mock ; son
+  // texte est analysé à l'import pour en extraire des règles (voir `RegleProfil`).
+  nomFichier?: string | null;
   ajouteLe: string;
+}
+
+// Catégories de règles d'un profil méthodologique (spec v2, § 19).
+export type CategorieRegle = "forme" | "bibliographie" | "methodologie" | "structure" | "evaluation";
+
+export const LIBELLES_CATEGORIE_REGLE: Record<CategorieRegle, string> = {
+  forme: "Forme",
+  bibliographie: "Bibliographie",
+  methodologie: "Méthodologie",
+  structure: "Structure",
+  evaluation: "Évaluation",
+};
+
+/**
+ * Règle explicite d'un profil (spec v2, § 19) : extraite des ressources par l'IA puis contrôlée
+ * par l'encadreur (« a_verifier » tant qu'il ne l'a pas confirmée), ou saisie à la main.
+ */
+export interface RegleProfil {
+  id: string;
+  categorie: CategorieRegle;
+  libelle: string;
+  detail?: string | null;
+  source: "ia" | "manuel";
+  ressource?: string | null; // titre de la ressource d'origine
+  statut: "a_verifier" | "confirmee";
 }
 
 // Hiérarchie établissement (spec section 2) : une école/université (Etablissement) regroupe des
@@ -72,18 +104,49 @@ export interface Etablissement {
   id: string;
   nom: string;
   adminId: string;
+  // Localisation (Afrique de l'Ouest et centrale) : `pays` est un code ISO alpha-2 ; `devise` en
+  // découle (XOF pour l'UEMOA, XAF pour la CEMAC...) et sert à l'affichage des montants.
+  pays?: string | null;
+  ville?: string | null;
+  devise?: CodeDevise | null;
   createdAt: string;
 }
 
-export interface Filiere {
+/** Département (UFR, faculté...) : niveau intermédiaire entre l'établissement et ses filières. */
+export interface Departement {
   id: string;
   etablissementId: string;
   nom: string;
   createdAt: string;
 }
 
+export interface Filiere {
+  id: string;
+  etablissementId: string;
+  departementId?: string | null;
+  nom: string;
+  createdAt: string;
+}
+
 /**
- * Classe (spec sections 9, 11, 12) : `etablissementId` est nullable - un encadrant en mode
+ * Discipline de référence (ex. « Informatique ») : `etablissementId` à null = référentiel commun
+ * de la plateforme, géré par le super-admin. Les profils méthodologiques gardent un libellé libre
+ * mais se voient proposer ces valeurs.
+ */
+export interface Discipline {
+  id: string;
+  nom: string;
+  etablissementId: string | null;
+  departementId: string | null;
+  createdAt: string;
+}
+
+// Devises de la zone : franc CFA (UEMOA / CEMAC) et principales monnaies nationales.
+export type CodeDevise =
+  "XOF" | "XAF" | "GNF" | "NGN" | "GHS" | "CDF" | "MRU" | "GMD" | "LRD" | "SLE" | "CVE" | "STN";
+
+/**
+ * Classe (spec sections 9, 11, 12) : `etablissementId` est nullable - un encadreur en mode
  * indépendant (spec section 95) peut créer une classe sans être rattaché à un établissement.
  * `encadrantIds` porte plusieurs encadreurs (spec section 71, ex. répartition d'étudiants entre
  * professeurs d'une même classe). `code` permet le rattachement d'un étudiant en autonomie (spec
@@ -137,7 +200,7 @@ export const LIBELLES_TYPE_DOCUMENT: Record<TypeDocument, string> = {
 export type TypeLivrable = "fichier" | "lien";
 
 /**
- * Livrable attendu, défini par l'encadrant au niveau du profil pédagogique (spec section 20) :
+ * Livrable attendu, défini par l'encadreur au niveau du profil pédagogique (spec section 20) :
  * s'applique à tous les documents rattachés à ce profil (même convention que guidesRedaction /
  * normes / exigences, plutôt qu'une définition répétée par étudiant).
  */
@@ -153,7 +216,7 @@ export interface LivrableDefinition {
   ajouteLe: string;
 }
 
-// Un encadrant possède plusieurs profils (spec section 8) : un par type de document × discipline.
+// Un encadreur possède plusieurs profils (spec section 8) : un par type de document × discipline.
 export interface ProfilEncadrant {
   id: string;
   encadrantId: string;
@@ -166,6 +229,8 @@ export interface ProfilEncadrant {
   normes: ElementReference[];
   exigences: ElementReference[];
   livrablesAttendus: LivrableDefinition[];
+  // Règles extraites des ressources ou saisies (spec v2, § 19) - absent sur les anciens profils.
+  reglesProfil?: RegleProfil[];
   // Canevas structuré (chapitres/critères) associé à ce profil (spec section 17) - distinct de
   // `contraintes.sectionsObligatoires` (checklist plate de mise en forme, conservée telle quelle).
   canevasId?: string | null;
@@ -184,7 +249,23 @@ export interface CritereGrille {
   libelle: string;
   poids: number;
   ordre: number;
+  // Catégorie de score qui alimente ce critère dans le score global pondéré (spec v2, § 24).
+  // Absente : déduite du libellé (voir lib/score.ts).
+  axe?: CategorieScore | null;
 }
+
+// Catégories du score de conformité : les quatre axes d'analyse et deux sous-catégories.
+export type CategorieScore =
+  "forme" | "structure" | "fond" | "coherence" | "methodologie" | "bibliographie";
+
+export const LIBELLES_CATEGORIE_SCORE: Record<CategorieScore, string> = {
+  forme: "Forme",
+  structure: "Structure",
+  fond: "Fond",
+  coherence: "Cohérence",
+  methodologie: "Méthodologie",
+  bibliographie: "Bibliographie",
+};
 
 export interface GrilleEvaluation {
   id: string;
@@ -217,6 +298,9 @@ export interface ChapitreCanevas {
   ordre: number;
   // Date limite indicative (spec section 76, ex. « Chapitre 1 → 5 septembre »).
   dateEcheance?: string | null;
+  // Sous-section d'un autre chapitre (spec v2, § 15) : null/absent = chapitre de premier niveau.
+  // Un seul niveau d'imbrication (chapitre → section) ; l'ordre est relatif au parent.
+  parentId?: string | null;
 }
 
 export interface CritereChapitre {
@@ -233,9 +317,9 @@ export interface CritereChapitre {
 export type StatutChapitreDocument = "en_attente" | "valide" | "refuse";
 
 /**
- * Décision de l'encadrant sur un chapitre d'un document (spec sections 50, 53-54).
+ * Décision de l'encadreur sur un chapitre d'un document (spec sections 50, 53-54).
  * `verrouille` passe à `true` dès la validation - seul un déverrouillage explicite de
- * l'encadrant (spec section 54) le repasse à `false` avec le statut réinitialisé.
+ * l'encadreur (spec section 54) le repasse à `false` avec le statut réinitialisé.
  */
 export interface ValidationChapitre {
   id: string;
@@ -289,7 +373,7 @@ export type StatutDocument =
   | "valide"
   // "Demander une révision" (le libellé écran) - clé technique conservée telle quelle.
   | "rejete"
-  // Décision "Refuser" de l'encadrant, distincte d'une simple demande de révision.
+  // Décision "Refuser" de l'encadreur, distincte d'une simple demande de révision.
   | "refuse";
 
 export interface DocumentSubmission {
@@ -308,6 +392,10 @@ export interface DocumentSubmission {
   scoreForme: number;
   scoreFond: number;
   scoreCoherence?: number;
+  scoreStructure?: number;
+  scoreMethodologie?: number;
+  scoreBibliographie?: number;
+  sourceAnalyse?: SourceIA | null;
   // Type de mémoire, discipline, et profil méthodologique effectivement résolu à la création
   // (spec sections 7-8).
   typeDocument?: TypeDocument | null;
@@ -318,27 +406,27 @@ export interface DocumentSubmission {
   problematique?: string | null;
   objectifs?: string | null;
   dateSoutenancePrevue?: string | null;
-  // Retour final de l'encadrant (écran de validation) : renseignés une fois le document validé.
+  // Retour final de l'encadreur (écran de validation) : renseignés une fois le document validé.
   note?: string | null;
   appreciation?: string | null;
   dateSoumission: string;
   dateMaj: string;
   version: number;
-  // Dérivés du document, exposés uniquement sur GET /documents/:id - pas sur les listes.
-  // Absents tant que le document n'a pas été chargé via cette route.
+  // État calculé « Prêt pour soumission » (spec v2, § 25) : recalculé et enregistré à chaque
+  // analyse par lib/score.ts (rôle tenu par le serveur en production).
   pretPourSoumission?: boolean;
   pointsBloquants?: string[];
 }
 
 // Cycle de vie d'un dépôt de livrable (spec section 59) : "a_faire" n'est jamais persisté (c'est
 // l'état par défaut d'une définition sans dépôt correspondant, voir lib/livrables.ts).
-export type StatutLivrable = "a_faire" | "soumis" | "en_correction" | "valide";
+export type StatutLivrable = "a_faire" | "en_cours" | "soumis" | "en_correction" | "valide";
 
 /**
  * Dépôt effectif d'un livrable par l'étudiant, rattaché à un document (spec sections 57-59).
  * `definitionId` référence `ProfilEncadrant.livrablesAttendus[].id` ; `nom`/`type`/`obligatoire`
  * sont dupliqués depuis la définition au moment du dépôt pour ne pas changer rétroactivement si
- * l'encadrant modifie ensuite son profil.
+ * l'encadreur modifie ensuite son profil.
  */
 export interface Livrable {
   id: string;
@@ -369,7 +457,18 @@ export interface PointAnalyse {
   libelle: string;
   detail: string;
   niveau: NiveauAlerte;
+  // Règle de l'encadreur concernée et passage du document visé (spec v2, § 23).
+  regle?: string | null;
+  passage?: string | null;
+  // « Point nécessitant l'avis de votre encadreur » : jugement scientifique que l'IA ne tranche pas.
+  avisEncadreur?: boolean;
+  // Erreur qui bloque la soumission même si le score est atteint (spec v2, § 25).
+  bloquant?: boolean;
+  sousCategorie?: "methodologie" | "bibliographie" | null;
 }
+
+// Origine d'un résultat d'IA : modèle Gemini réel, ou simulation locale (clé absente, quota...).
+export type SourceIA = "gemini" | "simulation";
 
 export interface Analyse {
   id: string;
@@ -378,6 +477,21 @@ export interface Analyse {
   score: number;
   points: PointAnalyse[];
   dateAnalyse: string;
+  source?: SourceIA;
+}
+
+/**
+ * Contenu textuel d'un document (spec v2, § 26) : texte extrait du fichier importé, ou texte
+ * rédigé dans l'éditeur de la plateforme (`html`). Collection séparée de `documents` pour ne pas
+ * alourdir les listes ; l'id est celui du document.
+ */
+export interface ContenuDocument {
+  id: string;
+  documentId: string;
+  texte: string;
+  html?: string | null;
+  origine: "import" | "redaction";
+  updatedAt: string;
 }
 
 export type AuteurMessage = "etudiant" | "ia" | "encadrant";
@@ -429,7 +543,7 @@ export interface Seance {
   updatedAt: string;
 }
 
-/** Créneau hebdomadaire récurrent déclaré par l'encadrant (spec section 74). */
+/** Créneau hebdomadaire récurrent déclaré par l'encadreur (spec section 74). */
 export interface DisponibiliteEncadrant {
   id: string;
   encadrantId: string;
@@ -448,7 +562,9 @@ export interface Forfait {
   id: string;
   nom: string;
   description: string;
+  // Montant mensuel dans `devise` (franc CFA par défaut, sans décimales).
   prixMensuel: number;
+  devise?: CodeDevise;
   maxEtudiants: number | null;
   maxEncadrants: number | null;
   fonctionnalites: string[];
@@ -458,6 +574,17 @@ export interface Forfait {
 
 export type StatutAbonnement = "actif" | "expire" | "annule";
 
+// Moyens de paiement proposés (simulés) : le mobile money domine en Afrique de l'Ouest et centrale.
+export type MoyenPaiement =
+  | "orange_money"
+  | "wave"
+  | "mtn_momo"
+  | "moov_money"
+  | "airtel_money"
+  | "free_money"
+  | "carte_bancaire"
+  | "virement";
+
 /** Abonnement d'un établissement à un forfait - un seul actif à la fois. */
 export interface Abonnement {
   id: string;
@@ -466,6 +593,8 @@ export interface Abonnement {
   statut: StatutAbonnement;
   dateDebut: string;
   dateRenouvellement: string | null;
+  moyenPaiement?: MoyenPaiement | null;
+  referencePaiement?: string | null;
 }
 
 export type StatutInvitation = "en_attente" | "acceptee" | "expiree";
@@ -481,7 +610,7 @@ export interface Invitation {
 
 export type TypeSegment = "normal" | "supprime" | "ajoute";
 
-/** Segment de texte du suivi des modifications de l'encadrant (barré / souligné). */
+/** Segment de texte du suivi des modifications de l'encadreur (barré / souligné). */
 export interface RevisionSegment {
   id: string;
   documentId: string;
@@ -491,7 +620,7 @@ export interface RevisionSegment {
   type: TypeSegment;
 }
 
-/** Paragraphe surligné par l'encadrant pour attirer l'attention de l'étudiant (spec section 5, #43). */
+/** Paragraphe surligné par l'encadreur pour attirer l'attention de l'étudiant (spec section 5, #43). */
 export interface Surlignage {
   id: string;
   documentId: string;
@@ -499,13 +628,38 @@ export interface Surlignage {
   date: string;
 }
 
-/** Commentaire ponctuel laissé par l'encadrant en marge d'un passage. */
+// Nature d'une remarque de l'encadreur (spec v2, § 34) : aide l'IA à interpréter la correction.
+export type CategorieCommentaire = "forme" | "methodologique" | "scientifique" | "general";
+
+export const LIBELLES_CATEGORIE_COMMENTAIRE: Record<CategorieCommentaire, string> = {
+  forme: "Forme",
+  methodologique: "Méthodologique",
+  scientifique: "Scientifique",
+  general: "Général",
+};
+
+/** Commentaire ponctuel laissé par l'encadreur en marge d'un passage. */
 export interface CommentaireMarge {
   id: string;
   documentId: string;
   numero: number;
   texte: string;
   date: string;
+  categorie?: CategorieCommentaire;
+  // Résolu = traité par l'étudiant (spec v2, § 34, § 37) ; l'encadreur peut le rouvrir.
+  resolu?: boolean;
+  dateResolution?: string | null;
+}
+
+/** Message de la messagerie encadreur ↔ étudiant, rattachée à un document (spec v2, § 40). */
+export interface MessageProjet {
+  id: string;
+  documentId: string;
+  auteurId: string;
+  auteurRole: "etudiant" | "encadrant";
+  texte: string;
+  date: string;
+  lu: boolean;
 }
 
 /** Entrée de FAQ affichée sur l'écran d'aide (contenu public). */
@@ -546,7 +700,7 @@ export interface DemandeSupport {
   updatedAt: string;
 }
 
-/** Encadrant exposé publiquement (choix à l'inscription / rattachement), sans donnée sensible. */
+/** Encadreur exposé publiquement (choix à l'inscription / rattachement), sans donnée sensible. */
 export interface EncadrantPublic {
   id: string;
   nom: string;
@@ -561,10 +715,10 @@ export interface EncadrantPublic {
 export type StatutDemandeEncadrement = "en_attente" | "acceptee" | "refusee";
 
 /**
- * Demande d'encadrement initiée par un étudiant (spec section 63) auprès d'un encadrant qu'il ne
+ * Demande d'encadrement initiée par un étudiant (spec section 63) auprès d'un encadreur qu'il ne
  * connaît pas encore (mode "recherche" de /rattachement-encadrant) - contrairement aux modes
- * "code" (encadrant/classe), qui rattachent immédiatement car c'est l'encadrant/l'établissement
- * qui a initié le contact. L'encadrant accepte ou refuse (spec section 65).
+ * "code" (encadrant/classe), qui rattachent immédiatement car c'est l'encadreur/l'établissement
+ * qui a initié le contact. L'encadreur accepte ou refuse (spec section 65).
  */
 export interface DemandeEncadrement {
   id: string;
@@ -576,7 +730,7 @@ export interface DemandeEncadrement {
   dateReponse?: string | null;
 }
 
-/** Réponse de l'étudiant ou de l'encadrant à un commentaire en marge (spec section 47). */
+/** Réponse de l'étudiant ou de l'encadreur à un commentaire en marge (spec section 47). */
 export interface ReponseCommentaire {
   id: string;
   commentaireMargeId: string;
@@ -586,7 +740,7 @@ export interface ReponseCommentaire {
   date: string;
 }
 
-export type StatutRegle = "proposee" | "adoptee" | "ignoree";
+export type StatutRegle = "proposee" | "adoptee" | "ignoree" | "desactivee";
 
 // Portée d'application d'une règle apprise (spec section 23-24), de la plus étroite à la plus
 // large.
@@ -750,9 +904,24 @@ export const LIBELLES_POSITION_PAGINATION: Record<PositionPagination, string> = 
  * sans les redéfinir - l'encadreur garde la main pour ses propres classes (héritage avec
  * surcharge, même principe que /admin/hierarchie-regles).
  */
+// Champs des normes d'établissement qui peuvent être « imposés » aux encadreurs (spec v2, § 20).
+export type ChampNorme =
+  | "formatCitation"
+  | "sourcesMinimum"
+  | "positionPagination"
+  | "styleRedactionnel"
+  | "voix"
+  | "police"
+  | "taillePolice"
+  | "interligne"
+  | "margesCm";
+
 export interface NormesEtablissement {
   id: string;
   etablissementId: string;
+  // Champs verrouillés : l'encadreur ne peut pas les redéfinir dans ses contraintes. Les autres
+  // restent des valeurs « par défaut » qu'il peut surcharger.
+  champsImposes?: ChampNorme[];
   formatCitation: FormatCitation;
   sourcesMinimum: number;
   typesSourcesAcceptees: string[];

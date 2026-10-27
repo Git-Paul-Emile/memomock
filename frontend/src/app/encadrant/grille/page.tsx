@@ -15,9 +15,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { apiGet, apiList, apiPost, apiPut } from "@/lib/api";
+import { apiGet, apiList, apiPatch, apiPost, apiPut } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import type { CritereGrille, GrilleEvaluation, ProfilEncadrant } from "@/types";
+import { LIBELLES_CATEGORIE_SCORE } from "@/types";
+import type { CategorieScore, CritereGrille, GrilleEvaluation, ProfilEncadrant } from "@/types";
+import { axeDuCritere, SEUIL_CATEGORIE_DEFAUT, SEUIL_SOUMISSION_DEFAUT } from "@/lib/score";
 
 const GRILLE_PAR_DEFAUT: Omit<CritereGrille, "id">[] = [
   { libelle: "Problématique", poids: 15, ordre: 0 },
@@ -29,18 +31,19 @@ const GRILLE_PAR_DEFAUT: Omit<CritereGrille, "id">[] = [
   { libelle: "Forme", poids: 10, ordre: 6 },
 ];
 
-type CritereEdite = { id: string; libelle: string; poids: number };
+// `axe` vide = catégorie déduite du libellé (lib/score.ts).
+type CritereEdite = { id: string; libelle: string; poids: number; axe: CategorieScore | "" };
 
 function versCritereEdite(criteres: CritereGrille[]): CritereEdite[] {
   return criteres.length > 0
-    ? criteres.map((c) => ({ id: c.id, libelle: c.libelle, poids: c.poids }))
-    : GRILLE_PAR_DEFAUT.map((c, i) => ({ id: `nouveau-${i}`, libelle: c.libelle, poids: c.poids }));
+    ? criteres.map((c) => ({ id: c.id, libelle: c.libelle, poids: c.poids, axe: c.axe ?? "" }))
+    : GRILLE_PAR_DEFAUT.map((c, i) => ({ id: `nouveau-${i}`, libelle: c.libelle, poids: c.poids, axe: "" }));
 }
 
 /**
  * Écran « Grille d'évaluation » (spec section 8.5, écrans E62-E65) : critères pondérés du profil
  * sélectionné, dont la somme des poids doit valoir 100. Sert à orienter l'analyse de l'IA - ne
- * remplace jamais la note finale de l'encadrant.
+ * remplace jamais la note finale de l'encadreur.
  */
 export default function GrilleEvaluationPage() {
   const { user } = useAuth();
@@ -85,9 +88,26 @@ export default function GrilleEvaluationPage() {
   const [criteres, setCriteres] = useSyncedState<CritereEdite[]>(critieresSource, []);
 
   const [enCours, setEnCours] = React.useState(false);
+  // Seuils de soumission (spec v2, § 25), enregistrés sur le profil avec la grille.
+  // Mémoïsé sur l'id du profil, comme les critères : sinon chaque rendu écraserait la saisie.
+  const seuilsSource = React.useMemo(
+    () =>
+      profilSelectionne
+        ? {
+            soumission: profilSelectionne.seuilSoumission ?? SEUIL_SOUMISSION_DEFAUT,
+            categorie: profilSelectionne.seuilCategorieMinimum ?? SEUIL_CATEGORIE_DEFAUT,
+          }
+        : undefined,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [profilSelectionne?.id]
+  );
+  const [seuils, setSeuils] = useSyncedState<{ soumission: number; categorie: number }>(
+    seuilsSource,
+    { soumission: SEUIL_SOUMISSION_DEFAUT, categorie: SEUIL_CATEGORIE_DEFAUT }
+  );
   const somme = criteres.reduce((acc, c) => acc + (Number(c.poids) || 0), 0);
 
-  const modifierCritere = (id: string, champ: "libelle" | "poids", valeur: string) => {
+  const modifierCritere = (id: string, champ: "libelle" | "poids" | "axe", valeur: string) => {
     setCriteres((prev) =>
       prev.map((c) =>
         c.id === id ? { ...c, [champ]: champ === "poids" ? Number(valeur) || 0 : valeur } : c
@@ -98,7 +118,7 @@ export default function GrilleEvaluationPage() {
   const ajouterCritere = () => {
     setCriteres((prev) => [
       ...prev,
-      { id: `nouveau-${crypto.randomUUID()}`, libelle: "", poids: 0 },
+      { id: `nouveau-${crypto.randomUUID()}`, libelle: "", poids: 0, axe: "" },
     ]);
   };
 
@@ -123,6 +143,7 @@ export default function GrilleEvaluationPage() {
         libelle: c.libelle.trim(),
         poids: c.poids,
         ordre: i,
+        axe: c.axe || null,
       }));
       const corps = {
         id: profilSelectionne.id,
@@ -139,7 +160,12 @@ export default function GrilleEvaluationPage() {
       } else {
         await apiPost<GrilleEvaluation>("grilles-evaluation", corps);
       }
-      toast.success("Grille d'évaluation enregistrée.");
+      await apiPatch<ProfilEncadrant>("profils-encadrant", profilSelectionne.id, {
+        seuilSoumission: seuils.soumission,
+        seuilCategorieMinimum: seuils.categorie,
+        updatedAt: new Date().toISOString(),
+      });
+      toast.success("Grille et seuils enregistrés.");
       refetchGrille();
     } catch {
       toast.error("L'enregistrement a échoué. Réessayez dans quelques instants.");
@@ -216,6 +242,24 @@ export default function GrilleEvaluationPage() {
                     placeholder="Ex : Méthodologie"
                   />
                 </div>
+                <div className="w-40 space-y-1.5">
+                  <Label className="text-xs">Catégorie du score</Label>
+                  <select
+                    aria-label="Catégorie du score"
+                    value={critere.axe}
+                    onChange={(e) => modifierCritere(critere.id, "axe", e.target.value)}
+                    className="h-9 w-full rounded-md border border-input bg-transparent px-2 text-sm"
+                  >
+                    <option value="">
+                      Auto ({LIBELLES_CATEGORIE_SCORE[axeDuCritere({ libelle: critere.libelle })]})
+                    </option>
+                    {(Object.keys(LIBELLES_CATEGORIE_SCORE) as CategorieScore[]).map((c) => (
+                      <option key={c} value={c}>
+                        {LIBELLES_CATEGORIE_SCORE[c]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <div className="w-24 space-y-1.5">
                   <Label className="text-xs">Poids (%)</Label>
                   <Input
@@ -238,6 +282,42 @@ export default function GrilleEvaluationPage() {
               <Plus className="size-4" />
               Ajouter un critère
             </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {profilSelectionne && !chargementGrille && (
+        <Card className="mt-4">
+          <CardHeader>
+            <CardTitle className="text-base">Seuils de soumission</CardTitle>
+            <CardDescription>
+              L&apos;étudiant ne peut soumettre que si le score global atteint le seuil, qu&apos;aucune
+              catégorie n&apos;est sous le minimum et qu&apos;il ne reste aucun point bloquant.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="seuil-soumission">Score global minimal (%)</Label>
+              <Input
+                id="seuil-soumission"
+                type="number"
+                min={0}
+                max={100}
+                value={seuils.soumission}
+                onChange={(e) => setSeuils((s) => ({ ...s, soumission: Number(e.target.value) || 0 }))}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="seuil-categorie">Minimum par catégorie (%)</Label>
+              <Input
+                id="seuil-categorie"
+                type="number"
+                min={0}
+                max={100}
+                value={seuils.categorie}
+                onChange={(e) => setSeuils((s) => ({ ...s, categorie: Number(e.target.value) || 0 }))}
+              />
+            </div>
           </CardContent>
         </Card>
       )}

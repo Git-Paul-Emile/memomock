@@ -82,7 +82,7 @@ export default function PlanningEtudiantPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Séances</CardTitle>
-            <CardDescription>Planifiées par votre encadrant.</CardDescription>
+            <CardDescription>Planifiées par votre encadreur.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             {chargementSeances ? (
@@ -91,7 +91,7 @@ export default function PlanningEtudiantPage() {
               <EmptyState
                 icon={CalendarClock}
                 title="Aucune séance planifiée"
-                description="Votre encadrant n'a pas encore programmé de séance de suivi."
+                description="Votre encadreur n'a pas encore programmé de séance de suivi."
               />
             ) : (
               <>

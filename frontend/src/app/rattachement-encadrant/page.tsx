@@ -20,11 +20,11 @@ import { APP_NAME } from "@/lib/constants";
 import type { Classe, DemandeEncadrement, EncadrantPublic, Invitation, PublicUser } from "@/types";
 
 /**
- * Écran « Rattachement à un encadrant » côté étudiant.
+ * Écran « Rattachement à un encadreur » côté étudiant.
  *
- * Intervient juste après l'inscription si l'étudiant n'est pas encore lié à un encadrant.
- * Deux modes : saisie d'un code d'invitation transmis par l'encadrant, ou recherche par nom
- * / établissement d'un encadrant déjà référencé sur la plateforme. La liste des encadrants
+ * Intervient juste après l'inscription si l'étudiant n'est pas encore lié à un encadreur.
+ * Deux modes : saisie d'un code d'invitation transmis par l'encadreur, ou recherche par nom
+ * / établissement d'un encadreur déjà référencé sur la plateforme. La liste des encadreurs
  * provient de la base (endpoint public /api/public/encadrants).
  */
 export default function RattachementEncadrantPage() {
@@ -82,7 +82,7 @@ export default function RattachementEncadrantPage() {
     definirUtilisateur(misAJour);
   };
 
-  // Contrairement aux modes "code" (l'encadrant/l'établissement a initié le contact), une
+  // Contrairement aux modes "code" (l'encadreur/l'établissement a initié le contact), une
   // recherche libre crée une demande soumise à acceptation (spec sections 63, 65) plutôt qu'un
   // rattachement immédiat.
   const demanderEncadrement = async () => {
@@ -113,7 +113,7 @@ export default function RattachementEncadrantPage() {
     } catch {
       toast.error(
         mode === "code"
-          ? "Ce code d'invitation est invalide. Vérifiez-le auprès de votre encadrant."
+          ? "Ce code d'invitation est invalide. Vérifiez-le auprès de votre encadreur."
           : mode === "classe"
             ? "Ce code de classe est invalide. Vérifiez-le auprès de votre établissement."
             : "Le rattachement a échoué. Réessayez dans quelques instants."
@@ -140,9 +140,9 @@ export default function RattachementEncadrantPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Rejoindre un encadrant</CardTitle>
+            <CardTitle>Rejoindre un encadreur</CardTitle>
             <CardDescription>
-              Pour recevoir un accompagnement personnalisé, rattachez-vous à l&apos;encadrant qui
+              Pour recevoir un accompagnement personnalisé, rattachez-vous à l&apos;encadreur qui
               suivra votre mémoire.
             </CardDescription>
           </CardHeader>
@@ -155,8 +155,8 @@ export default function RattachementEncadrantPage() {
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {mode === "recherche"
-                    ? "Votre demande a été transmise à l'encadrant. Vous serez notifié·e dès sa réponse."
-                    : "Vous êtes désormais lié à votre encadrant. Vous pouvez soumettre votre premier document dès maintenant."}
+                    ? "Votre demande a été transmise à l'encadreur. Vous serez notifié·e dès sa réponse."
+                    : "Vous êtes désormais lié à votre encadreur. Vous pouvez soumettre votre premier document dès maintenant."}
                 </p>
                 <Button asChild className="mt-2 w-full">
                   <Link href="/etudiant/dashboard">Accéder à mon espace</Link>
@@ -205,7 +205,7 @@ export default function RattachementEncadrantPage() {
 
                 {mode === "code" ? (
                   <div className="space-y-1.5">
-                    <Label htmlFor="code">Code transmis par votre encadrant</Label>
+                    <Label htmlFor="code">Code transmis par votre encadreur</Label>
                     <Input
                       id="code"
                       value={code}
@@ -214,7 +214,7 @@ export default function RattachementEncadrantPage() {
                       className="tracking-widest"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Ce code figure dans l&apos;e-mail d&apos;invitation reçu de votre encadrant.
+                      Ce code figure dans l&apos;e-mail d&apos;invitation reçu de votre encadreur.
                     </p>
                   </div>
                 ) : mode === "classe" ? (
@@ -229,7 +229,7 @@ export default function RattachementEncadrantPage() {
                     />
                     <p className="text-xs text-muted-foreground">
                       Ce code vous rattache automatiquement à votre établissement, votre classe et
-                      un encadrant (spec section 12).
+                      un encadreur (spec section 12).
                     </p>
                   </div>
                 ) : (
@@ -239,7 +239,7 @@ export default function RattachementEncadrantPage() {
                       <Input
                         value={recherche}
                         onChange={(e) => setRecherche(e.target.value)}
-                        placeholder="Nom de l'encadrant ou établissement…"
+                        placeholder="Nom de l'encadreur ou établissement…"
                         className="pl-8"
                       />
                     </div>
@@ -251,7 +251,7 @@ export default function RattachementEncadrantPage() {
                         </div>
                       ) : resultats.length === 0 ? (
                         <p className="py-4 text-center text-sm text-muted-foreground">
-                          Aucun encadrant ne correspond à votre recherche.
+                          Aucun encadreur ne correspond à votre recherche.
                         </p>
                       ) : (
                         resultats.map((e) => (
@@ -307,7 +307,7 @@ export default function RattachementEncadrantPage() {
                           id="message"
                           value={message}
                           onChange={(e) => setMessage(e.target.value)}
-                          placeholder="Ex : Mémoire de Master en informatique sur l'IA générative, recherche d'un encadrant en NLP."
+                          placeholder="Ex : Mémoire de Master en informatique sur l'IA générative, recherche d'un encadreur en NLP."
                           rows={3}
                         />
                       </div>
@@ -326,7 +326,7 @@ export default function RattachementEncadrantPage() {
 
                 <Separator className="my-4" />
                 <p className="text-center text-sm text-muted-foreground">
-                  Vous n&apos;avez pas encore de code ? Demandez-le à votre encadrant, ou{" "}
+                  Vous n&apos;avez pas encore de code ? Demandez-le à votre encadreur, ou{" "}
                   <Link href="/aide" className="font-medium text-primary hover:underline">
                     contactez le support
                   </Link>

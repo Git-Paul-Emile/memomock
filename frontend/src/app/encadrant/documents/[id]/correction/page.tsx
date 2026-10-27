@@ -20,10 +20,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { apiDelete, apiGet, apiList, apiPost } from "@/lib/api";
+import { apiDelete, apiGet, apiList, apiPatch, apiPost } from "@/lib/api";
+import { chargerContenu } from "@/lib/analyse-document";
 import { calculerSegments, texteCourantDuParagraphe } from "@/lib/revision-diff";
 import { cn } from "@/lib/utils";
+import { LIBELLES_CATEGORIE_COMMENTAIRE } from "@/types";
 import type {
+  CategorieCommentaire,
   CommentaireMarge,
   DocumentSubmission,
   RegleApprise,
@@ -35,7 +38,7 @@ import type {
 /**
  * Écran « Éditeur de correction » côté encadrant.
  *
- * L'encadrant modifie directement le texte dans un éditeur riche (TipTap, voir
+ * L'encadreur modifie directement le texte dans un éditeur riche (TipTap, voir
  * components/documents/editeur-correction.tsx) - conforme au mémo de cadrage. À
  * l'enregistrement, le texte de chaque paragraphe est comparé à sa version précédente
  * (lib/revision-diff.ts) pour recalculer les segments de révision (barré/souligné), qui restent
@@ -49,11 +52,18 @@ interface DonneesCorrection {
   reponses: ReponseCommentaire[];
   regles: RegleApprise[];
   surlignages: Surlignage[];
+  // Texte importé par l'étudiant, découpé en paragraphes : base de correction tant que
+  // l'encadreur n'a encore rien enregistré (aucun segment de révision).
+  paragraphesImportes: string[];
 }
+
+const NB_PARAGRAPHES_MAX = 400;
 
 export default function CorrectionEncadrantPage() {
   const { id } = useParams<{ id: string }>();
   const [nouveauCommentaire, setNouveauCommentaire] = React.useState("");
+  const [categorieCommentaire, setCategorieCommentaire] =
+    React.useState<CategorieCommentaire>("forme");
   const [envoiCommentaire, setEnvoiCommentaire] = React.useState(false);
 
   const [enregistrementEnCours, setEnregistrementEnCours] = React.useState(false);
@@ -82,8 +92,15 @@ export default function CorrectionEncadrantPage() {
         }),
         apiList<Surlignage>("surlignages", { filtres: { documentId: id }, limite: 200 }),
       ]);
+      const contenu = rev.data.length === 0 ? await chargerContenu(id) : null;
+      const paragraphesImportes = (contenu?.texte ?? "")
+        .split(/\n+/)
+        .map((ligne) => ligne.replace(/^## /, "").trim())
+        .filter(Boolean)
+        .slice(0, NB_PARAGRAPHES_MAX);
       return {
         document: doc,
+        paragraphesImportes,
         segments: rev.data,
         commentaires: com.data.sort((a, b) => a.numero - b.numero),
         reponses: rep.data,
@@ -122,8 +139,11 @@ export default function CorrectionEncadrantPage() {
   }, [data?.segments]);
 
   const paragraphesTexte = React.useMemo(
-    () => paragraphes.map(texteCourantDuParagraphe),
-    [paragraphes]
+    () =>
+      paragraphes.length > 0
+        ? paragraphes.map(texteCourantDuParagraphe)
+        : (data?.paragraphesImportes ?? []),
+    [paragraphes, data?.paragraphesImportes]
   );
 
   const enregistrerModifications = async () => {
@@ -172,6 +192,8 @@ export default function CorrectionEncadrantPage() {
         documentId: document.id,
         numero: commentaires.length + 1,
         texte,
+        categorie: categorieCommentaire,
+        resolu: false,
         date: new Date().toISOString(),
       });
       setCommentaires((prev) => [...prev, cree]);
@@ -181,6 +203,15 @@ export default function CorrectionEncadrantPage() {
     } finally {
       setEnvoiCommentaire(false);
     }
+  };
+
+  const basculerResolution = async (commentaire: CommentaireMarge) => {
+    const resolu = !commentaire.resolu;
+    const misAJour = await apiPatch<CommentaireMarge>("commentaires-marge", commentaire.id, {
+      resolu,
+      dateResolution: resolu ? new Date().toISOString() : null,
+    });
+    setCommentaires((prev) => prev.map((c) => (c.id === misAJour.id ? misAJour : c)));
   };
 
   // Surlignage par paragraphe (spec section 5, #43) - togglable, pas de sélection de caractères
@@ -257,7 +288,19 @@ export default function CorrectionEncadrantPage() {
                 <MessageSquarePlus className="size-3.5" />
                 Ajouter un commentaire en marge
               </p>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <select
+                  aria-label="Catégorie du commentaire"
+                  value={categorieCommentaire}
+                  onChange={(e) => setCategorieCommentaire(e.target.value as CategorieCommentaire)}
+                  className="h-9 rounded-md border border-input bg-transparent px-2 text-sm"
+                >
+                  {(Object.keys(LIBELLES_CATEGORIE_COMMENTAIRE) as CategorieCommentaire[]).map((c) => (
+                    <option key={c} value={c}>
+                      {LIBELLES_CATEGORIE_COMMENTAIRE[c]}
+                    </option>
+                  ))}
+                </select>
                 <Input
                   value={nouveauCommentaire}
                   onChange={(e) => setNouveauCommentaire(e.target.value)}
@@ -322,7 +365,10 @@ export default function CorrectionEncadrantPage() {
         <div className="space-y-4">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Commentaires ({commentaires.length})</CardTitle>
+              <CardTitle className="text-sm">
+                Commentaires ({commentaires.filter((c) => !c.resolu).length} ouvert(s) sur{" "}
+                {commentaires.length})
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {commentaires.length === 0 ? (
@@ -333,10 +379,28 @@ export default function CorrectionEncadrantPage() {
                 commentaires.map((c) => (
                   <div key={c.id} className="rounded-lg border p-2.5">
                     <div className="flex items-start gap-2">
-                      <Badge variant="warning" className="mt-0.5 shrink-0">
+                      <Badge variant={c.resolu ? "success" : "warning"} className="mt-0.5 shrink-0">
                         {c.numero}
                       </Badge>
-                      <p className="text-sm text-muted-foreground">{c.texte}</p>
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <p className={cn("text-sm text-muted-foreground", c.resolu && "line-through")}>
+                          {c.texte}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {c.categorie && (
+                            <Badge variant="outline" className="text-[10px]">
+                              {LIBELLES_CATEGORIE_COMMENTAIRE[c.categorie]}
+                            </Badge>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => basculerResolution(c)}
+                            className="text-[11px] text-primary hover:underline"
+                          >
+                            {c.resolu ? "Rouvrir" : "Marquer résolu"}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                     <FilCommentaire
                       commentaireMargeId={c.id}
@@ -358,7 +422,8 @@ export default function CorrectionEncadrantPage() {
                 Capture de l&apos;écart
               </CardTitle>
               <CardDescription>
-                Règles déduites de vos corrections, proposées à votre jumeau numérique.
+                Préférences déduites de vos corrections (Diff Engine). Elles ne s&apos;appliquent
+                qu&apos;après votre validation.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -380,7 +445,7 @@ export default function CorrectionEncadrantPage() {
               <Button variant="outline" size="sm" className="w-full" asChild>
                 <Link href="/encadrant/jumeau-numerique">
                   <CheckCircle2 className="size-4" />
-                  Gérer les règles apprises
+                  Ce que l&apos;IA a appris
                 </Link>
               </Button>
             </CardContent>

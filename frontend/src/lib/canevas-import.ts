@@ -20,10 +20,10 @@ function estCommeUnTitreEnMajuscules(texte: string): boolean {
 
 // --- .docx : structure XML (OOXML) lue via JSZip -----------------------------------------
 
-const WORD_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+export const WORD_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 const TAILLE_MIN_TITRE_DEMI_POINTS = 28; // 14pt (w:sz est exprimé en demi-points)
 
-function texteParagrapheDocx(p: Element): string {
+export function texteParagrapheDocx(p: Element): string {
   return Array.from(p.getElementsByTagNameNS(WORD_NS, "t"))
     .map((t) => t.textContent ?? "")
     .join("")
@@ -34,7 +34,7 @@ function texteParagrapheDocx(p: Element): string {
 // une taille de police plus grande : un paragraphe est retenu comme titre de chapitre s'il
 // utilise un style de titre nommé, OU s'il est court, en gras, et soit tout en majuscules soit
 // avec une taille de police >= 14pt.
-function estCommeUnTitreDocx(p: Element, texte: string): boolean {
+export function estCommeUnTitreDocx(p: Element, texte: string): boolean {
   if (!texte || texte.length > LONGUEUR_MAX_TITRE) return false;
 
   const styleId = p.getElementsByTagNameNS(WORD_NS, "pStyle")[0]?.getAttribute("w:val");
@@ -95,7 +95,7 @@ const FACTEUR_TAILLE_TITRE = 1.2; // taille de ligne attendue par rapport à la 
 
 let workerConfigure = false;
 
-async function chargerPdfjs() {
+export async function chargerPdfjs() {
   const pdfjsLib = await import("pdfjs-dist");
   // pdfjs a besoin d'une URL réelle (utilisée telle quelle, y compris pour son repli "fake
   // worker" en environnement où les Web Workers seraient indisponibles) - on la fait pointer

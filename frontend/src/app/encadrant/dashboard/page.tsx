@@ -197,7 +197,7 @@ export default function EncadrantDashboardPage() {
       userId: etudiantId,
       titre: "Rappel : échéance dépassée",
       message:
-        "Votre encadrant vous rappelle qu'une ou plusieurs échéances de suivi sont dépassées.",
+        "Votre encadreur vous rappelle qu'une ou plusieurs échéances de suivi sont dépassées.",
       type: "retard",
       lu: false,
       date: new Date().toISOString(),
@@ -213,7 +213,7 @@ export default function EncadrantDashboardPage() {
 
   // Filtre par classe (spec section 88) : le mock ne sait filtrer que par égalité exacte d'un
   // champ, or un document n'a pas de `classeId` propre (seul l'étudiant en a un) - on récupère
-  // donc tous les documents de l'encadrant puis on les recoupe côté client avec les étudiants de
+  // donc tous les documents de l'encadreur puis on les recoupe côté client avec les étudiants de
   // la classe choisie, avec une pagination calculée localement.
   const classeActive = classeFiltre !== "toutes";
   const { data: documentsPourFiltreClasse } = useApiList<DocumentSubmission>("documents", {

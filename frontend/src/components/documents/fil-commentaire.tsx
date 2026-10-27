@@ -54,7 +54,7 @@ export function FilCommentaire({
           <CornerDownRight className="mt-0.5 size-3 shrink-0 text-muted-foreground" />
           <div>
             <span className="font-medium">
-              {r.auteur === "etudiant" ? "Étudiant" : "Encadrant"}
+              {r.auteur === "etudiant" ? "Étudiant" : "Encadreur"}
             </span>{" "}
             <span className="text-muted-foreground">· {formatDateTime(r.date)}</span>
             <p>{r.texte}</p>

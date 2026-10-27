@@ -49,7 +49,8 @@ export default function CanevasDetailPage() {
     { limite: 500 }
   );
 
-  const chapitresTries = [...chapitres].sort((a, b) => a.ordre - b.ordre);
+  // Un seul niveau d'imbrication : chapitres de premier niveau, chacun avec ses sous-sections.
+  const chapitresTries = chapitres.filter((c) => !c.parentId).sort((a, b) => a.ordre - b.ordre);
 
   if (chargementCanevas || chargementChapitres || !canevas) {
     return (
@@ -76,6 +77,9 @@ export default function CanevasDetailPage() {
             <ChapitreCard
               key={chapitre.id}
               chapitre={chapitre}
+              sousSections={chapitres
+                .filter((s) => s.parentId === chapitre.id)
+                .sort((a, b) => a.ordre - b.ordre)}
               criteres={criteres
                 .filter((c) => c.chapitreId === chapitre.id)
                 .sort((a, b) => a.ordre - b.ordre)}
@@ -87,7 +91,7 @@ export default function CanevasDetailPage() {
 
         <NouveauChapitre
           canevasId={canevas.id}
-          ordreSuivant={chapitres.length}
+          ordreSuivant={chapitresTries.length}
           onCree={refetchChapitres}
         />
       </div>
@@ -97,21 +101,48 @@ export default function CanevasDetailPage() {
 
 function ChapitreCard({
   chapitre,
+  sousSections,
   criteres,
   onChapitreSupprime,
   onCriteresChanges,
 }: {
   chapitre: ChapitreCanevas;
+  sousSections: ChapitreCanevas[];
   criteres: CritereChapitre[];
   onChapitreSupprime: () => void;
   onCriteresChanges: () => void;
 }) {
   const [libelleCritere, setLibelleCritere] = React.useState("");
   const [ajoutEnCours, setAjoutEnCours] = React.useState(false);
+  const [titreSousSection, setTitreSousSection] = React.useState("");
+
+  const ajouterSousSection = async () => {
+    if (!titreSousSection.trim()) return;
+    try {
+      await apiPost<ChapitreCanevas>("chapitres-canevas", {
+        canevasId: chapitre.canevasId,
+        parentId: chapitre.id,
+        titre: titreSousSection.trim(),
+        description: null,
+        obligatoire: true,
+        ordre: sousSections.length,
+      });
+      setTitreSousSection("");
+      onChapitreSupprime();
+    } catch {
+      toast.error("L'ajout de la sous-section a échoué.");
+    }
+  };
+
+  const supprimerSousSection = async (id: string) => {
+    await apiDelete("chapitres-canevas", id);
+    onChapitreSupprime();
+  };
 
   const supprimerChapitre = async () => {
     try {
       await Promise.all(criteres.map((c) => apiDelete("criteres-chapitre", c.id)));
+      await Promise.all(sousSections.map((s) => apiDelete("chapitres-canevas", s.id)));
       await apiDelete("chapitres-canevas", chapitre.id);
       onChapitreSupprime();
     } catch {
@@ -164,6 +195,36 @@ function ChapitreCard({
         </Button>
       </CardHeader>
       <CardContent className="space-y-2">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Sous-sections
+        </p>
+        {sousSections.map((s) => (
+          <div key={s.id} className="flex items-center justify-between rounded-md border border-dashed px-3 py-1.5">
+            <span className="text-sm">↳ {s.titre}</span>
+            <Button variant="ghost" size="icon" onClick={() => supprimerSousSection(s.id)} aria-label={`Supprimer ${s.titre}`}>
+              <Trash2 className="size-3.5 text-destructive" />
+            </Button>
+          </div>
+        ))}
+        <div className="flex gap-2">
+          <Input
+            value={titreSousSection}
+            onChange={(e) => setTitreSousSection(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                ajouterSousSection();
+              }
+            }}
+            placeholder="Ajouter une sous-section (ex : Contexte)"
+          />
+          <Button variant="outline" onClick={ajouterSousSection} aria-label="Ajouter la sous-section">
+            <Plus className="size-4" />
+          </Button>
+        </div>
+        <p className="pt-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Critères
+        </p>
         {criteres.map((c) => (
           <div
             key={c.id}

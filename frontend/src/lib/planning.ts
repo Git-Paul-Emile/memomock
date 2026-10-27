@@ -21,7 +21,7 @@ export interface SeanceProposee {
 
 /**
  * Génère un planning de séances (spec section 75) réparties régulièrement entre `dateDebut` et
- * `dateSoutenance`, calées sur les créneaux hebdomadaires déclarés par l'encadrant
+ * `dateSoutenance`, calées sur les créneaux hebdomadaires déclarés par l'encadreur
  * (`disponibilites` - sans créneau déclaré, n'importe quel jour convient). Algorithme
  * déterministe (calcul de dates + gabarit de tâches ci-dessus), pas une IA simulée.
  */

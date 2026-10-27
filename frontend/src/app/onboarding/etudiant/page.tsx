@@ -43,7 +43,7 @@ export default function OnboardingEtudiantPage() {
 
   const terminer = async () => {
     if (!user?.encadrantId) {
-      toast.error("Aucun encadrant n'est associé à votre compte.");
+      toast.error("Aucun encadreur n'est associé à votre compte.");
       return;
     }
     setEnCours(true);
@@ -101,7 +101,7 @@ export default function OnboardingEtudiantPage() {
               <CardHeader>
                 <CardTitle>Votre mémoire</CardTitle>
                 <CardDescription>
-                  Le type de document conditionne le profil de votre encadrant.
+                  Le type de document conditionne le profil de votre encadreur.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">

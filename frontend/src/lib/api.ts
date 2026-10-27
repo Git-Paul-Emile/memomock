@@ -67,7 +67,7 @@ async function erreurDepuisReponse(res: Response): Promise<ApiError> {
  * Jeton d'identité mock de l'utilisateur courant, ou `null` si personne n'est connecté.
  * Stocké en localStorage lors de la connexion.
  */
-async function getToken(): Promise<string | null> {
+export async function getToken(): Promise<string | null> {
   if (typeof window === "undefined") return null;
   const raw = localStorage.getItem("memoai_mock_user");
   if (!raw) return null;
@@ -174,7 +174,7 @@ export function apiGet<T>(resource: string, id: string): Promise<T> {
 
 /**
  * GET d'un endpoint public (pour les ressources accessibles avant toute authentification).
- * Actuellement, les FAQ et la liste des encadrants sont accessibles publiquement.
+ * Actuellement, les FAQ et la liste des encadreurs sont accessibles publiquement.
  * json-server retourne directement les données.
  */
 export async function apiPublic<T>(path: string): Promise<T> {

@@ -37,13 +37,13 @@ type FormValues = z.infer<typeof schema>;
 
 // Comptes de démonstration : un par rôle. Les identifiants correspondent exactement aux
 // enregistrements de `data.json` (champs `email` / `password`) - voir README.
-// - étudiant      : u5  (Amina Diallo), rattachée à l'encadrant u2 et à l'établissement etab1
+// - étudiant      : u5  (Amina Diallo), rattachée à l'encadreur u2 et à l'établissement etab1
 // - encadrant     : u2  (Jérôme Leroux), encadre l'étudiante u5, rattaché à etab1
-// - établissement : u13 (direction Paris-Saclay), administre etab1
+// - établissement : u13 (direction de l'Université Atlantique de Dakar), administre etab1
 const COMPTES_DEMO = {
-  etudiant: { email: "amina.diallo@etu.memoai.fr", motDePasse: "etudiant123" },
-  encadrant: { email: "j.leroux@memoai.fr", motDePasse: "encadrant123" },
-  etablissement: { email: "direction@paris-saclay.memoai.fr", motDePasse: "etablissement123" },
+  etudiant: { email: "amina.diallo@etu.uad.edu.sn", motDePasse: "etudiant123" },
+  encadrant: { email: "jb.kouassi@uad.edu.sn", motDePasse: "encadrant123" },
+  etablissement: { email: "direction@uad.edu.sn", motDePasse: "etablissement123" },
 } as const;
 
 export default function LoginPage() {
@@ -132,7 +132,7 @@ export default function LoginPage() {
                 onClick={() => remplirCompteDemo("encadrant")}
               >
                 <UsersRound className="size-4" />
-                Encadrant·e
+                Encadreur·e
               </Button>
               <Button
                 type="button"

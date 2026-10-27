@@ -7,18 +7,31 @@
       "titre": "Impact de l'IA générative sur la pédagogie universitaire",
       "nomFichier": "diallo_memoire_v1.docx",
       "tailleOctets": 842112,
-      "statut": "soumis",
-      "scoreConformite": 0,
-      "scoreForme": 0,
-      "scoreFond": 0,
+      "statut": "analyse_terminee",
+      "scoreConformite": 64,
+      "scoreForme": 60,
+      "scoreFond": 65,
       "dateSoumission": "2026-07-08T09:12:00.000Z",
       "version": 1,
-      "dateMaj": "2026-07-08T09:12:00.000Z",
-      "scoreCoherence": 0,
+      "dateMaj": "2026-10-27T13:36:34.489Z",
+      "scoreCoherence": 70,
       "typeDocument": "master",
       "discipline": "Informatique",
       "profilEncadrantId": "pe1",
-      "dateSoutenancePrevue": "2026-11-15"
+      "dateSoutenancePrevue": "2026-11-15",
+      "sujet": "Usages de l'IA générative par les étudiants et enseignants de l'enseignement supérieur sénégalais",
+      "scoreStructure": 75,
+      "scoreMethodologie": 60,
+      "scoreBibliographie": 20,
+      "pretPourSoumission": false,
+      "pointsBloquants": [
+        "Score global de 64 % inférieur au seuil requis (75 %).",
+        "Bibliographie : 20 % (minimum requis : 50 %).",
+        "Nombre insuffisant de sources",
+        "Diagramme d'architecture manquant",
+        "Code source et données non mentionnés"
+      ],
+      "sourceAnalyse": "gemini"
     },
     {
       "id": "doc2",
@@ -43,7 +56,7 @@
       "id": "doc3",
       "etudiantId": "u7",
       "encadrantId": "u3",
-      "titre": "La transformation digitale des PME familiales en France",
+      "titre": "La transformation digitale des PME familiales au Sénégal",
       "nomFichier": "bernard_memoire_v1.docx",
       "tailleOctets": 987654,
       "statut": "analyse_terminee",
@@ -62,7 +75,7 @@
       "id": "doc4",
       "etudiantId": "u8",
       "encadrantId": "u3",
-      "titre": "Facteurs d'adoption du télétravail dans les PME post-2025",
+      "titre": "Facteurs d'adoption du mobile money dans les PME dakaroises",
       "nomFichier": "ba_memoire_v2.docx",
       "tailleOctets": 1102345,
       "statut": "en_correction",
@@ -81,7 +94,7 @@
       "id": "doc5",
       "etudiantId": "u9",
       "encadrantId": "u4",
-      "titre": "Le RGPD face aux modèles de langage génératifs",
+      "titre": "La protection des données personnelles face aux modèles de langage génératifs en zone CEMAC",
       "nomFichier": "petit_memoire_v2.pdf",
       "tailleOctets": 1345678,
       "statut": "pret_pour_encadrant",
@@ -100,7 +113,7 @@
       "id": "doc6",
       "etudiantId": "u10",
       "encadrantId": "u4",
-      "titre": "Responsabilité juridique des agents IA autonomes en droit français",
+      "titre": "Responsabilité juridique des agents IA autonomes en droit camerounais",
       "nomFichier": "rossi_memoire_v2.docx",
       "tailleOctets": 1189234,
       "statut": "en_relecture",
@@ -199,7 +212,7 @@
       "id": "doc103",
       "etudiantId": "u18",
       "encadrantId": "u3",
-      "titre": "Pilotage de la performance RSE en PME",
+      "titre": "Pilotage de la performance RSE dans les PME de l'UEMOA",
       "nomFichier": "memoire-u18.pdf",
       "tailleOctets": 1240000,
       "statut": "rejete",
@@ -219,7 +232,7 @@
       "id": "doc104",
       "etudiantId": "u19",
       "encadrantId": "u15",
-      "titre": "Attribution marketing multicanal",
+      "titre": "Attribution marketing multicanal dans les télécoms ouest-africains",
       "nomFichier": "memoire-u19.pdf",
       "tailleOctets": 1240000,
       "statut": "en_correction",
@@ -350,7 +363,7 @@
     {
       "userId": "u5",
       "titre": "Livrable conforme",
-      "message": "« Cahier des charges » a été validé par votre encadrant.",
+      "message": "« Cahier des charges » a été validé par votre encadreur.",
       "type": "correction",
       "lu": false,
       "date": "2026-08-21T17:47:32.469Z",
@@ -370,7 +383,7 @@
     {
       "userId": "u5",
       "titre": "Chapitre validé",
-      "message": "« Méthodologie » a été validé par votre encadrant.",
+      "message": "« Méthodologie » a été validé par votre encadreur.",
       "type": "validation",
       "lu": false,
       "date": "2026-08-21T19:06:32.013Z",
@@ -380,7 +393,7 @@
     {
       "userId": "u5",
       "titre": "Rappel : échéance dépassée",
-      "message": "Votre encadrant vous rappelle qu'une ou plusieurs échéances de suivi sont dépassées.",
+      "message": "Votre encadreur vous rappelle qu'une ou plusieurs échéances de suivi sont dépassées.",
       "type": "retard",
       "lu": false,
       "date": "2026-08-21T19:45:52.153Z",
@@ -389,29 +402,11 @@
     {
       "userId": "u6",
       "titre": "Rappel : échéance dépassée",
-      "message": "Votre encadrant vous rappelle qu'une ou plusieurs échéances de suivi sont dépassées.",
+      "message": "Votre encadreur vous rappelle qu'une ou plusieurs échéances de suivi sont dépassées.",
       "type": "retard",
       "lu": false,
       "date": "2026-08-21T19:45:52.153Z",
       "id": 6
-    },
-    {
-      "userId": "u3",
-      "titre": "Nouvelle demande d'encadrement",
-      "message": "Test Lot4 souhaite être encadré·e par vous.",
-      "type": "systeme",
-      "lu": false,
-      "date": "2026-08-21T20:14:17.951Z",
-      "id": 7
-    },
-    {
-      "userId": "LHn0Z_M",
-      "titre": "Demande d'encadrement acceptée",
-      "message": "Votre encadrant a accepté votre demande. Vous pouvez soumettre votre premier document.",
-      "type": "systeme",
-      "lu": false,
-      "date": "2026-08-21T20:14:23.358Z",
-      "id": 8
     },
     {
       "userId": "u5",
@@ -430,6 +425,136 @@
       "lu": false,
       "date": "2026-08-21T20:29:33.459Z",
       "id": 10
+    },
+    {
+      "userId": "u5",
+      "titre": "Échéance dépassée",
+      "message": "Maquette UX/UI (« Impact de l'IA générative sur la pédagogie universitaire ») : échéance du 15/08/2026 dépassée.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-10-27T13:29:37.101Z",
+      "lienDocumentId": "doc1",
+      "id": 11
+    },
+    {
+      "userId": "u5",
+      "titre": "Échéance dépassée",
+      "message": "Démonstration en ligne (« Impact de l'IA générative sur la pédagogie universitaire ») : échéance du 01/09/2026 dépassée.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-10-27T13:29:37.101Z",
+      "lienDocumentId": "doc1",
+      "id": 12
+    },
+    {
+      "userId": "u5",
+      "titre": "Échéance dépassée",
+      "message": "Résultats (« Impact de l'IA générative sur la pédagogie universitaire ») : échéance du 20/08/2026 dépassée.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-10-27T13:29:37.101Z",
+      "lienDocumentId": "doc1",
+      "id": 13
+    },
+    {
+      "userId": "u5",
+      "titre": "Échéance dépassée",
+      "message": "Conclusion (« Impact de l'IA générative sur la pédagogie universitaire ») : échéance du 15/09/2026 dépassée.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-10-27T13:29:37.101Z",
+      "lienDocumentId": "doc1",
+      "id": 14
+    },
+    {
+      "userId": "u2",
+      "titre": "Séance non effectuée",
+      "message": "Séance 2 du 17/08/2026 est toujours « planifiée » : marquez-la effectuée ou annulée.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-10-27T13:38:16.611Z",
+      "id": 15
+    },
+    {
+      "userId": "u2",
+      "titre": "Séance non effectuée",
+      "message": "Séance 4 du 26/10/2026 est toujours « planifiée » : marquez-la effectuée ou annulée.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-10-27T13:38:16.611Z",
+      "id": 16
+    },
+    {
+      "userId": "u2",
+      "titre": "Séance non effectuée",
+      "message": "Séance 3 du 28/08/2026 est toujours « planifiée » : marquez-la effectuée ou annulée.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-10-27T13:38:16.611Z",
+      "id": 17
+    },
+    {
+      "userId": "u2",
+      "titre": "Séance non effectuée",
+      "message": "Séance 4 du 10/09/2026 est toujours « planifiée » : marquez-la effectuée ou annulée.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-10-27T13:38:16.611Z",
+      "id": 18
+    },
+    {
+      "userId": "u2",
+      "titre": "Séance non effectuée",
+      "message": "Séance 1 du 24/08/2026 est toujours « planifiée » : marquez-la effectuée ou annulée.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-10-27T13:38:16.611Z",
+      "id": 19
+    },
+    {
+      "userId": "u2",
+      "titre": "Séance non effectuée",
+      "message": "Séance 2 du 14/09/2026 est toujours « planifiée » : marquez-la effectuée ou annulée.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-10-27T13:38:16.611Z",
+      "id": 20
+    },
+    {
+      "userId": "u2",
+      "titre": "Séance non effectuée",
+      "message": "Séance 3 du 05/10/2026 est toujours « planifiée » : marquez-la effectuée ou annulée.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-10-27T13:38:16.611Z",
+      "id": 21
+    },
+    {
+      "userId": "u2",
+      "titre": "Séance non effectuée",
+      "message": "Séance 1 du 24/08/2026 est toujours « planifiée » : marquez-la effectuée ou annulée.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-10-27T13:38:16.611Z",
+      "id": 22
+    },
+    {
+      "userId": "u2",
+      "titre": "Séance non effectuée",
+      "message": "Séance 3 du 05/10/2026 est toujours « planifiée » : marquez-la effectuée ou annulée.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-10-27T13:38:16.611Z",
+      "id": 23
+    },
+    {
+      "userId": "u2",
+      "titre": "Séance non effectuée",
+      "message": "Séance 2 du 14/09/2026 est toujours « planifiée » : marquez-la effectuée ou annulée.",
+      "type": "retard",
+      "lu": false,
+      "date": "2026-10-27T13:38:16.611Z",
+      "id": 24
     }
   ],
   "logsErreurs": [],
@@ -437,19 +562,21 @@
     {
       "id": "u1",
       "role": "admin",
-      "nom": "Système",
+      "nom": "MemoAssistant",
       "prenom": "Admin",
-      "email": "admin@memoai.fr",
+      "email": "admin@memoassistant.africa",
       "createdAt": "2026-01-05T09:00:00.000Z",
       "password": "admin123",
-      "telephoneVerifie": false
+      "telephoneVerifie": false,
+      "pays": "SN",
+      "telephone": "+221338001010"
     },
     {
       "id": "u2",
       "role": "encadrant",
-      "nom": "Leroux",
-      "prenom": "Jérôme",
-      "email": "j.leroux@memoai.fr",
+      "nom": "Kouassi",
+      "prenom": "Jean-Baptiste",
+      "email": "jb.kouassi@uad.edu.sn",
       "createdAt": "2026-01-06T09:00:00.000Z",
       "password": "encadrant123",
       "telephoneVerifie": false,
@@ -458,14 +585,16 @@
         "Génie logiciel"
       ],
       "disponible": true,
-      "etablissementId": "etab1"
+      "etablissementId": "etab1",
+      "pays": "SN",
+      "telephone": "+221771452201"
     },
     {
       "id": "u3",
       "role": "encadrant",
       "nom": "Sarr",
       "prenom": "Fatou",
-      "email": "f.sarr@memoai.fr",
+      "email": "f.sarr@uad.edu.sn",
       "createdAt": "2026-01-06T09:05:00.000Z",
       "password": "encadrant123",
       "telephoneVerifie": false,
@@ -474,29 +603,33 @@
         "Transformation digitale"
       ],
       "disponible": true,
-      "etablissementId": "etab1"
+      "etablissementId": "etab1",
+      "pays": "SN",
+      "telephone": "+221776318842"
     },
     {
       "id": "u4",
       "role": "encadrant",
-      "nom": "Belhadj",
-      "prenom": "Karim",
-      "email": "k.belhadj@memoai.fr",
+      "nom": "Fotso",
+      "prenom": "Emmanuel",
+      "email": "e.fotso@memoassistant.africa",
       "createdAt": "2026-01-06T09:10:00.000Z",
       "password": "encadrant123",
       "telephoneVerifie": false,
       "domainesExpertise": [
         "Droit du numérique",
-        "RGPD"
+        "Protection des données personnelles"
       ],
-      "disponible": false
+      "disponible": false,
+      "pays": "CM",
+      "telephone": "+237677412530"
     },
     {
       "id": "u5",
       "role": "etudiant",
       "nom": "Diallo",
       "prenom": "Amina",
-      "email": "amina.diallo@etu.memoai.fr",
+      "email": "amina.diallo@etu.uad.edu.sn",
       "encadrantId": "u2",
       "filiere": "Master 2 Informatique",
       "etablissementId": "etab1",
@@ -504,113 +637,137 @@
       "groupeId": "groupe1",
       "createdAt": "2026-02-01T10:00:00.000Z",
       "password": "etudiant123",
-      "telephoneVerifie": false
+      "telephoneVerifie": false,
+      "pays": "SN",
+      "telephone": "+221781234567",
+      "canalNotificationPrefere": "whatsapp"
     },
     {
       "id": "u6",
       "role": "etudiant",
-      "nom": "Morel",
-      "prenom": "Yanis",
-      "email": "y.morel@etu.memoai.fr",
+      "nom": "Mensah",
+      "prenom": "Koffi",
+      "email": "koffi.mensah@etu.uad.edu.sn",
       "encadrantId": "u2",
       "filiere": "Master 2 Informatique",
       "etablissementId": "etab1",
       "classeId": "classe1",
       "createdAt": "2026-02-01T10:05:00.000Z",
       "password": "etudiant123",
-      "telephoneVerifie": false
+      "telephoneVerifie": false,
+      "pays": "SN",
+      "telephone": "+221775640218",
+      "canalNotificationPrefere": "whatsapp"
     },
     {
       "id": "u7",
       "role": "etudiant",
-      "nom": "Bernard",
-      "prenom": "Chloé",
-      "email": "c.bernard@etu.memoai.fr",
+      "nom": "Ouédraogo",
+      "prenom": "Aïcha",
+      "email": "aicha.ouedraogo@etu.uad.edu.sn",
       "encadrantId": "u3",
       "filiere": "Master 2 Sciences de gestion",
       "etablissementId": "etab1",
       "classeId": "classe2",
       "createdAt": "2026-02-02T10:00:00.000Z",
       "password": "etudiant123",
-      "telephoneVerifie": false
+      "telephoneVerifie": false,
+      "pays": "SN",
+      "telephone": "+221769013377",
+      "canalNotificationPrefere": "whatsapp"
     },
     {
       "id": "u8",
       "role": "etudiant",
       "nom": "Ba",
       "prenom": "Mamadou",
-      "email": "m.ba@etu.memoai.fr",
+      "email": "mamadou.ba@etu.uad.edu.sn",
       "encadrantId": "u3",
       "filiere": "Master 2 Sciences de gestion",
       "etablissementId": "etab1",
       "classeId": "classe2",
       "createdAt": "2026-02-02T10:10:00.000Z",
       "password": "etudiant123",
-      "telephoneVerifie": false
+      "telephoneVerifie": false,
+      "pays": "SN",
+      "telephone": "+221772208853",
+      "canalNotificationPrefere": "whatsapp"
     },
     {
       "id": "u9",
       "role": "etudiant",
-      "nom": "Petit",
-      "prenom": "Lucas",
-      "email": "l.petit@etu.memoai.fr",
+      "nom": "Mbarga",
+      "prenom": "Junior",
+      "email": "junior.mbarga@gmail.com",
       "encadrantId": "u4",
       "filiere": "Master 2 Droit du numérique",
       "classeId": "classe3",
       "createdAt": "2026-02-03T10:00:00.000Z",
       "password": "etudiant123",
-      "telephoneVerifie": false
+      "telephoneVerifie": false,
+      "pays": "CM",
+      "telephone": "+237691220478",
+      "canalNotificationPrefere": "whatsapp"
     },
     {
       "id": "u10",
       "role": "etudiant",
-      "nom": "Rossi",
-      "prenom": "Sofia",
-      "email": "s.rossi@etu.memoai.fr",
+      "nom": "Nkoulou",
+      "prenom": "Grâce",
+      "email": "grace.nkoulou@yahoo.fr",
       "encadrantId": "u4",
       "filiere": "Master 2 Droit du numérique",
       "classeId": "classe3",
       "createdAt": "2026-02-03T10:15:00.000Z",
       "password": "etudiant123",
-      "telephoneVerifie": false
+      "telephoneVerifie": false,
+      "pays": "CM",
+      "telephone": "+237655803316",
+      "canalNotificationPrefere": "whatsapp"
     },
     {
       "id": "u11",
       "role": "admin",
       "nom": "Fall",
       "prenom": "Aïda",
-      "email": "admin.paris-saclay@memoai.fr",
+      "email": "a.fall@memoassistant.africa",
       "createdAt": "2026-01-05T09:10:00.000Z",
       "password": "admin123",
-      "telephoneVerifie": false
+      "telephoneVerifie": false,
+      "pays": "SN",
+      "telephone": "+221338001011"
     },
     {
       "id": "u12",
       "role": "admin",
       "nom": "Diop",
       "prenom": "Moussa",
-      "email": "admin.lyon2@memoai.fr",
+      "email": "m.diop@memoassistant.africa",
       "createdAt": "2026-01-05T09:15:00.000Z",
       "password": "admin123",
-      "telephoneVerifie": false
+      "telephoneVerifie": false,
+      "pays": "SN",
+      "telephone": "+221338001012"
     },
     {
       "id": "u13",
       "role": "admin_etablissement",
       "nom": "Ndiaye",
       "prenom": "Cheikh",
-      "email": "direction@paris-saclay.memoai.fr",
+      "email": "direction@uad.edu.sn",
       "etablissementId": "etab1",
       "createdAt": "2026-01-06T08:00:00.000Z",
       "password": "etablissement123",
-      "telephoneVerifie": false
+      "telephoneVerifie": false,
+      "pays": "SN",
+      "telephone": "+221338259900"
     },
     {
       "id": "u14",
       "role": "encadrant",
       "nom": "Traoré",
       "prenom": "Awa",
-      "email": "a.traore@memoai.fr",
+      "email": "a.traore@uad.edu.sn",
       "createdAt": "2026-06-18T08:00:00.000Z",
       "password": "Test1234!",
       "telephoneVerifie": false,
@@ -623,15 +780,16 @@
       "classeId": null,
       "groupeId": null,
       "actif": true,
-      "telephone": "+221770000000",
-      "canalNotificationPrefere": "email"
+      "telephone": "+221774450916",
+      "canalNotificationPrefere": "email",
+      "pays": "SN"
     },
     {
       "id": "u15",
       "role": "encadrant",
-      "nom": "Martin",
-      "prenom": "Paul",
-      "email": "p.martin@memoai.fr",
+      "nom": "Adjovi",
+      "prenom": "Serge",
+      "email": "s.adjovi@uad.edu.sn",
       "createdAt": "2026-06-18T08:00:00.000Z",
       "password": "Test1234!",
       "telephoneVerifie": false,
@@ -644,232 +802,270 @@
       "classeId": null,
       "groupeId": null,
       "actif": true,
-      "telephone": "+221770000000",
-      "canalNotificationPrefere": "email"
+      "telephone": "+221763372045",
+      "canalNotificationPrefere": "email",
+      "pays": "SN"
     },
     {
       "id": "u16",
       "role": "etudiant",
       "nom": "Sow",
       "prenom": "Ibrahima",
-      "email": "ibrahima.sow@etu.memoai.fr",
+      "email": "ibrahima.sow@etu.uad.edu.sn",
       "etablissementId": "etab1",
       "classeId": "classe1",
       "groupeId": "groupe1",
       "encadrantId": "u2",
       "filiere": "Master 2 Informatique",
       "actif": true,
-      "telephone": "+221770000000",
+      "telephone": "+221786206576",
       "canalNotificationPrefere": "email",
       "password": "Test1234!",
       "telephoneVerifie": false,
-      "createdAt": "2026-09-01T08:00:00.000Z"
+      "createdAt": "2026-09-01T08:00:00.000Z",
+      "pays": "SN"
     },
     {
       "id": "u17",
       "role": "etudiant",
       "nom": "Ba",
       "prenom": "Khadija",
-      "email": "khadija.ba@etu.memoai.fr",
+      "email": "khadija.ba@etu.uad.edu.sn",
       "etablissementId": "etab1",
       "classeId": "classe1",
       "groupeId": null,
       "encadrantId": "u14",
       "filiere": "Master 2 Informatique",
       "actif": true,
-      "telephone": "+221770000000",
+      "telephone": "+221766344487",
       "canalNotificationPrefere": "email",
       "password": "Test1234!",
       "telephoneVerifie": false,
-      "createdAt": "2026-09-01T08:00:00.000Z"
+      "createdAt": "2026-09-01T08:00:00.000Z",
+      "pays": "SN"
     },
     {
       "id": "u18",
       "role": "etudiant",
       "nom": "Sarr",
       "prenom": "Cheikh",
-      "email": "cheikh.sarr@etu.memoai.fr",
+      "email": "cheikh.sarr@etu.uad.edu.sn",
       "etablissementId": "etab1",
       "classeId": "classe2",
       "groupeId": "groupe2",
       "encadrantId": "u3",
       "filiere": "Master 2 Sciences de gestion",
       "actif": true,
-      "telephone": "+221770000000",
+      "telephone": "+221776482398",
       "canalNotificationPrefere": "email",
       "password": "Test1234!",
       "telephoneVerifie": false,
-      "createdAt": "2026-09-01T08:00:00.000Z"
+      "createdAt": "2026-09-01T08:00:00.000Z",
+      "pays": "SN"
     },
     {
       "id": "u19",
       "role": "etudiant",
       "nom": "Diallo",
       "prenom": "Mariama",
-      "email": "mariama.diallo@etu.memoai.fr",
+      "email": "mariama.diallo@etu.uad.edu.sn",
       "etablissementId": "etab1",
       "classeId": "classe2",
       "groupeId": null,
       "encadrantId": "u15",
       "filiere": "Master 2 Sciences de gestion",
       "actif": true,
-      "telephone": "+221770000000",
+      "telephone": "+221786620309",
       "canalNotificationPrefere": "email",
       "password": "Test1234!",
       "telephoneVerifie": false,
-      "createdAt": "2026-09-01T08:00:00.000Z"
+      "createdAt": "2026-09-01T08:00:00.000Z",
+      "pays": "SN"
     },
     {
       "id": "u20",
       "role": "etudiant",
       "nom": "Mbaye",
       "prenom": "Ousmane",
-      "email": "ousmane.mbaye@etu.memoai.fr",
+      "email": "ousmane.mbaye@etu.uad.edu.sn",
       "etablissementId": "etab1",
       "classeId": "classe4",
       "groupeId": "groupe3",
       "encadrantId": "u14",
       "filiere": "Licence 3 Informatique",
       "actif": true,
-      "telephone": "+221770000000",
+      "telephone": "+221766758220",
       "canalNotificationPrefere": "email",
       "password": "Test1234!",
       "telephoneVerifie": false,
-      "createdAt": "2026-09-01T08:00:00.000Z"
+      "createdAt": "2026-09-01T08:00:00.000Z",
+      "pays": "SN"
     },
     {
       "id": "u21",
       "role": "etudiant",
       "nom": "Gueye",
       "prenom": "Aminata",
-      "email": "aminata.gueye@etu.memoai.fr",
+      "email": "aminata.gueye@etu.uad.edu.sn",
       "etablissementId": "etab1",
       "classeId": "classe4",
       "groupeId": "groupe4",
       "encadrantId": "u14",
       "filiere": "Licence 3 Informatique",
       "actif": true,
-      "telephone": "+221770000000",
+      "telephone": "+221776896131",
       "canalNotificationPrefere": "email",
       "password": "Test1234!",
       "telephoneVerifie": false,
-      "createdAt": "2026-09-01T08:00:00.000Z"
+      "createdAt": "2026-09-01T08:00:00.000Z",
+      "pays": "SN"
     },
     {
       "id": "u22",
       "role": "etudiant",
       "nom": "Faye",
       "prenom": "Moussa",
-      "email": "moussa.faye@etu.memoai.fr",
+      "email": "moussa.faye@etu.uad.edu.sn",
       "etablissementId": "etab1",
       "classeId": "classe1",
       "groupeId": "groupe1",
       "encadrantId": "u2",
       "filiere": "Master 2 Informatique",
       "actif": true,
-      "telephone": "+221770000000",
+      "telephone": "+221787034042",
       "canalNotificationPrefere": "email",
       "password": "Test1234!",
       "telephoneVerifie": false,
-      "createdAt": "2026-09-01T08:00:00.000Z"
+      "createdAt": "2026-09-01T08:00:00.000Z",
+      "pays": "SN"
     },
     {
       "id": "u23",
       "role": "etudiant",
       "nom": "Sy",
       "prenom": "Aïssatou",
-      "email": "aissatou.sy@etu.memoai.fr",
+      "email": "aissatou.sy@etu.uad.edu.sn",
       "etablissementId": "etab1",
       "classeId": "classe1",
       "groupeId": null,
       "encadrantId": "u14",
       "filiere": "Master 2 Informatique",
       "actif": true,
-      "telephone": "+221770000000",
+      "telephone": "+221767171953",
       "canalNotificationPrefere": "email",
       "password": "Test1234!",
       "telephoneVerifie": false,
-      "createdAt": "2026-09-01T08:00:00.000Z"
+      "createdAt": "2026-09-01T08:00:00.000Z",
+      "pays": "SN"
     },
     {
       "id": "u24",
       "role": "etudiant",
       "nom": "Thiam",
       "prenom": "Pape",
-      "email": "pape.thiam@etu.memoai.fr",
+      "email": "pape.thiam@etu.uad.edu.sn",
       "etablissementId": "etab1",
       "classeId": "classe2",
       "groupeId": "groupe2",
       "encadrantId": "u3",
       "filiere": "Master 2 Sciences de gestion",
       "actif": true,
-      "telephone": "+221770000000",
+      "telephone": "+221777309864",
       "canalNotificationPrefere": "email",
       "password": "Test1234!",
       "telephoneVerifie": false,
-      "createdAt": "2026-09-01T08:00:00.000Z"
+      "createdAt": "2026-09-01T08:00:00.000Z",
+      "pays": "SN"
     },
     {
       "id": "u25",
       "role": "etudiant",
       "nom": "Cissé",
       "prenom": "Rama",
-      "email": "rama.cisse@etu.memoai.fr",
+      "email": "rama.cisse@etu.uad.edu.sn",
       "etablissementId": "etab1",
       "classeId": "classe2",
       "groupeId": null,
       "encadrantId": "u15",
       "filiere": "Master 2 Sciences de gestion",
       "actif": true,
-      "telephone": "+221770000000",
+      "telephone": "+221787447775",
       "canalNotificationPrefere": "email",
       "password": "Test1234!",
       "telephoneVerifie": false,
-      "createdAt": "2026-07-05T08:00:00.000Z"
+      "createdAt": "2026-07-05T08:00:00.000Z",
+      "pays": "SN"
     },
     {
       "id": "u26",
       "role": "etudiant",
       "nom": "Seck",
       "prenom": "Abdou",
-      "email": "abdou.seck@etu.memoai.fr",
+      "email": "abdou.seck@etu.uad.edu.sn",
       "etablissementId": "etab1",
       "classeId": "classe4",
       "groupeId": "groupe3",
       "encadrantId": "u14",
       "filiere": "Licence 3 Informatique",
       "actif": true,
-      "telephone": "+221770000000",
+      "telephone": "+221767585686",
       "canalNotificationPrefere": "email",
       "password": "Test1234!",
       "telephoneVerifie": false,
-      "createdAt": "2026-07-05T08:00:00.000Z"
+      "createdAt": "2026-07-05T08:00:00.000Z",
+      "pays": "SN"
     },
     {
       "id": "u27",
       "role": "etudiant",
       "nom": "Camara",
       "prenom": "Bineta",
-      "email": "bineta.camara@etu.memoai.fr",
+      "email": "bineta.camara@etu.uad.edu.sn",
       "etablissementId": "etab1",
       "classeId": "classe4",
       "groupeId": "groupe4",
       "encadrantId": "u14",
       "filiere": "Licence 3 Informatique",
       "actif": true,
-      "telephone": "+221770000000",
+      "telephone": "+221777723597",
       "canalNotificationPrefere": "email",
       "password": "Test1234!",
       "telephoneVerifie": false,
-      "createdAt": "2026-07-05T08:00:00.000Z"
+      "createdAt": "2026-07-05T08:00:00.000Z",
+      "pays": "SN"
+    },
+    {
+      "id": "u28",
+      "role": "admin_etablissement",
+      "prenom": "Hélène",
+      "nom": "Ateba",
+      "email": "direction@uhpy.cm",
+      "password": "etablissement123",
+      "telephone": "+237222301540",
+      "pays": "CM",
+      "etablissementId": "etab2",
+      "createdAt": "2026-09-02T08:00:00.000Z",
+      "telephoneVerifie": false
     }
   ],
   "etablissements": [
     {
       "id": "etab1",
-      "nom": "Université Paris-Saclay",
+      "nom": "Université Atlantique de Dakar",
       "adminId": "u13",
+      "pays": "SN",
+      "ville": "Dakar",
+      "devise": "XOF",
       "createdAt": "2026-01-06T08:00:00.000Z"
+    },
+    {
+      "id": "etab2",
+      "nom": "Université des Hauts-Plateaux de Yaoundé",
+      "adminId": "u28",
+      "pays": "CM",
+      "ville": "Yaoundé",
+      "devise": "XAF",
+      "createdAt": "2026-09-02T08:00:00.000Z"
     }
   ],
   "filieres": [
@@ -877,13 +1073,15 @@
       "id": "fil1",
       "etablissementId": "etab1",
       "nom": "Informatique",
-      "createdAt": "2026-01-06T08:05:00.000Z"
+      "createdAt": "2026-01-06T08:05:00.000Z",
+      "departementId": "dep1"
     },
     {
       "id": "fil2",
       "etablissementId": "etab1",
       "nom": "Sciences de gestion",
-      "createdAt": "2026-01-06T08:06:00.000Z"
+      "createdAt": "2026-01-06T08:06:00.000Z",
+      "departementId": "dep2"
     }
   ],
   "classes": [
@@ -973,28 +1171,28 @@
       "id": "temoignage1",
       "ordre": 1,
       "nom": "Amina Diallo",
-      "role": "Étudiante en Master 2 Informatique - Université Paris-Saclay",
-      "citation": "Le score de conformité m'a évité plusieurs allers-retours inutiles avec mon encadrant : je corrige la forme avant même de lui envoyer mon document."
+      "role": "Étudiante en Master 2 Informatique - Université Atlantique de Dakar",
+      "citation": "Le score de conformité m'a évité plusieurs allers-retours inutiles avec mon encadreur : je corrige la forme avant même de lui envoyer mon document, même tard le soir depuis mon téléphone."
     },
     {
       "id": "temoignage2",
       "ordre": 2,
-      "nom": "Jérôme Leroux",
-      "role": "Encadrant - Université Paris-Saclay",
-      "citation": "Je passe enfin mon temps de relecture sur le fond scientifique. Les corrections répétitives de forme sont déjà faites quand le document arrive sur mon bureau."
+      "nom": "Jean-Baptiste Kouassi",
+      "role": "Encadreur - Université Atlantique de Dakar",
+      "citation": "Avec quinze mémoires par promotion, je passe enfin mon temps de relecture sur le fond scientifique. Les corrections répétitives de forme sont déjà faites quand le document m'arrive."
     },
     {
       "id": "temoignage3",
       "ordre": 3,
-      "nom": "Lucas Petit",
-      "role": "Étudiant en Master 2 Droit du numérique - Université Lumière Lyon 2",
+      "nom": "Junior Mbarga",
+      "role": "Étudiant en Master 2 Droit du numérique - Yaoundé",
       "citation": "Le tuteur IA explique pourquoi une correction est suggérée, pas seulement quoi corriger. J'ai l'impression de progresser, pas juste de suivre des instructions."
     },
     {
       "id": "temoignage4",
       "ordre": 4,
       "nom": "Fatou Sarr",
-      "role": "Encadrante - Université Paris-Saclay",
+      "role": "Encadreuse - Université Atlantique de Dakar",
       "citation": "Configurer mes exigences une fois (normes, grille d'évaluation) puis les voir appliquées automatiquement à chaque étudiant m'a fait gagner un temps considérable."
     }
   ],
@@ -1156,7 +1354,7 @@
       "documentId": "doc6",
       "paragraphe": 1,
       "ordre": 3,
-      "texte": "une analyse comparative de la jurisprudence française et européenne.",
+      "texte": "une analyse comparative de la jurisprudence camerounaise et des actes uniformes OHADA.",
       "type": "normal"
     }
   ],
@@ -1166,7 +1364,7 @@
       "id": "faq1",
       "ordre": 1,
       "question": "Comment fonctionne le score de conformité ?",
-      "reponse": "Le score de conformité (0 à 100) mesure l'écart entre votre document et le profil méthodologique de votre encadrant. Il combine la forme (orthographe, grammaire, mise en page), le fond (argumentation, cohérence) et le taux de similitude. L'envoi officiel à l'encadrant se débloque une fois le seuil requis atteint."
+      "reponse": "Le score de conformité (0 à 100) mesure l'écart entre votre document et le profil méthodologique de votre encadreur. Il combine la forme (orthographe, grammaire, mise en page), la structure (canevas de votre encadreur), le fond (argumentation, méthodologie) et la cohérence entre les parties. L'envoi officiel à l'encadreur se débloque une fois le seuil requis atteint."
     },
     {
       "id": "faq2",
@@ -1177,8 +1375,8 @@
     {
       "id": "faq3",
       "ordre": 3,
-      "question": "Comment me rattacher à un encadrant ?",
-      "reponse": "Saisissez le code d'invitation transmis par votre encadrant, ou recherchez-le par nom / établissement s'il est déjà référencé sur la plateforme. Le rattachement se confirme en un clic."
+      "question": "Comment me rattacher à un encadreur ?",
+      "reponse": "Saisissez le code d'invitation transmis par votre encadreur, ou recherchez-le par nom / établissement s'il est déjà référencé sur la plateforme. Le rattachement se confirme en un clic."
     },
     {
       "id": "faq4",
@@ -1189,51 +1387,12 @@
     {
       "id": "faq5",
       "ordre": 5,
-      "question": "Comment l'IA apprend-elle des corrections de mon encadrant ?",
-      "reponse": "Lorsqu'un encadrant corrige directement le texte, le système capture l'écart entre la version validée par l'IA et la version corrigée. Chaque correction devient une règle prioritaire appliquée aux analyses suivantes : plus l'encadrant utilise l'outil, plus l'IA se rapproche de ses attentes réelles."
+      "question": "Comment l'IA apprend-elle des corrections de mon encadreur ?",
+      "reponse": "Lorsqu'un encadreur corrige directement le texte, le système capture l'écart entre la version validée par l'IA et la version corrigée. Chaque correction devient une règle prioritaire appliquée aux analyses suivantes : plus l'encadreur utilise l'outil, plus l'IA se rapproche de ses attentes réelles."
     }
   ],
   "passwordResets": [],
   "analyses": [
-    {
-      "id": "an-struct-doc1",
-      "documentId": "doc1",
-      "type": "structure",
-      "score": 60,
-      "dateAnalyse": "2026-08-15T09:30:00.000Z",
-      "points": [
-        {
-          "id": "ps1",
-          "libelle": "Introduction",
-          "detail": "Chapitre identifié, structure conforme au canevas.",
-          "niveau": "succes"
-        },
-        {
-          "id": "ps2",
-          "libelle": "État de l'art",
-          "detail": "Chapitre identifié, revue de littérature développée.",
-          "niveau": "succes"
-        },
-        {
-          "id": "ps3",
-          "libelle": "Méthodologie",
-          "detail": "Chapitre présent, mais le choix de l'échantillon n'est pas justifié.",
-          "niveau": "attention"
-        },
-        {
-          "id": "ps4",
-          "libelle": "Résultats",
-          "detail": "Chapitre attendu par le canevas mais non identifié dans le document déposé.",
-          "niveau": "erreur"
-        },
-        {
-          "id": "ps5",
-          "libelle": "Conclusion",
-          "detail": "Chapitre attendu par le canevas mais non identifié dans le document déposé.",
-          "niveau": "erreur"
-        }
-      ]
-    },
     {
       "id": "an1",
       "documentId": "doc3",
@@ -1536,14 +1695,186 @@
       ],
       "dateAnalyse": "2026-08-21T22:44:15.607Z",
       "id": "yWuJnoD"
+    },
+    {
+      "documentId": "doc1",
+      "type": "forme",
+      "score": 60,
+      "dateAnalyse": "2026-10-27T13:36:34.489Z",
+      "source": "gemini",
+      "points": [
+        {
+          "id": "doc1-forme-1793108194489-0",
+          "libelle": "Police Times New Roman",
+          "detail": "Vérifiez que le document final utilise strictement la police Times New Roman.",
+          "niveau": "info",
+          "regle": "Police : Times New Roman",
+          "passage": null,
+          "avisEncadreur": false,
+          "bloquant": false,
+          "sousCategorie": null
+        },
+        {
+          "id": "doc1-forme-1793108194489-1",
+          "libelle": "Pagination en bas de page",
+          "detail": "Assurez-vous que la pagination est correctement insérée en bas de page.",
+          "niveau": "attention",
+          "regle": "Pagination en bas de page (norme par défaut de l'établissement)",
+          "passage": null,
+          "avisEncadreur": false,
+          "bloquant": false,
+          "sousCategorie": null
+        },
+        {
+          "id": "doc1-forme-1793108194489-2",
+          "libelle": "Style académique formel",
+          "detail": "Le texte utilise un registre globalement correct, mais veillez à maintenir le ton académique formel.",
+          "niveau": "succes",
+          "regle": "Style rédactionnel : académique formel (norme par défaut de l'établissement)",
+          "passage": null,
+          "avisEncadreur": false,
+          "bloquant": false,
+          "sousCategorie": null
+        },
+        {
+          "id": "doc1-forme-1793108194489-3",
+          "libelle": "Nombre insuffisant de sources",
+          "detail": "Le document ne contient que 2 sources dans la bibliographie, ce qui est très insuffisant par rapport aux exigences.",
+          "niveau": "erreur",
+          "regle": "Au moins 20 sources bibliographiques (norme par défaut de l'établissement)",
+          "passage": "BIBLIOGRAPHIE",
+          "avisEncadreur": false,
+          "bloquant": true,
+          "sousCategorie": "bibliographie"
+        }
+      ],
+      "id": "ccfQmSw"
+    },
+    {
+      "documentId": "doc1",
+      "type": "structure",
+      "score": 75,
+      "dateAnalyse": "2026-10-27T13:36:34.489Z",
+      "source": "gemini",
+      "points": [
+        {
+          "id": "doc1-structure-1793108194489-0",
+          "libelle": "Introduction incomplète",
+          "detail": "L'introduction doit comporter explicitement le contexte, la problématique, les objectifs et l'annonce du plan.",
+          "niveau": "attention",
+          "regle": "[structure] L'introduction comporte contexte, problématique, objectifs et annonce du plan",
+          "passage": "INTRODUCTION",
+          "avisEncadreur": false,
+          "bloquant": false,
+          "sousCategorie": null
+        },
+        {
+          "id": "doc1-structure-1793108194489-1",
+          "libelle": "Diagramme d'architecture manquant",
+          "detail": "Exiger systématiquement un diagramme d'architecture en figure 1 pour les mémoires d'informatique.",
+          "niveau": "erreur",
+          "regle": "Exiger systématiquement un diagramme d'architecture en figure 1 pour les mémoires d'informatique.",
+          "passage": null,
+          "avisEncadreur": true,
+          "bloquant": true,
+          "sousCategorie": "methodologie"
+        },
+        {
+          "id": "doc1-structure-1793108194489-2",
+          "libelle": "Présentation des chapitres du canevas",
+          "detail": "Les chapitres principaux requis par le canevas (Introduction, État de l'art, Méthodologie, Résultats, Conclusion) sont présents.",
+          "niveau": "succes",
+          "regle": null,
+          "passage": null,
+          "avisEncadreur": false,
+          "bloquant": false,
+          "sousCategorie": null
+        }
+      ],
+      "id": "PlmM1a7"
+    },
+    {
+      "documentId": "doc1",
+      "type": "fond",
+      "score": 65,
+      "dateAnalyse": "2026-10-27T13:36:34.489Z",
+      "source": "gemini",
+      "points": [
+        {
+          "id": "doc1-fond-1793108194489-0",
+          "libelle": "Méthode d'enquête claire",
+          "detail": "L'échantillon et les outils de collecte (questionnaire, entretiens) sont clairement présentés.",
+          "niveau": "succes",
+          "regle": null,
+          "passage": "Nous avons mené une enquête par questionnaire",
+          "avisEncadreur": false,
+          "bloquant": false,
+          "sousCategorie": "methodologie"
+        },
+        {
+          "id": "doc1-fond-1793108194489-1",
+          "libelle": "Discussion des résultats à approfondir",
+          "detail": "La discussion doit confronter les résultats à au moins trois travaux de l'état de l'art.",
+          "niveau": "attention",
+          "regle": "[evaluation] La discussion confronte les résultats à au moins trois travaux de l'état de l'art",
+          "passage": "CHAPITRE 3 : RÉSULTATS",
+          "avisEncadreur": true,
+          "bloquant": false,
+          "sousCategorie": null
+        },
+        {
+          "id": "doc1-fond-1793108194489-2",
+          "libelle": "Code source et données non mentionnés",
+          "detail": "Le code source et les jeux de données utilisés doivent être déposés en annexe ou via un dépôt Git.",
+          "niveau": "erreur",
+          "regle": "Reproductibilité : Le code source et les jeux de données utilisés doivent être déposés en annexe ou via un dépôt Git.",
+          "passage": null,
+          "avisEncadreur": true,
+          "bloquant": true,
+          "sousCategorie": "methodologie"
+        }
+      ],
+      "id": "8peeiMz"
+    },
+    {
+      "documentId": "doc1",
+      "type": "coherence",
+      "score": 70,
+      "dateAnalyse": "2026-10-27T13:36:34.489Z",
+      "source": "gemini",
+      "points": [
+        {
+          "id": "doc1-coherence-1793108194489-0",
+          "libelle": "Alignement objectifs et résultats",
+          "detail": "L'objectif d'analyser l'impact de l'IA est bien retrouvé dans la présentation des résultats et la conclusion.",
+          "niveau": "succes",
+          "regle": null,
+          "passage": "L'objectif de ce travail est d'analyser l'impact...",
+          "avisEncadreur": false,
+          "bloquant": false,
+          "sousCategorie": null
+        },
+        {
+          "id": "doc1-coherence-1793108194489-1",
+          "libelle": "Annonce du plan absente",
+          "detail": "L'introduction ne contient pas d'annonce explicite du plan détaillé du mémoire.",
+          "niveau": "attention",
+          "regle": "[structure] L'introduction comporte contexte, problématique, objectifs et annonce du plan",
+          "passage": "INTRODUCTION",
+          "avisEncadreur": false,
+          "bloquant": false,
+          "sousCategorie": null
+        }
+      ],
+      "id": "gWJn_6p"
     }
   ],
   "encadrants": [
     {
       "id": "u2",
-      "nom": "Leroux",
-      "prenom": "Jérôme",
-      "email": "j.leroux@memoai.fr",
+      "nom": "Kouassi",
+      "prenom": "Jean-Baptiste",
+      "email": "jb.kouassi@uad.edu.sn",
       "filiere": null,
       "domainesExpertise": [
         "Intelligence artificielle",
@@ -1556,7 +1887,7 @@
       "id": "u3",
       "nom": "Sarr",
       "prenom": "Fatou",
-      "email": "f.sarr@memoai.fr",
+      "email": "f.sarr@uad.edu.sn",
       "filiere": null,
       "domainesExpertise": [
         "Stratégie d'entreprise",
@@ -1567,13 +1898,13 @@
     },
     {
       "id": "u4",
-      "nom": "Belhadj",
-      "prenom": "Karim",
-      "email": "k.belhadj@memoai.fr",
+      "nom": "Fotso",
+      "prenom": "Emmanuel",
+      "email": "e.fotso@memoassistant.africa",
       "filiere": null,
       "domainesExpertise": [
         "Droit du numérique",
-        "RGPD"
+        "Protection des données personnelles"
       ],
       "disponible": false,
       "nbEtudiantsSuivis": 2
@@ -1586,28 +1917,36 @@
       "documentId": "doc7",
       "numero": 1,
       "texte": "Précisez la taille des cohortes ici, c'est important pour la validité méthodologique.",
-      "date": "2026-06-11T10:00:00.000Z"
+      "date": "2026-06-11T10:00:00.000Z",
+      "categorie": "methodologique",
+      "resolu": false
     },
     {
       "id": "cm2",
       "documentId": "doc7",
       "numero": 2,
       "texte": "Bonne nuance. Pensez à citer une source récente pour appuyer cette affirmation.",
-      "date": "2026-06-11T10:05:00.000Z"
+      "date": "2026-06-11T10:05:00.000Z",
+      "categorie": "scientifique",
+      "resolu": false
     },
     {
       "id": "cm3",
       "documentId": "doc6",
       "numero": 1,
       "texte": "Reformuler ce passage : trop proche du langage parlé.",
-      "date": "2026-07-22T14:00:00.000Z"
+      "date": "2026-07-22T14:00:00.000Z",
+      "categorie": "forme",
+      "resolu": false
     },
     {
       "id": "cm4",
       "documentId": "doc6",
       "numero": 2,
-      "texte": "Ajouter une référence à l'arrêt de la CJUE mentionné en cours.",
-      "date": "2026-07-22T14:10:00.000Z"
+      "texte": "Ajouter une référence à l'acte additionnel CEDEAO sur la protection des données mentionné en cours.",
+      "date": "2026-07-22T14:10:00.000Z",
+      "categorie": "scientifique",
+      "resolu": false
     }
   ],
   "files-attente": [
@@ -1737,9 +2076,10 @@
       "guidesRedaction": [
         {
           "id": "gr1",
-          "titre": "Guide de rédaction Master Informatique 2026",
+          "titre": "Guide de rédaction des mémoires de Master - UAD 2026",
           "description": "Structure attendue : introduction, état de l'art, contribution, évaluation, conclusion.",
-          "ajouteLe": "2026-01-10T08:00:00.000Z"
+          "ajouteLe": "2026-01-10T08:00:00.000Z",
+          "nomFichier": "guide-memoires-master-uad-2026.pdf"
         },
         {
           "id": "gr2",
@@ -1826,7 +2166,54 @@
       "contraintes": null,
       "seuilSoumission": 75,
       "seuilCategorieMinimum": 50,
-      "updatedAt": "2026-08-21T17:48:15.784Z"
+      "updatedAt": "2026-08-21T17:48:15.784Z",
+      "reglesProfil": [
+        {
+          "id": "rp1",
+          "categorie": "structure",
+          "libelle": "L'introduction comporte contexte, problématique, objectifs et annonce du plan",
+          "detail": null,
+          "source": "ia",
+          "ressource": "Guide de rédaction des mémoires de Master - UAD 2026",
+          "statut": "confirmee"
+        },
+        {
+          "id": "rp2",
+          "categorie": "forme",
+          "libelle": "Times New Roman 12 pt, interligne 1,5, marges de 2,5 cm",
+          "detail": null,
+          "source": "ia",
+          "ressource": "Guide de rédaction des mémoires de Master - UAD 2026",
+          "statut": "confirmee"
+        },
+        {
+          "id": "rp3",
+          "categorie": "bibliographie",
+          "libelle": "Au moins 20 références, dont 30 % d'articles scientifiques de moins de 5 ans",
+          "detail": null,
+          "source": "ia",
+          "ressource": "Guide de rédaction des mémoires de Master - UAD 2026",
+          "statut": "confirmee"
+        },
+        {
+          "id": "rp4",
+          "categorie": "methodologie",
+          "libelle": "Justifier le choix de la démarche (qualitative, quantitative ou mixte) au regard de la question de recherche",
+          "detail": null,
+          "source": "ia",
+          "ressource": "Guide de rédaction des mémoires de Master - UAD 2026",
+          "statut": "a_verifier"
+        },
+        {
+          "id": "rp5",
+          "categorie": "evaluation",
+          "libelle": "La discussion confronte les résultats à au moins trois travaux de l'état de l'art",
+          "detail": null,
+          "source": "manuel",
+          "ressource": null,
+          "statut": "confirmee"
+        }
+      ]
     },
     {
       "id": "pe2",
@@ -1918,7 +2305,7 @@
       "exigences": [
         {
           "id": "ex3",
-          "titre": "Actualité juridique",
+          "titre": "Actualité juridique OHADA et CEMAC",
           "description": "Au moins 5 sources de moins de 2 ans doivent être citées.",
           "ajouteLe": "2026-01-16T09:00:00.000Z"
         }
@@ -2873,39 +3260,58 @@
   "forfaits": [
     {
       "id": "forfait-gratuit",
-      "nom": "Gratuit",
+      "nom": "Découverte",
       "description": "Pour découvrir la plateforme avec une petite promotion.",
       "prixMensuel": 0,
+      "devise": "XOF",
       "maxEtudiants": 20,
       "maxEncadrants": 3,
       "fonctionnalites": [
         "Analyse IA de base",
-        "1 canevas par encadrant"
+        "1 canevas par encadreur"
       ],
       "miseEnRelationPayante": false,
       "ordre": 0
     },
     {
-      "id": "forfait-etablissement",
-      "nom": "Établissement",
-      "description": "Pour une école ou un département gérant plusieurs classes.",
-      "prixMensuel": 199,
-      "maxEtudiants": 300,
-      "maxEncadrants": 30,
+      "id": "forfait-independant",
+      "nom": "Encadreur indépendant",
+      "description": "Pour un encadreur qui suit ses étudiants hors établissement.",
+      "prixMensuel": 5000,
+      "devise": "XOF",
+      "maxEtudiants": 30,
+      "maxEncadrants": 1,
       "fonctionnalites": [
-        "Classes et groupes illimités",
+        "Analyse IA selon vos exigences",
         "Canevas et grilles illimités",
-        "Statistiques d'encadrement",
-        "Support prioritaire"
+        "Paiement par mobile money"
       ],
       "miseEnRelationPayante": false,
       "ordre": 1
     },
     {
+      "id": "forfait-etablissement",
+      "nom": "Établissement",
+      "description": "Pour une école ou une UFR gérant plusieurs classes.",
+      "prixMensuel": 150000,
+      "devise": "XOF",
+      "maxEtudiants": 300,
+      "maxEncadrants": 30,
+      "fonctionnalites": [
+        "Classes et groupes illimités",
+        "Normes de l'établissement imposables",
+        "Statistiques d'encadrement",
+        "Support prioritaire"
+      ],
+      "miseEnRelationPayante": false,
+      "ordre": 2
+    },
+    {
       "id": "forfait-etablissement-pro",
       "nom": "Établissement Pro",
-      "description": "Pour un établissement multi-filières avec mise en relation étudiant/encadreur.",
-      "prixMensuel": 499,
+      "description": "Pour une université multi-filières avec mise en relation étudiant/encadreur.",
+      "prixMensuel": 350000,
+      "devise": "XOF",
       "maxEtudiants": null,
       "maxEncadrants": null,
       "fonctionnalites": [
@@ -2915,7 +3321,7 @@
         "Support dédié"
       ],
       "miseEnRelationPayante": true,
-      "ordre": 2
+      "ordre": 3
     }
   ],
   "abonnements": [
@@ -2925,30 +3331,32 @@
       "forfaitId": "forfait-etablissement",
       "statut": "actif",
       "dateDebut": "2026-01-06T08:00:00.000Z",
-      "dateRenouvellement": "2026-09-06T08:00:00.000Z"
+      "dateRenouvellement": "2026-12-06T08:00:00.000Z",
+      "moyenPaiement": "wave",
+      "referencePaiement": "DEMO-WAVE-0001"
     }
   ],
   "public": {
     "encadrants": [
       {
         "id": "u2",
-        "nom": "Leroux",
-        "prenom": "Jérôme",
-        "email": "j.leroux@memoai.fr",
+        "nom": "Kouassi",
+        "prenom": "Jean-Baptiste",
+        "email": "jb.kouassi@uad.edu.sn",
         "filiere": null
       },
       {
         "id": "u3",
         "nom": "Sarr",
         "prenom": "Fatou",
-        "email": "f.sarr@memoai.fr",
+        "email": "f.sarr@uad.edu.sn",
         "filiere": null
       },
       {
         "id": "u4",
-        "nom": "Belhadj",
-        "prenom": "Karim",
-        "email": "k.belhadj@memoai.fr",
+        "nom": "Fotso",
+        "prenom": "Emmanuel",
+        "email": "e.fotso@memoassistant.africa",
         "filiere": null
       }
     ],
@@ -2957,7 +3365,7 @@
         "id": "faq1",
         "ordre": 1,
         "question": "Comment fonctionne le score de conformité ?",
-        "reponse": "Le score de conformité (0 à 100) mesure l'écart entre votre document et le profil méthodologique de votre encadrant. Il combine la forme (orthographe, grammaire, mise en page), le fond (argumentation, cohérence) et le taux de similitude. L'envoi officiel à l'encadrant se débloque une fois le seuil requis atteint."
+        "reponse": "Le score de conformité (0 à 100) mesure l'écart entre votre document et le profil méthodologique de votre encadreur. Il combine la forme (orthographe, grammaire, mise en page), la structure (canevas de votre encadreur), le fond (argumentation, méthodologie) et la cohérence entre les parties. L'envoi officiel à l'encadreur se débloque une fois le seuil requis atteint."
       },
       {
         "id": "faq2",
@@ -2968,8 +3376,8 @@
       {
         "id": "faq3",
         "ordre": 3,
-        "question": "Comment me rattacher à un encadrant ?",
-        "reponse": "Saisissez le code d'invitation transmis par votre encadrant, ou recherchez-le par nom / établissement s'il est déjà référencé sur la plateforme. Le rattachement se confirme en un clic."
+        "question": "Comment me rattacher à un encadreur ?",
+        "reponse": "Saisissez le code d'invitation transmis par votre encadreur, ou recherchez-le par nom / établissement s'il est déjà référencé sur la plateforme. Le rattachement se confirme en un clic."
       },
       {
         "id": "faq4",
@@ -2980,8 +3388,8 @@
       {
         "id": "faq5",
         "ordre": 5,
-        "question": "Comment l'IA apprend-elle des corrections de mon encadrant ?",
-        "reponse": "Lorsqu'un encadrant corrige directement le texte, le système capture l'écart entre la version validée par l'IA et la version corrigée. Chaque correction devient une règle prioritaire appliquée aux analyses suivantes : plus l'encadrant utilise l'outil, plus l'IA se rapproche de ses attentes réelles."
+        "question": "Comment l'IA apprend-elle des corrections de mon encadreur ?",
+        "reponse": "Lorsqu'un encadreur corrige directement le texte, le système capture l'écart entre la version validée par l'IA et la version corrigée. Chaque correction devient une règle prioritaire appliquée aux analyses suivantes : plus l'encadreur utilise l'outil, plus l'IA se rapproche de ses attentes réelles."
       }
     ],
     "temoignages": [
@@ -2989,28 +3397,28 @@
         "id": "temoignage1",
         "ordre": 1,
         "nom": "Amina Diallo",
-        "role": "Étudiante en Master 2 Informatique - Université Paris-Saclay",
-        "citation": "Le score de conformité m'a évité plusieurs allers-retours inutiles avec mon encadrant : je corrige la forme avant même de lui envoyer mon document."
+        "role": "Étudiante en Master 2 Informatique - Université Atlantique de Dakar",
+        "citation": "Le score de conformité m'a évité plusieurs allers-retours inutiles avec mon encadreur : je corrige la forme avant même de lui envoyer mon document, même tard le soir depuis mon téléphone."
       },
       {
         "id": "temoignage2",
         "ordre": 2,
-        "nom": "Jérôme Leroux",
-        "role": "Encadrant - Université Paris-Saclay",
-        "citation": "Je passe enfin mon temps de relecture sur le fond scientifique. Les corrections répétitives de forme sont déjà faites quand le document arrive sur mon bureau."
+        "nom": "Jean-Baptiste Kouassi",
+        "role": "Encadreur - Université Atlantique de Dakar",
+        "citation": "Avec quinze mémoires par promotion, je passe enfin mon temps de relecture sur le fond scientifique. Les corrections répétitives de forme sont déjà faites quand le document m'arrive."
       },
       {
         "id": "temoignage3",
         "ordre": 3,
-        "nom": "Lucas Petit",
-        "role": "Étudiant en Master 2 Droit du numérique - Université Lumière Lyon 2",
+        "nom": "Junior Mbarga",
+        "role": "Étudiant en Master 2 Droit du numérique - Yaoundé",
         "citation": "Le tuteur IA explique pourquoi une correction est suggérée, pas seulement quoi corriger. J'ai l'impression de progresser, pas juste de suivre des instructions."
       },
       {
         "id": "temoignage4",
         "ordre": 4,
         "nom": "Fatou Sarr",
-        "role": "Encadrante - Université Paris-Saclay",
+        "role": "Encadreuse - Université Atlantique de Dakar",
         "citation": "Configurer mes exigences une fois (normes, grille d'évaluation) puis les voir appliquées automatiquement à chaque étudiant m'a fait gagner un temps considérable."
       }
     ]
@@ -3034,8 +3442,8 @@
         "licence",
         "master"
       ],
-      "dateDebut": "2026-10-01T00:00:00.000Z",
-      "dateFin": "2027-06-30T00:00:00.000Z",
+      "dateDebut": "2026-11-01T00:00:00.000Z",
+      "dateFin": "2027-07-31T00:00:00.000Z",
       "createdAt": "2026-06-15T08:00:00.000Z"
     },
     {
@@ -3053,8 +3461,8 @@
         "licence",
         "master"
       ],
-      "dateDebut": "2025-10-01T00:00:00.000Z",
-      "dateFin": "2026-06-30T00:00:00.000Z",
+      "dateDebut": "2025-11-01T00:00:00.000Z",
+      "dateFin": "2026-07-31T00:00:00.000Z",
       "createdAt": "2025-06-15T08:00:00.000Z"
     },
     {
@@ -3070,8 +3478,8 @@
       "niveaux": [
         "master"
       ],
-      "dateDebut": "2024-10-01T00:00:00.000Z",
-      "dateFin": "2025-06-30T00:00:00.000Z",
+      "dateDebut": "2024-11-01T00:00:00.000Z",
+      "dateFin": "2025-07-31T00:00:00.000Z",
       "createdAt": "2024-06-15T08:00:00.000Z"
     }
   ],
@@ -3084,7 +3492,8 @@
       "typesSourcesAcceptees": [
         "Revues scientifiques",
         "Ouvrages",
-        "Thèses"
+        "Thèses et mémoires (dépôts CAMES et universitaires)",
+        "Rapports d'institutions africaines (BAD, CEDEAO, UEMOA)"
       ],
       "partiesIntroduction": 5,
       "positionPagination": "bas_de_page",
@@ -3094,7 +3503,11 @@
       "taillePolice": "12pt",
       "interligne": "1.5",
       "margesCm": "2.5",
-      "updatedAt": "2026-08-28T10:00:00.000Z"
+      "updatedAt": "2026-08-28T10:00:00.000Z",
+      "champsImposes": [
+        "formatCitation",
+        "police"
+      ]
     }
   ],
   "affectations-encadrant": [
@@ -3154,5 +3567,136 @@
       "createdAt": "2026-06-21T08:15:00.000Z"
     }
   ],
-  "invitations-etablissement": []
+  "invitations-etablissement": [],
+  "departements": [
+    {
+      "id": "dep1",
+      "etablissementId": "etab1",
+      "nom": "UFR Sciences et Technologies",
+      "createdAt": "2026-01-06T08:02:00.000Z"
+    },
+    {
+      "id": "dep2",
+      "etablissementId": "etab1",
+      "nom": "UFR Sciences économiques et de gestion",
+      "createdAt": "2026-01-06T08:03:00.000Z"
+    }
+  ],
+  "disciplines": [
+    {
+      "id": "disc1",
+      "nom": "Informatique",
+      "etablissementId": null,
+      "departementId": null,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "disc2",
+      "nom": "Sciences de gestion",
+      "etablissementId": null,
+      "departementId": null,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "disc3",
+      "nom": "Droit",
+      "etablissementId": null,
+      "departementId": null,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "disc4",
+      "nom": "Droit du numérique",
+      "etablissementId": null,
+      "departementId": null,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "disc5",
+      "nom": "Économie",
+      "etablissementId": null,
+      "departementId": null,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "disc6",
+      "nom": "Sociologie",
+      "etablissementId": null,
+      "departementId": null,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "disc7",
+      "nom": "Santé publique",
+      "etablissementId": null,
+      "departementId": null,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "disc8",
+      "nom": "Agronomie",
+      "etablissementId": null,
+      "departementId": null,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "disc9",
+      "nom": "Génie civil",
+      "etablissementId": null,
+      "departementId": null,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "disc10",
+      "nom": "Sciences de l'éducation",
+      "etablissementId": null,
+      "departementId": null,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "disc11",
+      "nom": "Lettres modernes",
+      "etablissementId": null,
+      "departementId": null,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "disc12",
+      "nom": "Géographie",
+      "etablissementId": null,
+      "departementId": null,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "messages-projet": [
+    {
+      "id": "mp1",
+      "documentId": "doc1",
+      "auteurId": "u2",
+      "auteurRole": "encadrant",
+      "texte": "Bonjour Amina, pensez à importer votre chapitre méthodologie avant notre séance de jeudi.",
+      "date": "2026-10-20T09:15:00.000Z",
+      "lu": true
+    },
+    {
+      "id": "mp2",
+      "documentId": "doc1",
+      "auteurId": "u5",
+      "auteurRole": "etudiant",
+      "texte": "Bien reçu, je l'importe d'ici mercredi soir.",
+      "date": "2026-10-20T11:02:00.000Z",
+      "lu": true
+    }
+  ],
+  "contenus-documents": [
+    {
+      "id": "doc1",
+      "documentId": "doc1",
+      "texte": "## IMPACT DE L'IA GÉNÉRATIVE SUR LA PÉDAGOGIE UNIVERSITAIRE\nMémoire de Master 2 Informatique - Université Atlantique de Dakar\nPrésenté par Amina Diallo, sous la direction de Jean-Baptiste Kouassi\n\n## INTRODUCTION\nDepuis 2023, les outils d'intelligence artificielle générative se sont diffusés très rapidement dans les universités d'Afrique de l'Ouest. Au Sénégal, les étudiants les utilisent pour rédiger, traduire et réviser leurs travaux, souvent depuis leur téléphone, tandis que les enseignants s'interrogent sur la place à leur accorder dans l'évaluation.\nDans ce contexte, une question se pose : quel est l'impact de l'utilisation de l'IA générative sur les résultats académiques des étudiants de Master ?\nL'objectif de ce travail est d'analyser l'impact de ces outils sur la réussite des étudiants et de proposer des recommandations pour leur intégration pédagogique.\nPlus de 80 % des étudiants sénégalais utiliseraient déjà ChatGPT chaque semaine.\n\n## CHAPITRE 1 : ÉTAT DE L'ART\nLes travaux sur l'IA générative en éducation sont récents. Kasneci et al. (2023) identifient des opportunités pour l'apprentissage personnalisé mais aussi des risques liés à la fiabilité des contenus produits. L'UNESCO (2023) recommande d'encadrer leur usage dans l'enseignement supérieur et insiste sur la formation des enseignants.\nEn Afrique, peu d'études empiriques existent. Les rapports de l'Association des universités africaines soulignent surtout les inégalités d'accès à Internet et aux équipements, qui conditionnent l'usage de ces outils.\nCe chapitre montre que la littérature reste majoritairement produite dans les pays du Nord et que le contexte des universités ouest-africaines, marqué par des effectifs importants et des ressources limitées, est peu étudié.\n\n## CHAPITRE 2 : MÉTHODOLOGIE\nNous avons mené une enquête par questionnaire en ligne auprès de 120 étudiants de Master de trois facultés de Dakar, entre mars et mai 2026. Le questionnaire comportait 25 questions fermées sur la fréquence d'usage, les tâches réalisées avec l'IA et la perception de son utilité.\nNous avons également réalisé six entretiens semi-directifs avec des enseignants.\nLes données ont été analysées par statistiques descriptives (fréquences et pourcentages) avec le logiciel R.\n\n## CHAPITRE 3 : RÉSULTATS\n68 % des répondants déclarent utiliser un outil d'IA générative au moins une fois par semaine. Les usages les plus fréquents sont la reformulation de textes (54 %), la recherche d'explications sur un cours (47 %) et la traduction depuis l'anglais (39 %).\nLes étudiants qui utilisent souvent l'IA déclarent se sentir plus efficaces dans la rédaction de leurs devoirs. Les enseignants interrogés expriment des inquiétudes sur le plagiat et sur la difficulté d'évaluer le travail personnel des étudiants.\nCes résultats montrent que l'IA générative améliore les résultats académiques des étudiants.\n\n## CONCLUSION\nL'IA générative est désormais présente dans le quotidien des étudiants de Master à Dakar. Ce travail a montré son impact positif sur la réussite académique. Il est recommandé aux universités de former les enseignants et d'adopter une charte d'usage.\n\n## BIBLIOGRAPHIE\nKasneci, E. et al. (2023). ChatGPT for good? On opportunities and challenges of large language models for education. Learning and Individual Differences, 103.\nUNESCO (2023). Guidance for generative AI in education and research. Paris : UNESCO.",
+      "html": null,
+      "origine": "import",
+      "updatedAt": "2026-10-18T10:00:00.000Z"
+    }
+  ],
+  "journal-audit": []
 }

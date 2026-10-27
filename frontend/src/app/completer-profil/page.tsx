@@ -76,7 +76,7 @@ export default function CompleterProfilPage() {
 
   const onSubmit = async (values: FormValues) => {
     if (values.role === "etudiant" && !values.encadrantId) {
-      toast.error("Merci de sélectionner votre encadrant.");
+      toast.error("Merci de sélectionner votre encadreur.");
       return;
     }
     setIsSubmitting(true);
@@ -123,7 +123,7 @@ export default function CompleterProfilPage() {
                       : "text-muted-foreground hover:bg-accent"
                   )}
                 >
-                  {r === "etudiant" ? "Je suis étudiant(e)" : "Je suis encadrant(e)"}
+                  {r === "etudiant" ? "Je suis étudiant(e)" : "Je suis encadreur(e)"}
                 </button>
               ))}
             </div>
@@ -153,10 +153,10 @@ export default function CompleterProfilPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label>Encadrant·e</Label>
+                    <Label>Encadreur·e</Label>
                     <Select value={encadrantId} onValueChange={(v) => setValue("encadrantId", v)}>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Sélectionnez votre encadrant" />
+                        <SelectValue placeholder="Sélectionnez votre encadreur" />
                       </SelectTrigger>
                       <SelectContent>
                         {encadrants.map((e) => (

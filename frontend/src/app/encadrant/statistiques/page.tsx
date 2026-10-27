@@ -61,7 +61,7 @@ function InfoCarte({ label }: { label: string }) {
  */
 export default function EncadrantStatistiquesPage() {
   const { user } = useAuth();
-  // Corrige un bug préexistant : ces deux requêtes n'étaient pas filtrées par encadrant, chaque
+  // Corrige un bug préexistant : ces deux requêtes n'étaient pas filtrées par encadreur, chaque
   // encadrant voyait donc les statistiques de toute la plateforme.
   const { data: documents, isLoading: chargementDocuments } = useApiList<DocumentSubmission>(
     "documents",

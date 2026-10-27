@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { apiGet, apiPatch, apiPost } from "@/lib/api";
+import { finaliserDecision } from "@/lib/decision";
 import { cn } from "@/lib/utils";
 import type { DocumentSubmission, PublicUser } from "@/types";
 
@@ -33,7 +34,7 @@ interface DonneesValidation {
  */
 export default function ValidationPage() {
   const { id } = useParams<{ id: string }>();
-  const [decision, setDecision] = React.useState<"valider" | "reviser">("valider");
+  const [decision, setDecision] = React.useState<"valider" | "reviser" | "refuser">("valider");
   const [enCours, setEnCours] = React.useState(false);
   const [envoye, setEnvoye] = React.useState(false);
 
@@ -50,7 +51,7 @@ export default function ValidationPage() {
   const etudiant = data?.etudiant ?? null;
 
   // Note/commentaire pré-remplis à partir du document dès qu'il est chargé, puis modifiables
-  // librement par l'encadrant (état local dupliqué, comme dans les autres écrans de saisie).
+  // librement par l'encadreur (état local dupliqué, comme dans les autres écrans de saisie).
   const noteParDefaut = document?.note ? document.note.replace(/\s*\/.*/, "").trim() || "16" : "16";
   const commentaireParDefaut = document?.appreciation ?? "";
   const [note, setNote] = useSyncedState<string>(document ? noteParDefaut : undefined, "16");
@@ -63,19 +64,24 @@ export default function ValidationPage() {
     if (!document) return;
     setEnCours(true);
     try {
+      const statut = decision === "valider" ? "valide" : decision === "reviser" ? "rejete" : "refuse";
+      await finaliserDecision(document, statut);
       await apiPatch<DocumentSubmission>("documents", document.id, {
-        statut: decision === "valider" ? "valide" : "rejete",
+        statut,
         note: decision === "valider" ? `${note} / 20` : null,
         appreciation: commentaire.trim() || null,
         dateMaj: new Date().toISOString(),
       });
       await apiPost("notifications", {
         userId: document.etudiantId,
-        titre: decision === "valider" ? "Mémoire validé" : "Révision demandée",
+        titre:
+          decision === "valider" ? "Mémoire validé" : decision === "reviser" ? "Révision demandée" : "Document refusé",
         message:
           decision === "valider"
             ? `Félicitations, « ${document.titre} » a été validé (note ${note}/20).`
-            : `Votre encadrant a demandé des corrections sur « ${document.titre} ».`,
+            : decision === "reviser"
+              ? `Votre encadreur a demandé des corrections sur « ${document.titre} ».`
+              : `Votre encadreur a refusé « ${document.titre} » : une reprise importante est nécessaire.`,
         type: "validation",
         lu: false,
         date: new Date().toISOString(),
@@ -111,7 +117,11 @@ export default function ValidationPage() {
               <p className="mt-1 text-sm text-muted-foreground">
                 {decision === "valider"
                   ? "Le mémoire a été validé. L'étudiant a été notifié."
-                  : "Une demande de révision a été transmise à l'étudiant."}
+                  : decision === "reviser"
+                    ? "Une demande de révision a été transmise à l'étudiant."
+                    : "Le refus a été transmis à l'étudiant."}
+                {" "}L&apos;IA analyse vos corrections pour vous proposer de nouvelles
+                préférences (écran « Ce que l&apos;IA a appris »).
               </p>
             </div>
             <Button asChild>
@@ -146,7 +156,7 @@ export default function ValidationPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-3 sm:grid-cols-3">
             <button
               type="button"
               onClick={() => setDecision("valider")}
@@ -169,11 +179,22 @@ export default function ValidationPage() {
               <p className="text-sm font-medium">Demander une révision</p>
               <p className="text-xs text-muted-foreground">Des points restent à retravailler.</p>
             </button>
+            <button
+              type="button"
+              onClick={() => setDecision("refuser")}
+              className={cn(
+                "rounded-lg border p-4 text-left transition-colors",
+                decision === "refuser" ? "border-destructive bg-destructive/5" : "hover:bg-accent"
+              )}
+            >
+              <p className="text-sm font-medium">Refuser</p>
+              <p className="text-xs text-muted-foreground">Une reprise importante est nécessaire.</p>
+            </button>
           </div>
 
           {decision === "valider" && (
             <div className="space-y-1.5">
-              <Label htmlFor="note">Note (sur 20)</Label>
+              <Label htmlFor="note">Note (sur 20) - attribuée par vous, jamais par l&apos;IA</Label>
               <Input
                 id="note"
                 type="number"
@@ -187,7 +208,7 @@ export default function ValidationPage() {
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="commentaire">Commentaire de fond</Label>
+            <Label htmlFor="commentaire">Appréciation globale</Label>
             <Textarea
               id="commentaire"
               value={commentaire}

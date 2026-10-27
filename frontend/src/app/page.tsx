@@ -27,11 +27,11 @@ import { LIBELLES_TYPE_DOCUMENT, type FaqEntry, type Temoignage, type TypeDocume
 // CTA final, footer. Chaque section renvoie vers l'écran public dédié pour le détail complet.
 
 const ETAPES = [
-  "L'encadrant configure ses exigences (guides, modèles, normes, grille d'évaluation)",
+  "L'encadreur configure ses exigences (guides, modèles, normes, grille d'évaluation)",
   "L'étudiant rédige ou importe son document",
   "L'IA analyse la forme, le fond et la cohérence, puis propose des corrections",
   "L'étudiant révise jusqu'à atteindre le seuil de conformité requis",
-  "L'encadrant relit le fond scientifique et valide",
+  "L'encadreur relit le fond scientifique et valide",
 ];
 
 const TYPES_DOCUMENTS: { type: TypeDocument; description: string }[] = [
@@ -43,7 +43,7 @@ const TYPES_DOCUMENTS: { type: TypeDocument; description: string }[] = [
 const AVANTAGES_ETUDIANTS = [
   "Un premier retour immédiat sur la forme et le fond, sans attendre un créneau",
   "Un score de conformité qui suit votre progression version après version",
-  "Moins d'allers-retours inutiles avec votre encadrant",
+  "Moins d'allers-retours inutiles avec votre encadreur",
 ];
 
 const AVANTAGES_ENCADREURS = [
@@ -100,18 +100,19 @@ export default function Home() {
               Rédigez, corrigez et validez vos mémoires académiques plus sereinement.
             </h1>
             <p className="text-lg text-muted-foreground">
-              MemoAssistant AI accompagne les étudiants dans la rédaction de leur mémoire grâce à
-              une analyse automatique de la forme, du fond et de la cohérence, et donne aux
-              encadrants une vue centralisée de la progression et de la conformité des documents
-              reçus. Principe directeur : l&apos;IA prépare, l&apos;étudiant améliore,
-              l&apos;encadrant décide.
+              Pour les universités et écoles d&apos;Afrique de l&apos;Ouest et centrale (Licence,
+              Master, Doctorat) : MemoAssistant AI analyse le mémoire selon les exigences de VOTRE
+              encadreur - forme, structure, fond et cohérence - avant qu&apos;il ne le reçoive, et
+              donne aux encadreurs une vue centralisée de la progression de leurs étudiants.
+              Principe directeur : l&apos;IA prépare, l&apos;étudiant améliore, l&apos;encadreur
+              décide.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
               <Button size="lg" asChild>
                 <Link href="/register">Je suis étudiant(e)</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="/register">Je suis encadrant(e)</Link>
+                <Link href="/register">Je suis encadreur(e)</Link>
               </Button>
             </div>
           </div>
@@ -153,9 +154,9 @@ export default function Home() {
             <p className="max-w-xl text-muted-foreground">
               L&apos;IA analyse la forme, le fond et la cohérence de votre document, dialogue avec
               vous pour expliquer ses suggestions, et se personnalise selon les exigences précises
-              de votre encadrant (type de document, discipline, grille d&apos;évaluation). Elle
+              de votre encadreur (type de document, discipline, grille d&apos;évaluation). Elle
               n&apos;attribue jamais seule de note académique officielle et ne valide jamais un
-              mémoire à la place de l&apos;encadrant.
+              mémoire à la place de l&apos;encadreur.
             </p>
           </div>
         </section>

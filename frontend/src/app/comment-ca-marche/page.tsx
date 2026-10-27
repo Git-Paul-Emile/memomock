@@ -6,13 +6,13 @@ import { PublicFooter } from "@/components/marketing/public-footer";
 import { Card, CardContent } from "@/components/ui/card";
 
 const ETAPES = [
-  "L'encadrant configure ses exigences (guides, modèles, normes, grille d'évaluation)",
+  "L'encadreur configure ses exigences (guides, modèles, normes, grille d'évaluation)",
   "L'étudiant rédige ou importe son document",
   "L'IA analyse la forme, le fond et la cohérence",
   "L'étudiant corrige, avec l'aide du tuteur IA",
   "Un score de conformité mesure la progression",
-  "Le document est transmis à l'encadrant une fois le seuil atteint",
-  "L'encadrant corrige et valide le fond scientifique",
+  "Le document est transmis à l'encadreur une fois le seuil atteint",
+  "L'encadreur corrige et valide le fond scientifique",
   "L'étudiant révise si nécessaire, jusqu'à validation finale",
 ];
 
@@ -24,7 +24,7 @@ export default function CommentCaMarchePage() {
         <h1 className="mb-3 text-3xl font-bold tracking-tight">Comment ça marche ?</h1>
         <p className="mb-10 text-muted-foreground">
           MemoAssistant AI se positionne comme un intermédiaire intelligent entre l&apos;étudiant et
-          l&apos;encadrant : l&apos;IA prépare, l&apos;étudiant améliore, l&apos;encadrant décide.
+          l&apos;encadreur : l&apos;IA prépare, l&apos;étudiant améliore, l&apos;encadreur décide.
         </p>
 
         <div className="space-y-3">

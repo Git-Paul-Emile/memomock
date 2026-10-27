@@ -211,11 +211,11 @@ export default function AidePage() {
               </Button>
               <Separator />
               <a
-                href="mailto:support@memoai.fr"
+                href="mailto:support@memoassistant.africa"
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
               >
                 <Mail className="size-4" />
-                support@memoai.fr
+                support@memoassistant.africa
               </a>
             </CardContent>
           </Card>

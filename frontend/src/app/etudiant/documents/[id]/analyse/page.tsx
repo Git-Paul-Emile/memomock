@@ -11,21 +11,21 @@ import {
   History,
   Loader2,
   MessageSquareText,
+  PenLine,
   Wand2,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { ScoreJauge } from "@/components/shared/score-jauge";
-import { Badge } from "@/components/ui/badge";
+import { DetailScores } from "@/components/shared/detail-scores";
+import { BadgeSourceIa, PointAnalyseCarte } from "@/components/documents/point-analyse";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { apiGet, apiList, apiPatch, apiPost } from "@/lib/api";
-import { NIVEAU_ALERTE_VARIANT, SEUIL_SCORE_CONFORMITE } from "@/lib/constants";
-import { lancerAnalyseSimulee } from "@/lib/mock-ai";
+import { apiGet, apiList, apiPatch } from "@/lib/api";
+import { lancerAnalyseDocument } from "@/lib/analyse-document";
 import { formatDateTime } from "@/lib/utils";
 import type { Analyse, DocumentSubmission, TypeAnalyse } from "@/types";
 
@@ -62,8 +62,7 @@ export default function AnalyseDocumentPage() {
     },
     refetchInterval: (query) => {
       const etat = query.state.data;
-      if (etat && etat.document.statut === "analyse_en_cours" && etat.analyses.length === 0)
-        return 3000;
+      if (etat && etat.document.statut === "analyse_en_cours") return 3000;
       return false;
     },
   });
@@ -80,7 +79,7 @@ export default function AnalyseDocumentPage() {
         statut: "analyse_en_cours",
         dateMaj: new Date().toISOString(),
       });
-      void lancerAnalyseSimulee(document.id);
+      void lancerAnalyseDocument(document.id).catch(() => {});
       toast.success("Analyse relancée.");
       await refetch();
     } catch {
@@ -90,24 +89,8 @@ export default function AnalyseDocumentPage() {
     }
   };
 
-  const transmettreEncadrant = async () => {
-    if (!document) return;
-    await apiPatch("documents", document.id, {
-      statut: "pret_pour_encadrant",
-      dateMaj: new Date().toISOString(),
-    });
-    await apiPost("notifications", {
-      userId: document.encadrantId,
-      titre: "Document prêt pour relecture",
-      message: `« ${document.titre} » a atteint le score de conformité requis.`,
-      type: "validation",
-      lu: false,
-      date: new Date().toISOString(),
-      lienDocumentId: document.id,
-    });
-    toast.success("Document transmis à votre encadrant.");
-    await refetch();
-  };
+  // La soumission officielle passe par l'écran de confirmation, qui crée la version (spec v2, § 28).
+  const soumettreEncadreur = () => router.push(`/etudiant/documents/${document?.id}/confirmation`);
 
   if (isLoading || !document) {
     return (
@@ -119,18 +102,26 @@ export default function AnalyseDocumentPage() {
   }
 
   const analyseDisponible = analyses.length > 0;
-  // `pretPourSoumission` peut être fourni par l'API ; à défaut, on retombe sur une comparaison
-  // au seuil de conformité générique.
-  const scoreSuffisant =
-    document.pretPourSoumission ?? document.scoreConformite >= SEUIL_SCORE_CONFORMITE;
+  // État calculé à chaque analyse (lib/score.ts) : seuil global, minimum par catégorie, aucun
+  // point bloquant.
+  const scoreSuffisant = document.pretPourSoumission === true;
+  const enAnalyse = document.statut === "analyse_en_cours";
+  // « Déposé » (statut hérité) : fichier reçu mais jamais analysé - on propose l'analyse.
+  const aAnalyser = !analyseDisponible || enAnalyse || document.statut === "soumis";
 
   return (
     <div className="mx-auto max-w-4xl">
       <PageHeader
         title={document.titre}
-        description={`Version ${document.version} · ${document.nomFichier}`}
+        description={`Version ${document.version}${document.nomFichier ? ` · ${document.nomFichier}` : ""}`}
         actions={
           <>
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/etudiant/documents/${document.id}/redaction`}>
+                <PenLine className="size-4" />
+                Rédiger
+              </Link>
+            </Button>
             <Button variant="outline" size="sm" asChild>
               <Link href={`/etudiant/documents/${document.id}/versions`}>
                 <History className="size-4" />
@@ -144,12 +135,19 @@ export default function AnalyseDocumentPage() {
                 </a>
               </Button>
             )}
+            {!aAnalyser && ["analyse_terminee", "en_correction"].includes(document.statut) && (
+              <Button variant="outline" size="sm" onClick={relancerAnalyse} disabled={analyseEnCours}>
+                {analyseEnCours ? <Loader2 className="size-4 animate-spin" /> : <Wand2 className="size-4" />}
+                Réanalyser
+              </Button>
+            )}
+            <BadgeSourceIa source={document.sourceAnalyse} />
             <StatusBadge statut={document.statut} />
           </>
         }
       />
 
-      {!analyseDisponible && (
+      {aAnalyser && (
         <Card className="mb-6">
           <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
             <div className="flex size-14 items-center justify-center rounded-full bg-accent">
@@ -181,23 +179,30 @@ export default function AnalyseDocumentPage() {
         </Card>
       )}
 
-      {analyseDisponible && (
+      {!aAnalyser && (
         <>
           <Card className="mb-6">
-            <CardContent className="flex flex-col items-center gap-4 py-6 sm:flex-row sm:justify-around">
-              <ScoreJauge score={document.scoreConformite} taille={110} />
-              <div className="grid flex-1 grid-cols-2 gap-4 text-center">
-                <div>
-                  <p className="text-lg font-semibold">{document.scoreForme}</p>
-                  <p className="text-xs text-muted-foreground">Forme</p>
-                </div>
-                <div>
-                  <p className="text-lg font-semibold">{document.scoreFond}</p>
-                  <p className="text-xs text-muted-foreground">Fond</p>
-                </div>
-              </div>
+            <CardContent className="py-6">
+              <DetailScores document={document} />
             </CardContent>
           </Card>
+
+          {!scoreSuffisant && (document.pointsBloquants?.length ?? 0) > 0 && (
+            <Card className="mb-6 border-warning/40 bg-warning/5">
+              <CardContent className="space-y-2 pt-6">
+                <p className="text-sm font-medium">
+                  {document.pointsBloquants?.some((p) => p.startsWith("Score global"))
+                    ? "Points à corriger avant de pouvoir soumettre votre document"
+                    : "Votre document atteint le score global requis, mais certains points critiques doivent être corrigés avant la soumission."}
+                </p>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  {document.pointsBloquants?.map((point, i) => (
+                    <li key={i}>• {point}</li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
 
           <Tabs defaultValue="forme" className="mb-6">
             <TabsList>
@@ -224,27 +229,7 @@ export default function AnalyseDocumentPage() {
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {analyse?.points.map((point) => (
-                        <div
-                          key={point.id}
-                          className="flex items-start gap-3 rounded-lg border p-3"
-                        >
-                          <Badge
-                            variant={NIVEAU_ALERTE_VARIANT[point.niveau]}
-                            className="mt-0.5 shrink-0"
-                          >
-                            {point.niveau === "erreur"
-                              ? "À corriger"
-                              : point.niveau === "attention"
-                                ? "À vérifier"
-                                : point.niveau === "succes"
-                                  ? "Conforme"
-                                  : "Info"}
-                          </Badge>
-                          <div>
-                            <p className="text-sm font-medium">{point.libelle}</p>
-                            <p className="text-sm text-muted-foreground">{point.detail}</p>
-                          </div>
-                        </div>
+                        <PointAnalyseCarte key={point.id} point={point} />
                       ))}
                     </CardContent>
                   </Card>
@@ -255,15 +240,15 @@ export default function AnalyseDocumentPage() {
 
           <Card>
             <CardContent className="flex flex-col items-center gap-3 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
-              {document.statut === "analyse_terminee" && !scoreSuffisant && (
+              {["analyse_terminee", "en_correction"].includes(document.statut) && !scoreSuffisant && (
                 <>
                   <div className="flex items-center gap-3">
                     <AlertTriangle className="size-8 text-warning" />
                     <div>
-                      <p className="font-medium">Score encore insuffisant</p>
+                      <p className="font-medium">Document pas encore prêt pour la soumission</p>
                       <p className="text-sm text-muted-foreground">
-                        Démarrez une session de correction interactive avec le tuteur IA pour
-                        progresser.
+                        Corrigez les points relevés (le tuteur IA peut vous les expliquer), puis
+                        réimportez votre fichier pour une nouvelle analyse.
                       </p>
                     </div>
                   </div>
@@ -271,20 +256,20 @@ export default function AnalyseDocumentPage() {
                     onClick={() => router.push(`/etudiant/documents/${document.id}/correction`)}
                   >
                     <MessageSquareText className="size-4" />
-                    Démarrer la correction
+                    Corriger avec le tuteur IA
                   </Button>
                 </>
               )}
 
-              {document.statut === "analyse_terminee" && scoreSuffisant && (
+              {["analyse_terminee", "en_correction"].includes(document.statut) && scoreSuffisant && (
                 <>
                   <div className="flex items-center gap-3">
                     <Wand2 className="size-8 text-success" />
                     <div>
-                      <p className="font-medium">Score de conformité atteint</p>
+                      <p className="font-medium">Prêt pour la soumission</p>
                       <p className="text-sm text-muted-foreground">
-                        Vous pouvez transmettre ce document à votre encadrant, ou continuer à
-                        l&apos;améliorer.
+                        Seuils atteints et aucun point bloquant : vous pouvez soumettre ce document
+                        à votre encadreur, ou continuer à l&apos;améliorer.
                       </p>
                     </div>
                   </div>
@@ -295,27 +280,8 @@ export default function AnalyseDocumentPage() {
                     >
                       Continuer la correction
                     </Button>
-                    <Button onClick={transmettreEncadrant}>Transmettre à l&apos;encadrant</Button>
+                    <Button onClick={soumettreEncadreur}>Soumettre à l&apos;encadreur</Button>
                   </div>
-                </>
-              )}
-
-              {document.statut === "en_correction" && (
-                <>
-                  <div className="flex items-center gap-3">
-                    <MessageSquareText className="size-8 text-primary" />
-                    <div>
-                      <p className="font-medium">Correction interactive en cours</p>
-                      <p className="text-sm text-muted-foreground">
-                        Reprenez votre échange avec le tuteur IA.
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => router.push(`/etudiant/documents/${document.id}/correction`)}
-                  >
-                    Continuer la correction
-                  </Button>
                 </>
               )}
 
@@ -323,7 +289,7 @@ export default function AnalyseDocumentPage() {
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="size-8 text-primary" />
                   <div>
-                    <p className="font-medium">En attente de votre encadrant</p>
+                    <p className="font-medium">En attente de votre encadreur</p>
                     <p className="text-sm text-muted-foreground">
                       Votre document a été transmis et est en cours de relecture.
                     </p>
@@ -337,20 +303,20 @@ export default function AnalyseDocumentPage() {
                   <div>
                     <p className="font-medium">Mémoire validé</p>
                     <p className="text-sm text-muted-foreground">
-                      Félicitations, votre encadrant a validé ce document.
+                      Félicitations, votre encadreur a validé ce document.
                     </p>
                   </div>
                 </div>
               )}
 
-              {document.statut === "rejete" && (
+              {["rejete", "refuse"].includes(document.statut) && (
                 <div className="flex items-center gap-3">
                   <AlertTriangle className="size-8 text-destructive" />
                   <div>
                     <p className="font-medium">Document à retravailler</p>
                     <p className="text-sm text-muted-foreground">
-                      Votre encadrant a demandé des corrections importantes. Soumettez une nouvelle
-                      version.
+                      Votre encadreur a demandé une révision. Consultez ses retours puis soumettez
+                      une nouvelle version.
                     </p>
                   </div>
                 </div>

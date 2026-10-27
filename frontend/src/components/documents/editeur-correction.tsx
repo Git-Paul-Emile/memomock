@@ -7,7 +7,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { cn } from "@/lib/utils";
 
 /**
- * Éditeur riche (TipTap) utilisé par l'encadrant pour modifier directement le texte de
+ * Éditeur riche (TipTap) utilisé par l'encadreur pour modifier directement le texte de
  * l'étudiant - voir mémo de cadrage, section « Architecture Technique » et le parcours
  * encadrant ("il modifie directement le texte final dans l'éditeur (celui basé sur TipTap...)").
  *

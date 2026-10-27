@@ -8,6 +8,7 @@ import { Bell, GraduationCap, LogOut, Menu, UserRound } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { useNotificationsNonLuesCount } from "@/hooks/use-notifications";
 import { NavIcon } from "@/components/layout/nav-icon";
+import { genererAlertesAutomatiques } from "@/lib/alertes-auto";
 import { APP_NAME, ROLE_LABELS } from "@/lib/constants";
 import { cn, getInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -88,6 +89,12 @@ export function AppShell({
   const [sheetOuvert, setSheetOuvert] = React.useState(false);
 
   const { total: notificationsNonLues } = useNotificationsNonLuesCount(user?.id);
+
+  // Alertes de suivi (échéances, retards, séances) : au plus une génération par jour.
+  React.useEffect(() => {
+    if (!user) return;
+    void genererAlertesAutomatiques(user).catch(() => {});
+  }, [user]);
 
   if (!user) return null;
 

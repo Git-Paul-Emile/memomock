@@ -16,7 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiGet, apiPatch, apiPost } from "@/lib/api";
-import { lancerAnalyseSimulee } from "@/lib/mock-ai";
+import { enregistrerContenu, lancerAnalyseDocument } from "@/lib/analyse-document";
+import { ExtractionTexteError, extraireTexte } from "@/lib/extraction-texte";
 import { formatFileSize } from "@/lib/utils";
 import type { DocumentSubmission, PublicUser } from "@/types";
 
@@ -27,6 +28,24 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 const EXTENSIONS_ACCEPTEES = [".pdf", ".doc", ".docx"];
+
+/**
+ * Lit le texte du fichier et l'enregistre pour l'analyse IA. Un fichier illisible (ancien .doc,
+ * PDF scanné) n'empêche pas le dépôt : l'analyse se fera alors en mode simulé.
+ */
+async function preparerContenu(documentId: string, fichier: File): Promise<void> {
+  try {
+    const texte = await extraireTexte(fichier);
+    await enregistrerContenu(documentId, { texte, origine: "import" });
+    if (!texte) toast.info("Aucun texte lisible dans ce fichier (PDF scanné ?) : l'analyse sera simulée.");
+  } catch (err) {
+    toast.info(
+      err instanceof ExtractionTexteError
+        ? `${err.message} L'analyse sera simulée ; préférez un fichier .docx ou .pdf.`
+        : "Le texte du fichier n'a pas pu être lu : l'analyse sera simulée."
+    );
+  }
+}
 
 export default function SoumissionPage() {
   return (
@@ -94,13 +113,14 @@ function SoumissionContenu() {
     if (!fichier || !documentId) return;
     setIsSubmitting(true);
     try {
+      await preparerContenu(documentId, fichier);
       const document = await apiPatch<DocumentSubmission>("documents", documentId, {
         nomFichier: fichier.name,
         tailleOctets: fichier.size,
         statut: "analyse_en_cours",
         dateMaj: new Date().toISOString(),
       });
-      void lancerAnalyseSimulee(document.id);
+      void lancerAnalyseDocument(document.id).catch(() => {});
 
       if (document.encadrantId) {
         await apiPost("notifications", {
@@ -129,7 +149,7 @@ function SoumissionContenu() {
       return;
     }
     if (!user?.encadrantId) {
-      toast.error("Aucun encadrant n'est associé à votre compte.");
+      toast.error("Aucun encadreur n'est associé à votre compte.");
       return;
     }
     setIsSubmitting(true);
@@ -150,7 +170,8 @@ function SoumissionContenu() {
         dateMaj: maintenant,
         version: 1,
       });
-      void lancerAnalyseSimulee(document.id);
+      await preparerContenu(document.id, fichier);
+      void lancerAnalyseDocument(document.id).catch(() => {});
 
       await apiPost("notifications", {
         userId: user.encadrantId,
@@ -219,15 +240,15 @@ function SoumissionContenu() {
       <div className="mx-auto max-w-2xl">
         <PageHeader
           title="Importer votre fichier"
-          description="Votre document sera automatiquement analysé (forme, fond) puis transmis à votre encadrant une fois le score de conformité atteint."
+          description="Votre document sera analysé par l'IA selon les exigences de votre encadreur (forme, structure, fond, cohérence) puis soumis à votre encadreur une fois le score de conformité atteint."
         />
         <Card>
           <CardHeader>
             <CardTitle>{brouillon?.titre ?? "Document"}</CardTitle>
             <CardDescription>
               {encadrant
-                ? `Encadrant assigné : ${encadrant.prenom} ${encadrant.nom}`
-                : "Chargement de votre encadrant…"}
+                ? `Encadreur assigné : ${encadrant.prenom} ${encadrant.nom}`
+                : "Chargement de votre encadreur…"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
@@ -240,6 +261,13 @@ function SoumissionContenu() {
               {isSubmitting && <Loader2 className="size-4 animate-spin" />}
               Importer et lancer l&apos;analyse
             </Button>
+            <p className="text-center text-sm text-muted-foreground">
+              Pas encore de fichier ?{" "}
+              <a href={`/etudiant/documents/${documentId}/redaction`} className="text-primary hover:underline">
+                Rédigez directement dans la plateforme
+              </a>
+              , le plan de votre encadreur vous sera proposé.
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -250,7 +278,7 @@ function SoumissionContenu() {
     <div className="mx-auto max-w-2xl">
       <PageHeader
         title="Soumettre un document"
-        description="Votre document sera automatiquement analysé (forme, fond) puis transmis à votre encadrant une fois le score de conformité atteint."
+        description="Votre document sera analysé par l'IA selon les exigences de votre encadreur (forme, structure, fond, cohérence) puis soumis à votre encadreur une fois le score de conformité atteint."
       />
 
       <Card>
@@ -258,8 +286,8 @@ function SoumissionContenu() {
           <CardTitle>Nouveau mémoire</CardTitle>
           <CardDescription>
             {encadrant
-              ? `Encadrant assigné : ${encadrant.prenom} ${encadrant.nom}`
-              : "Chargement de votre encadrant…"}
+              ? `Encadreur assigné : ${encadrant.prenom} ${encadrant.nom}`
+              : "Chargement de votre encadreur…"}
           </CardDescription>
         </CardHeader>
         <CardContent>

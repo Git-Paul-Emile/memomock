@@ -31,12 +31,14 @@ export function ListeReferences({
   titre: string;
   description: string;
   elements: ElementReference[];
-  onAjouter: (item: { titre: string; description: string }) => Promise<void>;
+  // `fichier` : ressource téléversée (.docx/.pdf), analysée par l'IA pour en extraire des règles.
+  onAjouter: (item: { titre: string; description: string; fichier?: File | null }) => Promise<void>;
   onSupprimer: (id: string) => Promise<void>;
 }) {
   const [ouvert, setOuvert] = React.useState(false);
   const [titreChamp, setTitreChamp] = React.useState("");
   const [descriptionChamp, setDescriptionChamp] = React.useState("");
+  const [fichier, setFichier] = React.useState<File | null>(null);
   const [enCours, setEnCours] = React.useState(false);
   const [elementASupprimer, setElementASupprimer] = React.useState<ElementReference | null>(null);
   const [suppressionEnCours, setSuppressionEnCours] = React.useState(false);
@@ -45,9 +47,10 @@ export function ListeReferences({
     if (!titreChamp.trim()) return;
     setEnCours(true);
     try {
-      await onAjouter({ titre: titreChamp.trim(), description: descriptionChamp.trim() });
+      await onAjouter({ titre: titreChamp.trim(), description: descriptionChamp.trim(), fichier });
       setTitreChamp("");
       setDescriptionChamp("");
+      setFichier(null);
       setOuvert(false);
     } finally {
       setEnCours(false);
@@ -94,6 +97,23 @@ export function ListeReferences({
                 />
               </div>
               <div className="space-y-1.5">
+                <Label htmlFor="ref-fichier">Fichier (facultatif, .docx ou .pdf)</Label>
+                <Input
+                  id="ref-fichier"
+                  type="file"
+                  accept=".docx,.pdf"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0] ?? null;
+                    setFichier(f);
+                    if (f && !titreChamp.trim()) setTitreChamp(f.name.replace(/\.(docx|pdf)$/i, ""));
+                  }}
+                />
+                <p className="text-xs text-muted-foreground">
+                  L&apos;IA lira le document et proposera les règles qu&apos;il contient ; vous les
+                  vérifierez avant qu&apos;elles soient appliquées.
+                </p>
+              </div>
+              <div className="space-y-1.5">
                 <Label htmlFor="ref-description">Description</Label>
                 <Textarea
                   id="ref-description"
@@ -108,7 +128,7 @@ export function ListeReferences({
                 Annuler
               </Button>
               <Button onClick={soumettre} disabled={enCours || !titreChamp.trim()}>
-                Ajouter
+                {enCours && fichier ? "Analyse du document…" : "Ajouter"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -134,6 +154,7 @@ export function ListeReferences({
                 )}
                 <p className="mt-1 text-[11px] text-muted-foreground">
                   Ajouté le {formatDate(el.ajouteLe)}
+                  {el.nomFichier && ` · ${el.nomFichier}`}
                 </p>
               </div>
               <Button

@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiGet, apiList, apiPatch, apiPost } from "@/lib/api";
+import { creerVersion } from "@/lib/versions";
 import type { Analyse, DocumentSubmission, PublicUser } from "@/types";
 
 interface DonneesConfirmation {
@@ -24,11 +25,11 @@ interface DonneesConfirmation {
 }
 
 /**
- * Écran « Confirmation de soumission à l'encadrant » côté étudiant.
+ * Écran « Confirmation de soumission à l'encadreur » côté étudiant.
  *
  * Récapitulatif (document, score de conformité, points de forme déjà traités par l'IA), puis
- * transmission officielle : passage du statut à « prêt pour l'encadrant » + notification de
- * l'encadrant. Toutes les données proviennent de la base.
+ * transmission officielle : passage du statut à « prêt pour l'encadreur » + notification de
+ * l'encadreur. Toutes les données proviennent de la base.
  */
 export default function ConfirmationSoumissionPage() {
   const { id } = useParams<{ id: string }>();
@@ -61,17 +62,25 @@ export default function ConfirmationSoumissionPage() {
     if (!document) return;
     setEnCours(true);
     try {
+      // Chaque soumission officielle fige une version (spec v2, § 28-29) ; une re-soumission
+      // après révision porte un numéro supérieur (« Révisé »).
+      const version = await creerVersion(document, "etudiant");
       await apiPatch<DocumentSubmission>("documents", document.id, {
         statut: "pret_pour_encadrant",
-        dateMaj: new Date().toISOString(),
+        version: version.numero,
+        dateSoumission: version.createdAt,
+        dateMaj: version.createdAt,
       });
+      const revision = version.numero > 1;
       await apiPost("notifications", {
         userId: document.encadrantId,
-        titre: "Document prêt pour relecture",
-        message: `« ${document.titre} » a été transmis pour relecture (score ${document.scoreConformite}/100).`,
-        type: "validation",
+        titre: revision ? "Version révisée reçue" : "Nouveau document soumis",
+        message: `« ${document.titre} » - V${version.numero}, score estimatif ${document.scoreConformite} %${
+          document.pointsBloquants?.length ? "" : ", aucun point bloquant"
+        }.`,
+        type: "soumission",
         lu: false,
-        date: new Date().toISOString(),
+        date: version.createdAt,
         lienDocumentId: document.id,
       });
       setEnvoye(true);
@@ -98,9 +107,9 @@ export default function ConfirmationSoumissionPage() {
           <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
             <CheckCircle2 className="size-12 text-success" />
             <div>
-              <p className="text-lg font-semibold">Document transmis à votre encadrant</p>
+              <p className="text-lg font-semibold">Document soumis à votre encadreur</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                {encadrant ? `${encadrant.prenom} ${encadrant.nom}` : "Votre encadrant"} recevra une
+                {encadrant ? `${encadrant.prenom} ${encadrant.nom}` : "Votre encadreur"} recevra une
                 notification. Vous serez averti dès qu&apos;un retour sera disponible.
               </p>
             </div>
@@ -116,7 +125,7 @@ export default function ConfirmationSoumissionPage() {
   return (
     <div className="mx-auto max-w-2xl">
       <PageHeader
-        title="Transmettre à l'encadrant"
+        title="Transmettre à l'encadreur"
         description="Vérifiez le récapitulatif avant l'envoi officiel de votre mémoire."
       />
 
@@ -126,7 +135,7 @@ export default function ConfirmationSoumissionPage() {
             <div>
               <p className="font-medium">{document.titre}</p>
               <p className="text-sm text-muted-foreground">
-                Encadrant : {encadrant ? `${encadrant.prenom} ${encadrant.nom}` : "-"}
+                Encadreur : {encadrant ? `${encadrant.prenom} ${encadrant.nom}` : "-"}
               </p>
               <div className="mt-3 flex gap-4 text-xs text-muted-foreground">
                 <span>
@@ -148,7 +157,7 @@ export default function ConfirmationSoumissionPage() {
               Points déjà traités par l&apos;IA
             </CardTitle>
             <CardDescription>
-              Ces éléments de forme sont conformes : votre encadrant peut se concentrer sur le fond.
+              Ces éléments de forme sont conformes : votre encadreur peut se concentrer sur le fond.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -180,7 +189,7 @@ export default function ConfirmationSoumissionPage() {
                 htmlFor="accepte"
                 className="text-sm font-normal leading-snug text-muted-foreground"
               >
-                Je confirme que cette version est prête à être relue par mon encadrant et
+                Je confirme que cette version est prête à être relue par mon encadreur et
                 qu&apos;elle reflète mon travail personnel.
               </Label>
             </div>

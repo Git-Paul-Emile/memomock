@@ -29,6 +29,7 @@ import {
   LIBELLES_VOIX_REDACTION,
 } from "@/types";
 import type {
+  ChampNorme,
   FormatCitation,
   NormesEtablissement,
   PositionPagination,
@@ -41,6 +42,8 @@ const TYPES_SOURCES = [
   "Revues scientifiques",
   "Ouvrages",
   "Thèses",
+  "Thèses et mémoires (dépôts CAMES et universitaires)",
+  "Rapports d'institutions africaines (BAD, CEDEAO, UEMOA)",
   "Rapports officiels",
   "Sites web",
 ];
@@ -54,7 +57,9 @@ const INTERLIGNES = ["Simple", "1.5", "Double"];
  * s'ouvre pré-rempli, l'enregistrement crée alors l'enregistrement (POST) puis le met à jour
  * (PATCH) - voir `enregistrer` ci-dessous.
  */
-const NORMES_PAR_DEFAUT: Omit<NormesEtablissement, "id" | "etablissementId" | "updatedAt"> = {
+const NORMES_PAR_DEFAUT: Omit<NormesEtablissement, "id" | "etablissementId" | "updatedAt" | "champsImposes"> & {
+  champsImposes: ChampNorme[];
+} = {
   formatCitation: "APA 7",
   sourcesMinimum: 20,
   typesSourcesAcceptees: ["Revues scientifiques", "Ouvrages", "Thèses"],
@@ -66,9 +71,23 @@ const NORMES_PAR_DEFAUT: Omit<NormesEtablissement, "id" | "etablissementId" | "u
   taillePolice: "12pt",
   interligne: "1.5",
   margesCm: "2.5",
+  champsImposes: [],
 };
 
 type Brouillon = typeof NORMES_PAR_DEFAUT;
+
+// Libellés des normes pouvant être imposées aux encadreurs (spec v2, § 20).
+const LIBELLES_CHAMPS: Record<ChampNorme, string> = {
+  formatCitation: "Format de citation",
+  sourcesMinimum: "Nombre minimum de sources",
+  positionPagination: "Pagination",
+  styleRedactionnel: "Style rédactionnel",
+  voix: "Voix",
+  police: "Police",
+  taillePolice: "Taille de police",
+  interligne: "Interligne",
+  margesCm: "Marges",
+};
 
 /** Isole les champs éditables d'un enregistrement de normes (sans id / clés techniques). */
 function extraireBrouillon(normes: NormesEtablissement): Brouillon {
@@ -84,6 +103,7 @@ function extraireBrouillon(normes: NormesEtablissement): Brouillon {
     taillePolice: normes.taillePolice,
     interligne: normes.interligne,
     margesCm: normes.margesCm,
+    champsImposes: normes.champsImposes ?? [],
   };
 }
 
@@ -134,6 +154,14 @@ export default function NormesPage() {
     changer(
       "typesSourcesAcceptees",
       actuels.includes(type) ? actuels.filter((item) => item !== type) : [...actuels, type]
+    );
+  };
+
+  const basculerImpose = (champ: ChampNorme) => {
+    const actuels = brouillon.champsImposes ?? [];
+    changer(
+      "champsImposes",
+      actuels.includes(champ) ? actuels.filter((c) => c !== champ) : [...actuels, champ]
     );
   };
 
@@ -203,8 +231,9 @@ export default function NormesPage() {
 
       <p className="mb-5 flex gap-3 rounded-lg border bg-muted p-4 text-sm text-muted-foreground">
         <Info className="size-5 shrink-0" />
-        Ces normes sont appliquées par défaut à tous les encadreurs. Chaque professeur peut les
-        redéfinir pour ses propres classes depuis son profil pédagogique.
+        Ces normes s&apos;appliquent à tous les encadreurs. Une norme « par défaut » peut être
+        redéfinie par chaque professeur pour ses classes ; une norme « imposée » ne peut pas
+        l&apos;être et prime sur toutes les autres règles (section 4).
       </p>
 
       <div className="space-y-4">
@@ -402,6 +431,33 @@ export default function NormesPage() {
                 onChange={(event) => changer("margesCm", event.target.value)}
               />
             </div>
+          </div>
+        </Section>
+
+        <Section
+          numero={4}
+          titre="Normes imposées aux encadreurs"
+          ouvertes={sectionsOuvertes}
+          onToggle={basculerSection}
+        >
+          <p className="mb-3 text-sm text-muted-foreground">
+            Cochez les normes obligatoires pour tout l&apos;établissement. Elles apparaîtront
+            verrouillées dans les contraintes des encadreurs et l&apos;IA les vérifiera en priorité.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {(Object.keys(LIBELLES_CHAMPS) as ChampNorme[]).map((champ) => (
+              <label
+                key={champ}
+                className="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm"
+              >
+                <input
+                  type="checkbox"
+                  checked={(brouillon.champsImposes ?? []).includes(champ)}
+                  onChange={() => basculerImpose(champ)}
+                />
+                {LIBELLES_CHAMPS[champ]}
+              </label>
+            ))}
           </div>
         </Section>
       </div>

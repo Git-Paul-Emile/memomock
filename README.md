@@ -1,11 +1,15 @@
-# MemoAI Assistant
+# MemoAssistant AI
 
-Plateforme d'aide à la rédaction et à l'encadrement de mémoires académiques décrite dans le
-mémo de cadrage (`feature.md`).
+Plateforme de pré-validation des mémoires et thèses selon les exigences de chaque encadreur,
+pour les universités et écoles d'**Afrique de l'Ouest et centrale** (système LMD). Référence
+fonctionnelle : `documents/MemoAssistant AI - Specification v2.0.pdf` (source HTML dans
+`documents/sources/`), qui fusionne le document de conception v1.0, `feature.md` et la maquette.
 
 Ce dépôt contient **une seule application** : le frontend Next.js. Il n'y a pas de backend
 séparé — les données sont servies par un mock (`json-server` sur `frontend/data.json`), et
-l'authentification est simulée côté client (voir plus bas).
+l'authentification est simulée côté client (voir plus bas). Seule l'**IA est réelle** : les
+analyses, le tuteur, l'extraction des règles et le Diff Engine appellent Gemini (Google AI
+Studio) depuis des routes serveur Next.js, avec repli automatique sur une simulation locale.
 
 - **Frontend** (`frontend/`) — Next.js / React, tous les écrans étudiant / encadrant /
   administrateur d'établissement / super-admin.
@@ -33,6 +37,10 @@ cd frontend
 npm install
 ```
 
+Pour activer l'IA réelle, créez `frontend/.env.local` (voir `.env.example`) avec
+`GEMINI_API_KEY=...` (clé Google AI Studio). Sans clé, l'application fonctionne entièrement en
+mode simulé et l'indique sur chaque analyse (« Analyse simulée »).
+
 ```bash
 # Terminal 1 — API mock (json-server) sur http://localhost:4000
 npm run mock:server
@@ -46,14 +54,18 @@ Les trois premiers sont accessibles en un clic depuis la page `/login` :
 
 | Rôle | E-mail | Mot de passe |
 | --- | --- | --- |
-| Étudiant | `amina.diallo@etu.memoai.fr` | `etudiant123` |
-| Encadrant | `j.leroux@memoai.fr` | `encadrant123` |
-| Administrateur d'établissement | `direction@paris-saclay.memoai.fr` | `etablissement123` |
-| Super-admin plateforme | `admin@memoai.fr` | `admin123` |
+| Étudiant | `amina.diallo@etu.uad.edu.sn` | `etudiant123` |
+| Encadreur | `jb.kouassi@uad.edu.sn` | `encadrant123` |
+| Administrateur d'établissement | `direction@uad.edu.sn` | `etablissement123` |
+| Super-admin plateforme | `admin@memoassistant.africa` | `admin123` |
 
-Ces comptes sont liés entre eux : l'étudiante Amina Diallo est encadrée par Jérôme Leroux, et
-tous deux sont rattachés à l'établissement _Université Paris-Saclay_ administré par le
-troisième compte.
+Ces comptes sont liés entre eux : l'étudiante Amina Diallo est encadrée par Jean-Baptiste
+Kouassi, et tous deux sont rattachés à l'_Université Atlantique de Dakar_ (établissement fictif,
+Sénégal, F CFA) administrée par le troisième compte. Un second établissement fictif est situé au
+Cameroun (`direction@uhpy.cm`). Le mémoire `doc1` d'Amina contient un texte réel : utilisez
+« Réanalyser » pour voir une analyse Gemini complète.
+
+Les données d'exemple sont fictives (noms, numéros, universités).
 
 ### Déploiement distant
 
@@ -61,7 +73,8 @@ En déploiement (Vercel, voir `vercel.json`), `json-server` n'est pas disponible
 Next.js de secours, `src/app/api/mock/[[...path]]/route.ts`, réimplémente les mêmes verbes
 REST à partir de `data.json` (en mémoire, réinitialisée à chaque démarrage). Le client HTTP
 (`src/lib/api.ts`) bascule automatiquement vers `/api/mock` quand l'application tourne sur un
-hôte distant configuré pour une API locale.
+hôte distant configuré pour une API locale. Déclarez `GEMINI_API_KEY` dans les variables
+d'environnement du projet Vercel (jamais avec le préfixe `NEXT_PUBLIC_`).
 
 ## Scripts
 
@@ -94,26 +107,55 @@ et `src/context/auth-context.tsx` est la seule source de vérité sur « qui est
 - **Sessions actives** : chaque connexion génère un identifiant de session stocké en
   `localStorage`, visible dans `/parametres` avec possibilité de révoquer les autres sessions.
 
-## RGPD
+## Protection des données
 
-Les fonctionnalités RGPD sont implémentées côté client contre l'API mock :
+La page `/confidentialite` cite la loi de protection des données de chaque pays de la zone et
+les textes régionaux (Convention de Malabo, acte additionnel CEDEAO) - référentiel dans
+`src/lib/afrique.ts`, à faire valider par un juriste avant production. Elle signale aussi le
+transfert du texte des documents vers l'API Gemini (serveurs hors d'Afrique). Droits implémentés
+côté client contre l'API mock :
 
-- **Droit d'accès et de portabilité** (art. 15 et 20) : `/parametres` assemble et télécharge un
+- **Droit d'accès et de portabilité** : `/parametres` assemble et télécharge un
   export JSON complet des données de l'utilisateur courant (profil, documents, analyses,
   notifications).
-- **Droit à l'effacement** (art. 17) : `/parametres` anonymise les données identifiantes (nom,
+- **Droit à l'effacement** : `/parametres` anonymise les données identifiantes (nom,
   e-mail, téléphone, avatar) et neutralise le compte. Les enregistrements académiques
   (documents, analyses) sont conservés mais détachés de l'identité — le détail est affiché
   avant confirmation.
 - **Droit de rectification** : modification du profil depuis la même page.
-- **Information des personnes concernées** (art. 12-14) : page `/confidentialite`, liée depuis
+- **Information des personnes concernées** : page `/confidentialite`, liée depuis
   l'inscription et les paramètres du compte.
 
-## Contenu IA (simulé)
+## Intelligence artificielle (Gemini)
 
-Il n'y a aucun appel à un LLM réel. Les analyses de forme / fond, le score de conformité et
-les échanges avec le tuteur IA sont générés localement à partir de gabarits
-(`src/lib/mock-ai.ts`) et de données pré-calculées dans `data.json`.
+| Route serveur | Rôle |
+| --- | --- |
+| `POST /api/ia/analyse` | Analyse forme / structure / fond / cohérence selon le référentiel de l'encadreur |
+| `POST /api/ia/tuteur` | Tuteur conversationnel (explique, ne réécrit pas) |
+| `POST /api/ia/extraire-regles` | Extraction des règles d'un guide téléversé par l'encadreur |
+| `POST /api/ia/proposer-regles` | Diff Engine : préférences déduites des corrections de l'encadreur |
+| `GET /api/ia/statut` | IA configurée ou non (sans exposer la clé) |
+
+- La clé n'est lue que dans `src/lib/ia/gemini.server.ts`. Les modèles sont essayés dans
+  l'ordre `GEMINI_MODEL` (liste séparée par des virgules ; par défaut `gemini-3.5-flash`,
+  `gemini-3.5-flash-lite`, `gemini-3.8-flash`), avec un délai maximal par tentative.
+- Le client (`src/lib/ia/client.ts`) bascule sur `src/lib/mock-ai.ts` si l'IA ne répond pas ;
+  le contrôle de structure simulé compare tout de même le texte au canevas.
+- Le texte des fichiers .docx/.pdf est extrait dans le navigateur (`src/lib/extraction-texte.ts`)
+  et stocké dans la collection `contenus-documents`.
+- Le score global est pondéré par la grille de l'encadreur et l'état « Prêt pour soumission »
+  (seuil global, minimum par catégorie, points bloquants) est calculé par `src/lib/score.ts`.
+- Garde-fou mock : les routes exigent un jeton `Authorization` ; en production, vérifier un vrai
+  jeton signé et limiter le débit pour protéger le quota.
+
+## Adaptation Afrique de l'Ouest et centrale
+
+`src/lib/afrique.ts` centralise pays (24), indicatifs, devises (F CFA XOF/XAF et monnaies
+nationales), fuseaux horaires, moyens de paiement (Orange Money, Wave, MTN MoMo, Moov, Airtel,
+Free Money, carte, virement) et lois de protection des données. Il alimente l'inscription (pays +
+indicatif), les paramètres, la création d'établissement, l'abonnement (paiement simulé), la
+tarification et la politique de confidentialité. Calendrier académique par défaut : novembre →
+juillet. Notifications relayées (simulé) par WhatsApp, SMS ou e-mail.
 
 ## Structure du projet
 

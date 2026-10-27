@@ -20,12 +20,14 @@ interface UseApiResourceResult<T> {
 export function useApiResource<T>(
   queryKey: QueryKey,
   queryFn: () => Promise<T>,
-  options?: { enabled?: boolean }
+  // `refetchInterval` : rafraîchissement périodique (ex. messagerie), en millisecondes.
+  options?: { enabled?: boolean; refetchInterval?: number }
 ): UseApiResourceResult<T> {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey,
     queryFn,
     enabled: options?.enabled ?? true,
+    refetchInterval: options?.refetchInterval,
   });
 
   return {

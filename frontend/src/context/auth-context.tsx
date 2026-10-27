@@ -27,6 +27,7 @@ export interface InscriptionPayload {
   email: string;
   motDePasse: string;
   telephone: string; // Obligatoire à l'inscription, non vérifié (pas de code OTP).
+  pays?: string;
   encadrantId?: string;
   filiere?: string;
   // Renseigné uniquement pour role === "admin_etablissement" : sert à créer l'établissement juste
@@ -93,6 +94,7 @@ async function synchroniserProfil(firebaseUser: MockUser): Promise<PublicUser> {
     encadrantId: user.encadrantId,
     filiere: user.filiere,
     telephone: user.telephone,
+    pays: user.pays ?? null,
     canalNotificationPrefere: user.canalNotificationPrefere,
     actif: user.actif,
     etablissementId: user.etablissementId ?? null,
@@ -124,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Session valide mais profil applicatif absent/incomplet (ex : inscription
         // interrompue avant complétion, ou session restaurée sans repasser par un
         // formulaire) : on ne bloque pas l'affichage, l'utilisateur reste "non connecté" côté
-        // MemoAI jusqu'à une vraie connexion/inscription (ou complétion de profil).
+        // MemoAssistant jusqu'à une vraie connexion/inscription (ou complétion de profil).
         setUser(null);
       } finally {
         setIsLoading(false);
