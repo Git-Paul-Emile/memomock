@@ -41,7 +41,7 @@
       "nomFichier": "morel_memoire_v1.pdf",
       "tailleOctets": 1230456,
       "statut": "analyse_terminee",
-      "scoreConformite": 72,
+      "scoreConformite": 69,
       "scoreForme": 74,
       "scoreFond": 68,
       "dateSoumission": "2026-07-09T14:30:00.000Z",
@@ -50,7 +50,15 @@
       "scoreCoherence": 74,
       "typeDocument": "master",
       "discipline": "Informatique",
-      "profilEncadrantId": "pe1"
+      "profilEncadrantId": "pe1",
+      "scoreStructure": 89,
+      "scoreMethodologie": 68,
+      "scoreBibliographie": 74,
+      "pretPourSoumission": false,
+      "pointsBloquants": [
+        "Score global de 69 % inférieur au seuil requis (75 %)."
+      ],
+      "sourceAnalyse": "simulation"
     },
     {
       "id": "doc3",
@@ -60,7 +68,7 @@
       "nomFichier": "bernard_memoire_v1.docx",
       "tailleOctets": 987654,
       "statut": "analyse_terminee",
-      "scoreConformite": 71,
+      "scoreConformite": 62,
       "scoreForme": 82,
       "scoreFond": 60,
       "dateSoumission": "2026-07-05T11:00:00.000Z",
@@ -69,7 +77,15 @@
       "scoreCoherence": 60,
       "typeDocument": "master",
       "discipline": "Sciences de gestion",
-      "profilEncadrantId": "pe2"
+      "profilEncadrantId": "pe2",
+      "scoreStructure": 71,
+      "scoreMethodologie": 60,
+      "scoreBibliographie": 82,
+      "pretPourSoumission": false,
+      "pointsBloquants": [
+        "Score global de 62 % inférieur au seuil requis (75 %)."
+      ],
+      "sourceAnalyse": "simulation"
     },
     {
       "id": "doc4",
@@ -79,7 +95,7 @@
       "nomFichier": "ba_memoire_v2.docx",
       "tailleOctets": 1102345,
       "statut": "en_correction",
-      "scoreConformite": 74,
+      "scoreConformite": 70,
       "scoreForme": 85,
       "scoreFond": 68,
       "dateSoumission": "2026-07-02T09:00:00.000Z",
@@ -88,7 +104,15 @@
       "scoreCoherence": 68,
       "typeDocument": "master",
       "discipline": "Sciences de gestion",
-      "profilEncadrantId": "pe2"
+      "profilEncadrantId": "pe2",
+      "scoreStructure": 77,
+      "scoreMethodologie": 68,
+      "scoreBibliographie": 85,
+      "pretPourSoumission": false,
+      "pointsBloquants": [
+        "Score global de 70 % inférieur au seuil requis (75 %)."
+      ],
+      "sourceAnalyse": "simulation"
     },
     {
       "id": "doc5",
@@ -98,7 +122,7 @@
       "nomFichier": "petit_memoire_v2.pdf",
       "tailleOctets": 1345678,
       "statut": "pret_pour_encadrant",
-      "scoreConformite": 86,
+      "scoreConformite": 85,
       "scoreForme": 90,
       "scoreFond": 82,
       "dateSoumission": "2026-06-28T09:00:00.000Z",
@@ -107,7 +131,13 @@
       "scoreCoherence": 82,
       "typeDocument": "master",
       "discipline": "Droit du numérique",
-      "profilEncadrantId": "pe3"
+      "profilEncadrantId": "pe3",
+      "scoreStructure": 86,
+      "scoreMethodologie": 82,
+      "scoreBibliographie": 90,
+      "pretPourSoumission": true,
+      "pointsBloquants": [],
+      "sourceAnalyse": "simulation"
     },
     {
       "id": "doc6",
@@ -136,7 +166,7 @@
       "nomFichier": "diallo_memoire_final.docx",
       "tailleOctets": 1450000,
       "statut": "valide",
-      "scoreConformite": 95,
+      "scoreConformite": 94,
       "scoreForme": 96,
       "scoreFond": 94,
       "note": "18 / 20",
@@ -147,7 +177,13 @@
       "scoreCoherence": 94,
       "typeDocument": "master",
       "discipline": "Informatique",
-      "profilEncadrantId": "pe1"
+      "profilEncadrantId": "pe1",
+      "scoreStructure": 95,
+      "scoreMethodologie": 94,
+      "scoreBibliographie": 96,
+      "pretPourSoumission": true,
+      "pointsBloquants": [],
+      "sourceAnalyse": "simulation"
     },
     {
       "id": "doc8",
@@ -157,7 +193,7 @@
       "nomFichier": "morel_memoire_ancien.pdf",
       "tailleOctets": 765432,
       "statut": "rejete",
-      "scoreConformite": 45,
+      "scoreConformite": 41,
       "scoreForme": 50,
       "scoreFond": 40,
       "dateSoumission": "2026-05-20T09:00:00.000Z",
@@ -166,7 +202,19 @@
       "scoreCoherence": 40,
       "typeDocument": "master",
       "discipline": "Informatique",
-      "profilEncadrantId": "pe1"
+      "profilEncadrantId": "pe1",
+      "scoreStructure": 45,
+      "scoreMethodologie": 40,
+      "scoreBibliographie": 50,
+      "pretPourSoumission": false,
+      "pointsBloquants": [
+        "Score global de 41 % inférieur au seuil requis (75 %).",
+        "Structure : 45 % (minimum requis : 50 %).",
+        "Fond : 40 % (minimum requis : 50 %).",
+        "Cohérence : 40 % (minimum requis : 50 %).",
+        "Méthodologie : 40 % (minimum requis : 50 %)."
+      ],
+      "sourceAnalyse": "simulation"
     },
     {
       "id": "doc101",
@@ -315,7 +363,7 @@
       "titre": "Refonte d'un intranet documentaire",
       "nomFichier": "memoire-u23.pdf",
       "tailleOctets": 1240000,
-      "statut": "analyse_en_cours",
+      "statut": "soumis",
       "scoreConformite": 0,
       "scoreForme": 0,
       "scoreFond": 0,
@@ -326,7 +374,21 @@
       "typeDocument": "master",
       "discipline": "Informatique",
       "profilEncadrantId": null,
-      "dateSoutenancePrevue": "2027-06-15T09:00:00.000Z"
+      "dateSoutenancePrevue": "2027-06-15T09:00:00.000Z",
+      "scoreStructure": 0,
+      "scoreMethodologie": 0,
+      "scoreBibliographie": 0,
+      "pretPourSoumission": false,
+      "pointsBloquants": [
+        "Score global de 0 % inférieur au seuil requis (80 %).",
+        "Forme : 0 % (minimum requis : 50 %).",
+        "Structure : 0 % (minimum requis : 50 %).",
+        "Fond : 0 % (minimum requis : 50 %).",
+        "Cohérence : 0 % (minimum requis : 50 %).",
+        "Méthodologie : 0 % (minimum requis : 50 %).",
+        "Bibliographie : 0 % (minimum requis : 50 %)."
+      ],
+      "sourceAnalyse": null
     },
     {
       "id": "doc109",
@@ -1874,39 +1936,60 @@
       "id": "u2",
       "nom": "Kouassi",
       "prenom": "Jean-Baptiste",
-      "email": "jb.kouassi@uad.edu.sn",
       "filiere": null,
       "domainesExpertise": [
         "Intelligence artificielle",
         "Génie logiciel"
       ],
       "disponible": true,
-      "nbEtudiantsSuivis": 2
+      "nbEtudiantsSuivis": 4
     },
     {
       "id": "u3",
       "nom": "Sarr",
       "prenom": "Fatou",
-      "email": "f.sarr@uad.edu.sn",
       "filiere": null,
       "domainesExpertise": [
         "Stratégie d'entreprise",
         "Transformation digitale"
       ],
       "disponible": true,
-      "nbEtudiantsSuivis": 2
+      "nbEtudiantsSuivis": 4
     },
     {
       "id": "u4",
       "nom": "Fotso",
       "prenom": "Emmanuel",
-      "email": "e.fotso@memoassistant.africa",
       "filiere": null,
       "domainesExpertise": [
         "Droit du numérique",
         "Protection des données personnelles"
       ],
       "disponible": false,
+      "nbEtudiantsSuivis": 2
+    },
+    {
+      "id": "u14",
+      "nom": "Traoré",
+      "prenom": "Awa",
+      "filiere": null,
+      "domainesExpertise": [
+        "Génie logiciel",
+        "Bases de données"
+      ],
+      "disponible": true,
+      "nbEtudiantsSuivis": 6
+    },
+    {
+      "id": "u15",
+      "nom": "Adjovi",
+      "prenom": "Serge",
+      "filiere": null,
+      "domainesExpertise": [
+        "Marketing digital",
+        "Stratégie"
+      ],
+      "disponible": true,
       "nbEtudiantsSuivis": 2
     }
   ],
@@ -3270,7 +3353,6 @@
         "Analyse IA de base",
         "1 canevas par encadreur"
       ],
-      "miseEnRelationPayante": false,
       "ordre": 0
     },
     {
@@ -3286,7 +3368,6 @@
         "Canevas et grilles illimités",
         "Paiement par mobile money"
       ],
-      "miseEnRelationPayante": false,
       "ordre": 1
     },
     {
@@ -3303,24 +3384,21 @@
         "Statistiques d'encadrement",
         "Support prioritaire"
       ],
-      "miseEnRelationPayante": false,
       "ordre": 2
     },
     {
       "id": "forfait-etablissement-pro",
       "nom": "Établissement Pro",
-      "description": "Pour une université multi-filières avec mise en relation étudiant/encadreur.",
+      "description": "Pour une université multi-filières et multi-sites.",
       "prixMensuel": 350000,
       "devise": "XOF",
       "maxEtudiants": null,
       "maxEncadrants": null,
       "fonctionnalites": [
         "Étudiants et encadreurs illimités",
-        "Mise en relation étudiant/encadreur assistée",
         "Statistiques avancées",
         "Support dédié"
       ],
-      "miseEnRelationPayante": true,
       "ordre": 3
     }
   ],
@@ -3342,21 +3420,30 @@
         "id": "u2",
         "nom": "Kouassi",
         "prenom": "Jean-Baptiste",
-        "email": "jb.kouassi@uad.edu.sn",
         "filiere": null
       },
       {
         "id": "u3",
         "nom": "Sarr",
         "prenom": "Fatou",
-        "email": "f.sarr@uad.edu.sn",
         "filiere": null
       },
       {
         "id": "u4",
         "nom": "Fotso",
         "prenom": "Emmanuel",
-        "email": "e.fotso@memoassistant.africa",
+        "filiere": null
+      },
+      {
+        "id": "u14",
+        "nom": "Traoré",
+        "prenom": "Awa",
+        "filiere": null
+      },
+      {
+        "id": "u15",
+        "nom": "Adjovi",
+        "prenom": "Serge",
         "filiere": null
       }
     ],

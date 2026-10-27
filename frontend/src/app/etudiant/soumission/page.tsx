@@ -16,7 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiGet, apiPatch, apiPost } from "@/lib/api";
-import { enregistrerContenu, lancerAnalyseDocument } from "@/lib/analyse-document";
+import { chargerContenu, enregistrerContenu, lancerAnalyseDocument } from "@/lib/analyse-document";
+import { chapitresModifies, messageVerrouillage, titresVerrouillesParId } from "@/lib/verrouillage";
 import { ExtractionTexteError, extraireTexte } from "@/lib/extraction-texte";
 import { formatFileSize } from "@/lib/utils";
 import type { DocumentSubmission, PublicUser } from "@/types";
@@ -31,11 +32,21 @@ const EXTENSIONS_ACCEPTEES = [".pdf", ".doc", ".docx"];
 
 /**
  * Lit le texte du fichier et l'enregistre pour l'analyse IA. Un fichier illisible (ancien .doc,
- * PDF scanné) n'empêche pas le dépôt : l'analyse se fera alors en mode simulé.
+ * PDF scanné) n'empêche pas le dépôt : l'analyse se fera alors en mode simulé. Renvoie `false`
+ * si l'import modifie un chapitre validé et verrouillé : il est alors refusé (spec v2, § 35).
  */
-async function preparerContenu(documentId: string, fichier: File): Promise<void> {
+async function preparerContenu(documentId: string, fichier: File): Promise<boolean> {
   try {
     const texte = await extraireTexte(fichier);
+    const [verrouilles, precedent] = await Promise.all([
+      titresVerrouillesParId(documentId).catch(() => []),
+      chargerContenu(documentId),
+    ]);
+    const modifies = chapitresModifies(precedent?.texte ?? "", texte, verrouilles);
+    if (modifies.length > 0) {
+      toast.error(messageVerrouillage(modifies));
+      return false;
+    }
     await enregistrerContenu(documentId, { texte, origine: "import" });
     if (!texte) toast.info("Aucun texte lisible dans ce fichier (PDF scanné ?) : l'analyse sera simulée.");
   } catch (err) {
@@ -45,6 +56,7 @@ async function preparerContenu(documentId: string, fichier: File): Promise<void>
         : "Le texte du fichier n'a pas pu être lu : l'analyse sera simulée."
     );
   }
+  return true;
 }
 
 export default function SoumissionPage() {
@@ -113,7 +125,7 @@ function SoumissionContenu() {
     if (!fichier || !documentId) return;
     setIsSubmitting(true);
     try {
-      await preparerContenu(documentId, fichier);
+      if (!(await preparerContenu(documentId, fichier))) return;
       const document = await apiPatch<DocumentSubmission>("documents", documentId, {
         nomFichier: fichier.name,
         tailleOctets: fichier.size,

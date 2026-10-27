@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { apiDelete, apiPost } from "@/lib/api";
 import { formaterMontant } from "@/lib/afrique";
@@ -42,7 +41,6 @@ export default function ForfaitsAdminPage() {
   const [maxEncadrants, setMaxEncadrants] = React.useState("");
   const [fonctionnalite, setFonctionnalite] = React.useState("");
   const [fonctionnalites, setFonctionnalites] = React.useState<string[]>([]);
-  const [miseEnRelationPayante, setMiseEnRelationPayante] = React.useState(false);
   const [enCours, setEnCours] = React.useState(false);
   const [aSupprimer, setASupprimer] = React.useState<Forfait | null>(null);
 
@@ -54,7 +52,6 @@ export default function ForfaitsAdminPage() {
     setMaxEncadrants("");
     setFonctionnalite("");
     setFonctionnalites([]);
-    setMiseEnRelationPayante(false);
   };
 
   const ajouterFonctionnalite = () => {
@@ -76,7 +73,6 @@ export default function ForfaitsAdminPage() {
         maxEtudiants: maxEtudiants.trim() ? Number(maxEtudiants) : null,
         maxEncadrants: maxEncadrants.trim() ? Number(maxEncadrants) : null,
         fonctionnalites,
-        miseEnRelationPayante,
         ordre: forfaits.length,
       });
       reinitialiser();
@@ -209,18 +205,10 @@ export default function ForfaitsAdminPage() {
                     </div>
                   )}
                 </div>
-                <div className="flex items-center justify-between rounded-lg border p-3">
-                  <div>
-                    <p className="text-sm font-medium">Mise en relation payante</p>
-                    <p className="text-xs text-muted-foreground">
-                      Spec section 97 - informatif, aucune facturation réelle.
-                    </p>
-                  </div>
-                  <Switch
-                    checked={miseEnRelationPayante}
-                    onCheckedChange={setMiseEnRelationPayante}
-                  />
-                </div>
+                <p className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
+                  La mise en relation étudiant / encadreur est gratuite pour tous les forfaits
+                  (modèle économique non arrêté).
+                </p>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setOuvert(false)}>
@@ -250,16 +238,11 @@ export default function ForfaitsAdminPage() {
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium">{f.nom}</p>
                     <Badge variant="outline">{formaterMontant(f.prixMensuel, f.devise ?? "XOF")} / mois</Badge>
-                    {f.miseEnRelationPayante && (
-                      <Badge variant="secondary" className="text-[10px]">
-                        Mise en relation payante
-                      </Badge>
-                    )}
                   </div>
                   <p className="text-sm text-muted-foreground">{f.description}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {f.maxEtudiants ?? "Illimité"} étudiant(s) · {f.maxEncadrants ?? "Illimité"}{" "}
-                    encadrant(s)
+                    encadreur(s)
                   </p>
                   {f.fonctionnalites.length > 0 && (
                     <div className="mt-1.5 flex flex-wrap gap-1">

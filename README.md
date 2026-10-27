@@ -1,8 +1,8 @@
 # MemoAssistant AI
 
 Plateforme de pré-validation des mémoires et thèses selon les exigences de chaque encadreur,
-pour les universités et écoles d'**Afrique de l'Ouest et centrale** (système LMD). Référence
-fonctionnelle : `documents/MemoAssistant AI - Specification v2.0.pdf` (source HTML dans
+pour les universités et écoles d'**Afrique francophone de l'Ouest et du Centre** (système LMD, français uniquement pour l'instant). Référence
+fonctionnelle : `documents/MemoAssistant AI - Specification v2.1.pdf` (source HTML dans
 `documents/sources/`), qui fusionne le document de conception v1.0, `feature.md` et la maquette.
 
 Ce dépôt contient **une seule application** : le frontend Next.js. Il n'y a pas de backend
@@ -148,14 +148,27 @@ côté client contre l'API mock :
 - Garde-fou mock : les routes exigent un jeton `Authorization` ; en production, vérifier un vrai
   jeton signé et limiter le débit pour protéger le quota.
 
-## Adaptation Afrique de l'Ouest et centrale
+## Adaptation à l'Afrique francophone
 
-`src/lib/afrique.ts` centralise pays (24), indicatifs, devises (F CFA XOF/XAF et monnaies
-nationales), fuseaux horaires, moyens de paiement (Orange Money, Wave, MTN MoMo, Moov, Airtel,
+`src/lib/afrique.ts` centralise 16 pays francophones, indicatifs, devises (F CFA XOF/XAF, GNF, CDF,
+MRU), fuseaux horaires, moyens de paiement (Orange Money, Wave, MTN MoMo, Moov, Airtel,
 Free Money, carte, virement) et lois de protection des données. Il alimente l'inscription (pays +
 indicatif), les paramètres, la création d'établissement, l'abonnement (paiement simulé), la
 tarification et la politique de confidentialité. Calendrier académique par défaut : novembre →
-juillet. Notifications relayées (simulé) par WhatsApp, SMS ou e-mail.
+juillet. Le canal préféré (WhatsApp, SMS, e-mail) est enregistré ; son relais simulé viendra plus
+tard. La mise en relation étudiant / encadreur est gratuite pour tous.
+
+## Rattachement et annuaire
+
+- Tout code (encadreur, classe, établissement) se saisit à l'inscription, dans « Rejoindre un
+  encadreur » ou dans les paramètres : `src/lib/invitations.ts` reconnaît son origine. Un code
+  d'établissement est à usage unique et réservé au rôle invité.
+- Le super-admin désigne l'administrateur d'un établissement (`/admin/etablissements`) : compte
+  existant, ou code `ADM-…` à saisir à l'inscription avec le rôle « Établissement ».
+- L'annuaire public `encadrants` (`src/lib/annuaire.ts`) est mis à jour à chaque inscription ou
+  modification d'un encadreur ; il ne contient aucune donnée sensible.
+- Les chapitres validés sont verrouillés (`src/lib/verrouillage.ts`) : toute modification est
+  refusée dans l'éditeur et au réimport.
 
 ## Structure du projet
 

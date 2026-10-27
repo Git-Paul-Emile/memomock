@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { APP_NAME } from "@/lib/constants";
 import { PAYS_PAR_DEFAUT, trouverPays } from "@/lib/afrique";
 import { SelectPays } from "@/components/shared/select-pays";
+import { CodeInvalideError, utiliserCode } from "@/lib/invitations";
 import type { EncadrantPublic, Etablissement, RoleInscription } from "@/types";
 
 // Format international strict (ex : +221771234567) : "+" et indicatif pays obligatoires.
@@ -50,12 +51,14 @@ const schemaBase = z.object({
   encadrantId: z.string().optional(),
   etablissementNom: z.string().optional(),
   etablissementVille: z.string().optional(),
+  // Code reçu d'un encadreur, d'une classe ou d'un établissement (facultatif).
+  codeInvitation: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof schemaBase>;
 
 export default function RegisterPage() {
-  const { register: creerCompte } = useAuth();
+  const { register: creerCompte, definirUtilisateur } = useAuth();
   const router = useRouter();
   const [role, setRole] = React.useState<RoleInscription>("etudiant");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -93,11 +96,12 @@ export default function RegisterPage() {
   };
 
   const onSubmit = async (values: FormValues) => {
-    if (role === "etudiant" && !values.encadrantId) {
-      toast.error("Merci de sélectionner votre encadreur.");
+    const code = values.codeInvitation?.trim();
+    if (role === "etudiant" && !values.encadrantId && !code) {
+      toast.error("Choisissez votre encadreur ou saisissez le code reçu.");
       return;
     }
-    if (role === "admin_etablissement" && !values.etablissementNom?.trim()) {
+    if (role === "admin_etablissement" && !code && !values.etablissementNom?.trim()) {
       toast.error("Merci d'indiquer le nom de votre établissement.");
       return;
     }
@@ -107,9 +111,21 @@ export default function RegisterPage() {
     }
     setIsSubmitting(true);
     try {
-      const { etablissementVille, ...donnees } = values;
-      const user = await creerCompte({ ...donnees, telephone: values.telephone.replace(/\s/g, ""), role });
-      if (role === "admin_etablissement") {
+      const { etablissementVille, codeInvitation: _code, ...donnees } = values;
+      let user = await creerCompte({ ...donnees, telephone: values.telephone.replace(/\s/g, ""), role });
+      if (code) {
+        // Le compte est créé même si le code est refusé : l'utilisateur pourra le ressaisir
+        // depuis « Rejoindre un encadreur » ou ses paramètres.
+        try {
+          const resultat = await utiliserCode(user, code);
+          user = resultat.utilisateur;
+          definirUtilisateur(user);
+          toast.success(resultat.message);
+        } catch (err) {
+          toast.error(err instanceof CodeInvalideError ? err.message : "Le code n'a pas pu être utilisé.");
+        }
+      }
+      if (role === "admin_etablissement" && !user.etablissementId) {
         const etablissement = await apiPost<Etablissement>("etablissements", {
           nom: values.etablissementNom!.trim(),
           adminId: user.id,
@@ -260,6 +276,20 @@ export default function RegisterPage() {
                   </div>
                 </>
               )}
+
+              <div className="space-y-1.5">
+                <Label htmlFor="codeInvitation">Code d&apos;invitation (facultatif)</Label>
+                <Input
+                  id="codeInvitation"
+                  placeholder="Ex : MASTER-INFO-26"
+                  className="uppercase"
+                  {...register("codeInvitation")}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Reçu de votre encadreur, de votre classe ou de votre établissement : il vous
+                  rattache automatiquement.
+                </p>
+              </div>
 
               {role === "admin_etablissement" && (
                 <div className="space-y-1.5">

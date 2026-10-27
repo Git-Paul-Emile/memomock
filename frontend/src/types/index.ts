@@ -141,9 +141,8 @@ export interface Discipline {
   createdAt: string;
 }
 
-// Devises de la zone : franc CFA (UEMOA / CEMAC) et principales monnaies nationales.
-export type CodeDevise =
-  "XOF" | "XAF" | "GNF" | "NGN" | "GHS" | "CDF" | "MRU" | "GMD" | "LRD" | "SLE" | "CVE" | "STN";
+// Devises de la zone francophone : franc CFA (UEMOA / CEMAC) et monnaies nationales.
+export type CodeDevise = "XOF" | "XAF" | "GNF" | "CDF" | "MRU";
 
 /**
  * Classe (spec sections 9, 11, 12) : `etablissementId` est nullable - un encadreur en mode
@@ -554,9 +553,8 @@ export interface DisponibiliteEncadrant {
 
 /**
  * Forfait/abonnement (spec section 96) : offre du catalogue plateforme, gérée par le
- * super-admin. `miseEnRelationPayante` (spec section 97) indique, à titre informatif, si la mise
- * en relation étudiant/encadreur est facturée sur ce forfait - le modèle économique exact n'étant
- * pas arrêté dans le cahier des charges, aucune logique de facturation réelle n'y est attachée.
+ * super-admin. La mise en relation étudiant/encadreur est gratuite pour l'instant (décision
+ * produit) : aucun forfait ne la facture.
  */
 export interface Forfait {
   id: string;
@@ -568,7 +566,6 @@ export interface Forfait {
   maxEtudiants: number | null;
   maxEncadrants: number | null;
   fonctionnalites: string[];
-  miseEnRelationPayante: boolean;
   ordre: number;
 }
 
@@ -949,7 +946,9 @@ export interface InvitationEtablissement {
   id: string;
   etablissementId: string;
   email: string;
-  role: RoleInvitable;
+  // `admin_etablissement` : invitation émise par le super-admin pour désigner l'administrateur
+  // d'un établissement qu'il a créé (jamais par l'établissement lui-même).
+  role: RoleInvitable | "admin_etablissement";
   classeId: string | null;
   code: string;
   statut: StatutInvitation;

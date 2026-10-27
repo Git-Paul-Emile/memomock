@@ -11,6 +11,14 @@ import { SelectPays } from "@/components/shared/select-pays";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -22,7 +30,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { apiList, apiPost } from "@/lib/api";
+import { apiList, apiPatch, apiPost } from "@/lib/api";
+import { genererCodeInvitation } from "@/lib/etablissement";
 import { LIBELLES_DEVISE, PAYS_PAR_DEFAUT, trouverPays } from "@/lib/afrique";
 import { journaliser } from "@/lib/audit";
 import type {
@@ -102,6 +111,48 @@ export default function AdminEtablissementsPage() {
 
   const lignes = data ?? [];
 
+  // Désignation de l'administrateur (spec v2, partie VII) : compte existant → rattachement
+  // immédiat ; sinon, code d'invitation à transmettre, utilisé à l'inscription.
+  const [aDesigner, setADesigner] = React.useState<Etablissement | null>(null);
+  const [emailAdmin, setEmailAdmin] = React.useState("");
+  const [codeGenere, setCodeGenere] = React.useState<string | null>(null);
+
+  const designer = async () => {
+    if (!aDesigner || !emailAdmin.trim()) return;
+    const email = emailAdmin.trim().toLowerCase();
+    try {
+      const existants = await apiList<PublicUser>("users", { filtres: { email }, limite: 1 });
+      const compte = existants.data[0];
+      if (compte) {
+        if (compte.role === "admin") {
+          toast.error("Un super-administrateur ne peut pas administrer un établissement.");
+          return;
+        }
+        await apiPatch("users", compte.id, { role: "admin_etablissement", etablissementId: aDesigner.id });
+        await apiPatch("etablissements", aDesigner.id, { adminId: compte.id });
+        await journaliser("Désignation d'administrateur", aDesigner.nom, email);
+        toast.success(`${compte.prenom} ${compte.nom} administre désormais « ${aDesigner.nom} ».`);
+        setADesigner(null);
+        refetch();
+        return;
+      }
+      const code = genererCodeInvitation("ADM");
+      await apiPost("invitations-etablissement", {
+        etablissementId: aDesigner.id,
+        email,
+        role: "admin_etablissement",
+        classeId: null,
+        code,
+        statut: "en_attente",
+        createdAt: new Date().toISOString(),
+      });
+      await journaliser("Invitation d'administrateur", aDesigner.nom, email);
+      setCodeGenere(code);
+    } catch {
+      toast.error("La désignation a échoué.");
+    }
+  };
+
   return (
     <div>
       <PageHeader
@@ -174,6 +225,17 @@ export default function AdminEtablissementsPage() {
                       </TableCell>
                       <TableCell>
                         {l.admin ? `${l.admin.prenom} ${l.admin.nom}` : <Badge variant="outline">À désigner</Badge>}
+                        <button
+                          type="button"
+                          className="ml-2 text-xs text-primary hover:underline"
+                          onClick={() => {
+                            setADesigner(l.etablissement);
+                            setEmailAdmin("");
+                            setCodeGenere(null);
+                          }}
+                        >
+                          {l.admin ? "Changer" : "Désigner"}
+                        </button>
                       </TableCell>
                       <TableCell className="text-right">
                         {l.departements} / {l.filieres}
@@ -189,6 +251,45 @@ export default function AdminEtablissementsPage() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={!!aDesigner} onOpenChange={(ouvert) => !ouvert && setADesigner(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Administrateur de « {aDesigner?.nom} »</DialogTitle>
+            <DialogDescription>
+              Saisissez l&apos;e-mail de la personne. Si elle a déjà un compte, elle est désignée
+              immédiatement ; sinon, un code lui permettra de s&apos;inscrire comme administrateur
+              de cet établissement.
+            </DialogDescription>
+          </DialogHeader>
+          {codeGenere ? (
+            <div className="space-y-2 text-sm">
+              <p>Aucun compte pour cette adresse. Transmettez ce code d&apos;inscription :</p>
+              <code className="block rounded-md border bg-muted px-3 py-2 text-center text-lg font-semibold tracking-widest">
+                {codeGenere}
+              </code>
+              <p className="text-muted-foreground">
+                À l&apos;inscription, choisir le rôle « Établissement » et saisir ce code.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              <Label htmlFor="email-admin">E-mail</Label>
+              <Input id="email-admin" type="email" value={emailAdmin} onChange={(e) => setEmailAdmin(e.target.value)} />
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setADesigner(null)}>
+              Fermer
+            </Button>
+            {!codeGenere && (
+              <Button onClick={designer} disabled={!emailAdmin.trim()}>
+                Désigner
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

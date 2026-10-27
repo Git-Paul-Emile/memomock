@@ -29,6 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { apiPatch } from "@/lib/api";
+import { publierEncadrant } from "@/lib/annuaire";
 import { ROLE_LABELS } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
 import type { PublicUser, Role } from "@/types";
@@ -70,7 +71,8 @@ export default function AdminUtilisateursPage() {
   const basculerActif = async (utilisateur: PublicUser) => {
     setEnCours(utilisateur.id);
     try {
-      await apiPatch("users", utilisateur.id, { actif: utilisateur.actif === false });
+      const misAJour = await apiPatch<PublicUser>("users", utilisateur.id, { actif: utilisateur.actif === false });
+      await publierEncadrant(misAJour).catch(() => {});
       toast.success(utilisateur.actif === false ? "Compte réactivé." : "Compte désactivé.");
       refetch();
     } catch {

@@ -46,10 +46,10 @@ const OFFRES = [
   {
     nom: "Établissement Pro",
     prix: 350000,
-    description: "Pour une université multi-filières.",
+    description: "Pour une université multi-filières et multi-sites.",
     fonctionnalites: [
       "Étudiants et encadreurs illimités",
-      "Mise en relation étudiant / encadreur",
+      "Plusieurs sites et UFR",
       "Statistiques avancées",
       "Support dédié",
     ],
@@ -96,7 +96,10 @@ export default function TarificationPage() {
           ))}
         </div>
 
-        <p className="mt-8 flex items-center justify-center gap-2 text-center text-sm text-muted-foreground">
+        <p className="mt-8 text-center text-sm font-medium">
+          La mise en relation étudiant / encadreur est gratuite pour tous.
+        </p>
+        <p className="mt-2 flex items-center justify-center gap-2 text-center text-sm text-muted-foreground">
           <Smartphone className="size-4" />
           Paiement par mobile money (Orange Money, Wave, MTN MoMo, Moov Money, Airtel Money), carte
           bancaire ou virement, selon le pays.

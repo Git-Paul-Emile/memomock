@@ -1,5 +1,6 @@
 /**
- * Référentiel de la zone de déploiement : Afrique de l'Ouest et Afrique centrale.
+ * Référentiel de la zone de déploiement : Afrique francophone de l'Ouest et du Centre (choix
+ * produit actuel : pas de version anglaise ; les pays anglophones et lusophones viendront plus tard).
  *
  * Centralise tout ce qui dépend du pays : indicatif téléphonique, devise, fuseau horaire,
  * moyens de paiement mobile courants et loi de protection des données personnelles. Les écrans
@@ -39,15 +40,8 @@ export const PAYS: Pays[] = [
   { code: "BJ", nom: "Bénin", indicatif: "+229", exempleNumero: "01 97 12 34 56", devise: "XOF", fuseau: "Africa/Porto-Novo", zone: "UEMOA", region: "ouest", paiements: ["mtn_momo", "moov_money", ...CARTE_ET_VIREMENT], loiDonnees: { reference: "Loi n° 2017-20 portant Code du numérique (livre V)", autorite: "Autorité de Protection des Données à caractère Personnel (APDP)" } },
   { code: "TG", nom: "Togo", indicatif: "+228", exempleNumero: "90 12 34 56", devise: "XOF", fuseau: "Africa/Lome", zone: "UEMOA", region: "ouest", paiements: ["moov_money", ...CARTE_ET_VIREMENT], loiDonnees: { reference: "Loi n° 2019-014 relative à la protection des données à caractère personnel", autorite: "Instance de Protection des Données à caractère Personnel (IPDCP)" } },
   { code: "NE", nom: "Niger", indicatif: "+227", exempleNumero: "90 12 34 56", devise: "XOF", fuseau: "Africa/Niamey", zone: "UEMOA", region: "ouest", paiements: ["airtel_money", "moov_money", ...CARTE_ET_VIREMENT], loiDonnees: { reference: "Loi n° 2017-28 relative à la protection des données à caractère personnel", autorite: "Haute Autorité de Protection des Données à caractère Personnel (HAPDP)" } },
-  { code: "GW", nom: "Guinée-Bissau", indicatif: "+245", exempleNumero: "955 123 456", devise: "XOF", fuseau: "Africa/Bissau", zone: "UEMOA", region: "ouest", paiements: ["orange_money", "mtn_momo", ...CARTE_ET_VIREMENT] },
   { code: "GN", nom: "Guinée", indicatif: "+224", exempleNumero: "620 12 34 56", devise: "GNF", fuseau: "Africa/Conakry", zone: "CEDEAO", region: "ouest", paiements: ["orange_money", "mtn_momo", ...CARTE_ET_VIREMENT] },
   { code: "MR", nom: "Mauritanie", indicatif: "+222", exempleNumero: "22 12 34 56", devise: "MRU", fuseau: "Africa/Nouakchott", zone: "CEDEAO", region: "ouest", paiements: CARTE_ET_VIREMENT },
-  { code: "GM", nom: "Gambie", indicatif: "+220", exempleNumero: "301 2345", devise: "GMD", fuseau: "Africa/Banjul", zone: "CEDEAO", region: "ouest", paiements: ["wave", ...CARTE_ET_VIREMENT] },
-  { code: "CV", nom: "Cap-Vert", indicatif: "+238", exempleNumero: "991 23 45", devise: "CVE", fuseau: "Atlantic/Cape_Verde", zone: "CEDEAO", region: "ouest", paiements: CARTE_ET_VIREMENT },
-  { code: "GH", nom: "Ghana", indicatif: "+233", exempleNumero: "24 123 4567", devise: "GHS", fuseau: "Africa/Accra", zone: "CEDEAO", region: "ouest", paiements: ["mtn_momo", "airtel_money", ...CARTE_ET_VIREMENT], loiDonnees: { reference: "Data Protection Act, 2012 (Act 843)", autorite: "Data Protection Commission" } },
-  { code: "NG", nom: "Nigeria", indicatif: "+234", exempleNumero: "803 123 4567", devise: "NGN", fuseau: "Africa/Lagos", zone: "CEDEAO", region: "ouest", paiements: CARTE_ET_VIREMENT, loiDonnees: { reference: "Nigeria Data Protection Act, 2023", autorite: "Nigeria Data Protection Commission (NDPC)" } },
-  { code: "LR", nom: "Liberia", indicatif: "+231", exempleNumero: "77 012 3456", devise: "LRD", fuseau: "Africa/Monrovia", zone: "CEDEAO", region: "ouest", paiements: ["orange_money", "mtn_momo", ...CARTE_ET_VIREMENT] },
-  { code: "SL", nom: "Sierra Leone", indicatif: "+232", exempleNumero: "76 123456", devise: "SLE", fuseau: "Africa/Freetown", zone: "CEDEAO", region: "ouest", paiements: ["orange_money", ...CARTE_ET_VIREMENT] },
   // --- Afrique centrale ---
   { code: "CM", nom: "Cameroun", indicatif: "+237", exempleNumero: "6 71 23 45 67", devise: "XAF", fuseau: "Africa/Douala", zone: "CEMAC", region: "centre", paiements: ["orange_money", "mtn_momo", ...CARTE_ET_VIREMENT], loiDonnees: { reference: "Loi n° 2024/017 du 23 décembre 2024 relative à la protection des données à caractère personnel", autorite: "Autorité de protection des données à caractère personnel" } },
   { code: "GA", nom: "Gabon", indicatif: "+241", exempleNumero: "06 12 34 56", devise: "XAF", fuseau: "Africa/Libreville", zone: "CEMAC", region: "centre", paiements: ["airtel_money", "moov_money", ...CARTE_ET_VIREMENT], loiDonnees: { reference: "Loi n° 001/2011 relative à la protection des données à caractère personnel", autorite: "Commission Nationale pour la Protection des Données à Caractère Personnel (CNPDCP)" } },
@@ -56,7 +50,6 @@ export const PAYS: Pays[] = [
   { code: "CF", nom: "Centrafrique", indicatif: "+236", exempleNumero: "70 12 34 56", devise: "XAF", fuseau: "Africa/Bangui", zone: "CEMAC", region: "centre", paiements: ["orange_money", ...CARTE_ET_VIREMENT] },
   { code: "GQ", nom: "Guinée équatoriale", indicatif: "+240", exempleNumero: "222 123 456", devise: "XAF", fuseau: "Africa/Malabo", zone: "CEMAC", region: "centre", paiements: CARTE_ET_VIREMENT },
   { code: "CD", nom: "RD Congo", indicatif: "+243", exempleNumero: "81 234 5678", devise: "CDF", fuseau: "Africa/Kinshasa", zone: "CEEAC", region: "centre", paiements: ["orange_money", "airtel_money", ...CARTE_ET_VIREMENT] },
-  { code: "ST", nom: "Sao Tomé-et-Principe", indicatif: "+239", exempleNumero: "981 2345", devise: "STN", fuseau: "Africa/Sao_Tome", zone: "CEEAC", region: "centre", paiements: CARTE_ET_VIREMENT },
 ];
 
 export const PAYS_PAR_DEFAUT = "SN";
@@ -85,15 +78,8 @@ export const LIBELLES_DEVISE: Record<CodeDevise, string> = {
   XOF: "Franc CFA (BCEAO)",
   XAF: "Franc CFA (BEAC)",
   GNF: "Franc guinéen",
-  NGN: "Naira",
-  GHS: "Cedi",
   CDF: "Franc congolais",
   MRU: "Ouguiya",
-  GMD: "Dalasi",
-  LRD: "Dollar libérien",
-  SLE: "Leone",
-  CVE: "Escudo cap-verdien",
-  STN: "Dobra",
 };
 
 /** Montant formaté dans sa devise, sans décimales (ex. « 100 000 F CFA »). */

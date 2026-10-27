@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { publierEncadrant } from "@/lib/annuaire";
 import { apiDelete, apiList, apiPatch, apiPost } from "@/lib/api";
 import { ETABLISSEMENT_INCONNU } from "@/lib/etablissement";
 import { getInitials } from "@/lib/utils";
@@ -98,7 +99,8 @@ export default function ProfesseursPage() {
   const basculerActivation = async (professeur: PublicUser) => {
     const actif = professeur.actif !== false;
     try {
-      await apiPatch<PublicUser>("users", professeur.id, { actif: !actif });
+      const misAJour = await apiPatch<PublicUser>("users", professeur.id, { actif: !actif });
+      await publierEncadrant(misAJour).catch(() => {});
       refetch();
       toast.success(actif ? "Compte désactivé." : "Compte réactivé.");
     } catch {

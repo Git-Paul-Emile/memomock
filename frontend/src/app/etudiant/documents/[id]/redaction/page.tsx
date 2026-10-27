@@ -24,7 +24,8 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { apiGet, apiList, apiPatch } from "@/lib/api";
+import { apiGet, apiList, apiPatch, apiPost } from "@/lib/api";
+import { chapitresModifies, messageVerrouillage } from "@/lib/verrouillage";
 import {
   chargerContenu,
   enregistrerContenu,
@@ -38,6 +39,9 @@ import type { ChapitreCanevas, DocumentSubmission, ValidationChapitre } from "@/
 interface DonneesRedaction {
   document: DocumentSubmission;
   html: string;
+  // Texte enregistré au chargement : référence pour détecter une modification des chapitres
+  // verrouillés.
+  texteInitial: string;
   chapitresVerrouilles: string[];
 }
 
@@ -122,6 +126,7 @@ export default function RedactionPage() {
     return {
       document,
       html: contenu?.html ?? (contenu?.texte ? htmlDepuisTexte(contenu.texte) : htmlDepuisCanevas(chapitres)),
+      texteInitial: contenu?.texte ?? "",
       chapitresVerrouilles: verrouilles,
     };
   });
@@ -142,11 +147,32 @@ export default function RedactionPage() {
   );
 
   const sauvegarder = async (): Promise<boolean> => {
-    if (!editor) return false;
+    if (!editor || !data) return false;
     const html = editor.getHTML();
-    await enregistrerContenu(id, { texte: texteDepuisHtml(html), html, origine: "redaction" });
+    const texte = texteDepuisHtml(html);
+    // Blocage réel (spec v2, § 35) : un chapitre validé ne peut pas être modifié.
+    const modifies = chapitresModifies(data.texteInitial, texte, data.chapitresVerrouilles);
+    if (modifies.length > 0) {
+      toast.error(messageVerrouillage(modifies));
+      return false;
+    }
+    await enregistrerContenu(id, { texte, html, origine: "redaction" });
     await apiPatch("documents", id, { dateMaj: new Date().toISOString() });
     return true;
+  };
+
+  const demanderDeverrouillage = async () => {
+    if (!data) return;
+    await apiPost("notifications", {
+      userId: data.document.encadrantId,
+      titre: "Demande de déverrouillage",
+      message: `L'étudiant demande à modifier : ${data.chapitresVerrouilles.join(", ")} (« ${data.document.titre} »).`,
+      type: "validation",
+      lu: false,
+      date: new Date().toISOString(),
+      lienDocumentId: data.document.id,
+    });
+    toast.success("Demande envoyée à votre encadreur.");
   };
 
   const enregistrer = async () => {
@@ -218,8 +244,14 @@ export default function RedactionPage() {
       {data.chapitresVerrouilles.length > 0 && (
         <p className="mb-4 flex items-start gap-2 rounded-lg border border-warning/40 bg-warning/5 p-3 text-sm">
           <Lock className="mt-0.5 size-4 shrink-0" />
-          Chapitres validés et verrouillés par votre encadreur : {data.chapitresVerrouilles.join(", ")}.
-          Ne les modifiez pas sans son accord (il peut les déverrouiller).
+          <span className="flex-1">
+            Chapitres validés et verrouillés par votre encadreur :{" "}
+            {data.chapitresVerrouilles.join(", ")}. Toute modification de ces chapitres sera
+            refusée à l&apos;enregistrement.
+          </span>
+          <Button size="sm" variant="outline" onClick={demanderDeverrouillage}>
+            Demander le déverrouillage
+          </Button>
         </p>
       )}
 

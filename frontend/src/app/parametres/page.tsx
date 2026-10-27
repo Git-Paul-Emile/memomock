@@ -39,6 +39,8 @@ import { getInitials } from "@/lib/utils";
 import { ROLE_LABELS } from "@/lib/constants";
 import { PAYS_PAR_DEFAUT, paysDepuisTelephone } from "@/lib/afrique";
 import { SelectPays } from "@/components/shared/select-pays";
+import { publierEncadrant } from "@/lib/annuaire";
+import { CodeInvalideError, utiliserCode } from "@/lib/invitations";
 import type {
   CanalNotification,
   DocumentSubmission,
@@ -67,6 +69,9 @@ const schemaProfil = z.object({
     .or(z.literal("")),
   filiere: z.string().optional(),
   pays: z.string().min(2, "Choisissez votre pays"),
+  // Encadreur : critères de mise en relation (spec § 98), publiés dans l'annuaire.
+  domaines: z.string().optional(),
+  disponible: z.boolean().optional(),
 });
 
 type FormValues = z.infer<typeof schemaProfil>;
@@ -76,6 +81,8 @@ export default function ParametresPage() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [avatarEnCours, setAvatarEnCours] = React.useState(false);
   const [canalEnCours, setCanalEnCours] = React.useState(false);
+  const [codeSaisi, setCodeSaisi] = React.useState("");
+  const [codeEnCours, setCodeEnCours] = React.useState(false);
   const [exportEnCours, setExportEnCours] = React.useState(false);
   const [suppressionOuverte, setSuppressionOuverte] = React.useState(false);
   const [confirmationTexte, setConfirmationTexte] = React.useState("");
@@ -116,6 +123,8 @@ export default function ParametresPage() {
           telephone: user.telephone ?? "",
           filiere: user.filiere ?? "",
           pays: user.pays ?? paysDepuisTelephone(user.telephone)?.code ?? PAYS_PAR_DEFAUT,
+          domaines: (user.domainesExpertise ?? []).join(", "),
+          disponible: user.disponible ?? true,
         }
       : undefined,
   });
@@ -126,14 +135,39 @@ export default function ParametresPage() {
     setIsSubmitting(true);
     try {
       // L'e-mail n'est pas modifiable ici : on l'écarte du PATCH.
-      const { email: _email, ...misAJourData } = values;
-      const misAJour = await apiPatch<PublicUser>("users", user.id, misAJourData);
+      const { email: _email, domaines, ...misAJourData } = values;
+      const misAJour = await apiPatch<PublicUser>("users", user.id, {
+        ...misAJourData,
+        ...(user.role === "encadrant"
+          ? {
+              domainesExpertise: (domaines ?? "")
+                .split(",")
+                .map((d) => d.trim())
+                .filter(Boolean),
+            }
+          : {}),
+      });
+      await publierEncadrant(misAJour).catch(() => {});
       definirUtilisateur(misAJour);
       toast.success("Profil mis à jour.");
     } catch {
       toast.error("Impossible de mettre à jour le profil.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const appliquerCode = async () => {
+    setCodeEnCours(true);
+    try {
+      const { utilisateur, message } = await utiliserCode(user, codeSaisi);
+      definirUtilisateur(utilisateur);
+      setCodeSaisi("");
+      toast.success(message);
+    } catch (err) {
+      toast.error(err instanceof CodeInvalideError ? err.message : "Le code n'a pas pu être utilisé.");
+    } finally {
+      setCodeEnCours(false);
     }
   };
 
@@ -361,6 +395,25 @@ export default function ParametresPage() {
                 <p className="text-xs text-destructive">{errors.telephone.message}</p>
               )}
             </div>
+            {user.role === "encadrant" && (
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor="domaines">Domaines d&apos;expertise</Label>
+                  <Input
+                    id="domaines"
+                    placeholder="Ex : Intelligence artificielle, Génie logiciel"
+                    {...register("domaines")}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Séparés par des virgules. Visibles par les étudiants qui cherchent un encadreur.
+                  </p>
+                </div>
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" {...register("disponible")} />
+                  J&apos;accepte de nouvelles demandes d&apos;encadrement
+                </label>
+              </>
+            )}
             {user.role === "etudiant" && (
               <div className="space-y-1.5">
                 <Label htmlFor="filiere">Filière</Label>
@@ -534,6 +587,30 @@ export default function ParametresPage() {
           </Button>
         </CardContent>
       </Card>
+
+      {user.role !== "admin" && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Rejoindre avec un code</CardTitle>
+            <CardDescription>
+              Code reçu d&apos;un encadreur, d&apos;une classe ou d&apos;un établissement.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex gap-2">
+            <Input
+              value={codeSaisi}
+              onChange={(e) => setCodeSaisi(e.target.value)}
+              placeholder="Ex : ENC-4F7K2Q"
+              className="uppercase"
+              aria-label="Code d'invitation"
+            />
+            <Button onClick={appliquerCode} disabled={codeSaisi.trim().length < 4 || codeEnCours}>
+              {codeEnCours && <Loader2 className="size-4 animate-spin" />}
+              Valider
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

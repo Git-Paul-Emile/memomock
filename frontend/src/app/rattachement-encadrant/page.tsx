@@ -14,10 +14,11 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { apiList, apiPatch, apiPost, apiPublic } from "@/lib/api";
+import { apiPost, apiPublic } from "@/lib/api";
+import { CodeInvalideError, utiliserCode } from "@/lib/invitations";
 import { cn, getInitials } from "@/lib/utils";
 import { APP_NAME } from "@/lib/constants";
-import type { Classe, DemandeEncadrement, EncadrantPublic, Invitation, PublicUser } from "@/types";
+import type { DemandeEncadrement, EncadrantPublic } from "@/types";
 
 /**
  * Écran « Rattachement à un encadreur » côté étudiant.
@@ -51,35 +52,12 @@ export default function RattachementEncadrantPage() {
     `${e.prenom} ${e.nom} ${e.filiere ?? ""}`.toLowerCase().includes(recherche.toLowerCase())
   );
 
-  const rejoindreParCode = async () => {
-    const res = await apiList<Invitation>("invitations", {
-      filtres: { code: code.trim().toUpperCase() },
-      limite: 1,
-    });
-    const invitation = res.data[0];
-    if (!invitation || invitation.statut === "expiree") throw new Error("Code invalide");
-    const misAJour = await apiPatch<PublicUser>("users", user!.id, {
-      encadrantId: invitation.encadrantId,
-    });
-    await apiPatch<Invitation>("invitations", invitation.id, { statut: "acceptee" });
-    definirUtilisateur(misAJour);
-  };
-
-  // CRUD standard : on résout la classe par son code, puis on met à jour le profil de
-  // l'utilisateur connecté.
-  const rejoindreParCodeClasse = async () => {
-    const res = await apiList<Classe>("classes", {
-      filtres: { code: codeClasse.trim().toUpperCase() },
-      limite: 1,
-    });
-    const classe = res.data[0];
-    if (!classe) throw new Error("Classe introuvable");
-    const misAJour = await apiPatch<PublicUser>("users", user!.id, {
-      classeId: classe.id,
-      etablissementId: classe.etablissementId,
-      encadrantId: classe.encadrantIds[0] ?? user!.encadrantId,
-    });
-    definirUtilisateur(misAJour);
+  // Codes d'encadreur, de classe ou d'établissement : même logique que l'inscription
+  // (lib/invitations.ts), qui reconnaît l'origine du code.
+  const rejoindreParCode = async (valeur: string) => {
+    const { utilisateur, message } = await utiliserCode(user!, valeur);
+    definirUtilisateur(utilisateur);
+    toast.success(message);
   };
 
   // Contrairement aux modes "code" (l'encadreur/l'établissement a initié le contact), une
@@ -106,17 +84,15 @@ export default function RattachementEncadrantPage() {
   const valider = async () => {
     setEnCours(true);
     try {
-      if (mode === "code") await rejoindreParCode();
-      else if (mode === "classe") await rejoindreParCodeClasse();
+      if (mode === "code") await rejoindreParCode(code);
+      else if (mode === "classe") await rejoindreParCode(codeClasse);
       else await demanderEncadrement();
       setConfirme(true);
-    } catch {
+    } catch (err) {
       toast.error(
-        mode === "code"
-          ? "Ce code d'invitation est invalide. Vérifiez-le auprès de votre encadreur."
-          : mode === "classe"
-            ? "Ce code de classe est invalide. Vérifiez-le auprès de votre établissement."
-            : "Le rattachement a échoué. Réessayez dans quelques instants."
+        err instanceof CodeInvalideError
+          ? err.message
+          : "Le rattachement a échoué. Réessayez dans quelques instants."
       );
     } finally {
       setEnCours(false);

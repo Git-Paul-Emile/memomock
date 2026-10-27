@@ -18,6 +18,7 @@ import {
 import { auth, type MockUser } from "@/lib/firebase";
 import { API_BASE_URL, ApiError } from "@/lib/api";
 import { oublierSessionId } from "@/lib/session-id";
+import { publierEncadrant } from "@/lib/annuaire";
 import type { PublicUser, RoleInscription } from "@/types";
 
 export interface InscriptionPayload {
@@ -95,6 +96,8 @@ async function synchroniserProfil(firebaseUser: MockUser): Promise<PublicUser> {
     filiere: user.filiere,
     telephone: user.telephone,
     pays: user.pays ?? null,
+    domainesExpertise: user.domainesExpertise,
+    disponible: user.disponible,
     canalNotificationPrefere: user.canalNotificationPrefere,
     actif: user.actif,
     etablissementId: user.etablissementId ?? null,
@@ -157,6 +160,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
     await updateProfile(identifiants.user, { displayName: `${payload.prenom} ${payload.nom}` });
     const profil = await synchroniserProfil(identifiants.user);
+    // Un nouvel encadreur doit apparaître dans l'annuaire public (inscription, mise en relation).
+    await publierEncadrant(profil).catch(() => {});
     setUser(profil);
     return profil;
   }, []);
