@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Copy, FileUp, Library, Loader2, Plus, Trash2, UploadCloud } from "lucide-react";
+import { Copy, FileUp, Library, Loader2, Trash2, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/context/auth-context";
@@ -40,35 +40,11 @@ export default function CanevasListePage() {
     refetch,
   } = useApiList<Canevas>("canevas", { filtres: { encadrantId: user?.id }, limite: 100 });
 
-  const [ouvert, setOuvert] = React.useState(false);
-  const [nom, setNom] = React.useState("");
-  const [enCours, setEnCours] = React.useState(false);
   const [aSupprimer, setASupprimer] = React.useState<Canevas | null>(null);
   const [duplicationEnCours, setDuplicationEnCours] = React.useState<string | null>(null);
 
-  const creer = async () => {
-    if (!nom.trim() || !user) return;
-    setEnCours(true);
-    try {
-      const maintenant = new Date().toISOString();
-      await apiPost<Canevas>("canevas", {
-        encadrantId: user.id,
-        nom: nom.trim(),
-        description: null,
-        createdAt: maintenant,
-        updatedAt: maintenant,
-      });
-      setNom("");
-      setOuvert(false);
-      refetch();
-      toast.success("Canevas créé.");
-    } catch {
-      toast.error("La création a échoué.");
-    } finally {
-      setEnCours(false);
-    }
-  };
-
+  // Pas de création « à vide » : un canevas naît toujours de l'import d'un document (guide,
+  // modèle de mémoire), ou de la duplication d'un canevas existant.
   // Clone profond (spec section 16) : nouveau canevas + copie de tous ses chapitres/critères
   // avec de nouveaux ids, pour permettre de réutiliser un modèle d'une année sur l'autre.
   const dupliquer = async (source: Canevas) => {
@@ -147,36 +123,6 @@ export default function CanevasListePage() {
         actions={
           <>
             <ImporterCanevasDialog encadrantId={user?.id} onImporte={refetch} />
-            <Dialog open={ouvert} onOpenChange={setOuvert}>
-              <DialogTrigger asChild>
-                <Button size="sm">
-                  <Plus className="size-4" />
-                  Nouveau canevas
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Nouveau canevas</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-1.5">
-                  <Label htmlFor="canevas-nom">Nom</Label>
-                  <Input
-                    id="canevas-nom"
-                    value={nom}
-                    onChange={(e) => setNom(e.target.value)}
-                    placeholder="Ex : Canevas Master Informatique 2026"
-                  />
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setOuvert(false)}>
-                    Annuler
-                  </Button>
-                  <Button onClick={creer} disabled={!nom.trim() || enCours}>
-                    Créer
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
           </>
         }
       />
@@ -185,7 +131,7 @@ export default function CanevasListePage() {
         <EmptyState
           icon={Library}
           title="Aucun canevas"
-          description="Créez votre premier canevas puis associez-le à un profil pédagogique."
+          description="Importez un guide ou un modèle de mémoire (.docx ou .pdf) : ses chapitres sont repris pour créer le canevas, que vous associez ensuite à un profil pédagogique."
         />
       ) : (
         <div className="space-y-2">
